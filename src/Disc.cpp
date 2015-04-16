@@ -354,10 +354,9 @@ int Disc::isMoving(int index) const{
 }
 
 //----------------------------------
-int Disc::setMoving(int index, int moving){
+void Disc::setMoving(int index, int moving){
     
     perlin[index] = moving;
-//    return perlin[index];
     
 }
 

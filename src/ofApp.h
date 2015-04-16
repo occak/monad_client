@@ -41,14 +41,18 @@ class ofApp : public ofBaseApp{
     void guiEvent(ofxUIEventArgs &e);
     
     //game
-    float costRadius, costTexture, costDensity, costRotation, costMute;
+    float   costRadius,
+            costTexture,
+            costDensity,
+            costRotation,
+            costMute,
+            costMove;
     bool radiusChanged, textureChanged, densityChanged, rotationChanged, positionChanged = false;
 		
     
     ofEasyCam cam;
     
-    //TCP & udp
-    ofxUDPManager receiver;
+    //TCP
     ofxTCPClient client;
     vector<string> received;
     string title;

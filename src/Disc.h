@@ -69,7 +69,7 @@ class Disc{
     int toggleMute(int index);
     
     int isMoving(int index) const;
-    int setMoving(int index, int moving);
+    void setMoving(int index, int moving);
     
     float origin = 10;
     int selected = -1;
