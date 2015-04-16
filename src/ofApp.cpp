@@ -9,6 +9,7 @@
  
  move-stop-reset TCP Ã
  move-stop-reset costs Ã
+ position update TCP Ã
  
  mute button
  
@@ -322,16 +323,21 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         else if(e.getName() == "move" && i == me->getDiscIndex()){
             ofxUIToggle *toggle = e.getToggle();
             if(me->getLife()>0){
-                cout<< me->getLife() << endl;
                 if (toggle->getValue() == true) {
                     me->setLife(me->getLife()-costMove);
                     disc.setMoving(me->getDiscIndex(), 1);
                 }
-                else disc.setMoving(me->getDiscIndex(), 0);
-                cout<< me->getLife() << endl;
+                else {
+                    disc.setMoving(me->getDiscIndex(), 0);
+                }
                 
                 string movement = "move//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMoving(me->getDiscIndex()));
                 client.send(movement);
+                
+                if (toggle->getValue() == false){
+                    string position = "zPosition//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getPosition(me->getDiscIndex()));
+                    client.send(position);
+                }
                 
                 //update server
                 string lifeUpdate = "life//";
@@ -382,6 +388,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             if(toggle->getValue() == false){
                 if(me->getLife()>0){
                     int costFactor = 0;
+                    string zPositionAll = "zPositionAll//";
                     for(int i = 0; i<disc.getDiscIndex(); i++){
                         ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
                         ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (canvas->getWidget("move all"));
@@ -390,12 +397,14 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                         if(toggleMove->getValue()==true){
                             toggleMove->setValue(false);
                             disc.setMoving(i, 0);
+                            zPositionAll += ofToString(i)+": "+ofToString(disc.getPosition(i))+"//";
                             costFactor++;
                         }
                     }
                     me->setLife(me->getLife()-(costMove*costFactor));
                     string stopAll = "stopAll//";
                     client.send(stopAll);
+                    client.send(zPositionAll);
                     
                     //update server
                     string lifeUpdate = "life//";
@@ -454,7 +463,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             }
         }
     }
-    if(e.getKind() == OFX_UI_WIDGET_LABELTOGGLE){
+    if(e.getKind() == OFX_UI_WIDGET_LABELTOGGLE && e.getName() != "mute"){
         
         ofxUILabelToggle *updateButton = static_cast <ofxUILabelToggle*> (e.getToggle());
         if(updateButton->getValue() == true){
@@ -640,10 +649,10 @@ void ofApp::update(){
                         if(nameValue[0] == "posOffset"+ofToString(i)) {
                             disc.setPosOffset (i, ofToFloat(nameValue[1]));
                             //sound
-                            float amountFreq = ofMap(abs(disc.getNetRotationSpeed(i)), 0, 10, 0, 5000);
-                            float amountMod = ofMap(abs(disc.getPosition(i)), 0, 50, 0, 5000);
-                            soundChange("amountFreq", i, amountFreq);
-                            soundChange("amountMod", i, amountMod);
+//                            float amountFreq = ofMap(abs(disc.getNetRotationSpeed(i)), 0, 10, 0, 5000);
+//                            float amountMod = ofMap(abs(disc.getPosition(i)), 0, 50, 0, 5000);
+//                            soundChange("amountFreq", i, amountFreq);
+//                            soundChange("amountMod", i, amountMod);
                         }
                         if(nameValue[0] == "mute"+ofToString(i)) {
                             disc.setMute(i, ofToInt(nameValue[1]));
@@ -881,6 +890,20 @@ void ofApp::update(){
                     toggleMove->setValue(false);
                 }
             }
+
+            else if (title == "zPosition"){
+                vector<string> nameValue;
+                nameValue = ofSplitString(received[1], ": ");
+                disc.setPosition(ofToInt(nameValue[0]), ofToFloat(nameValue[1]));
+            }
+            
+            else if (title == "zPositionAll"){
+                for (int i = 1; i < received.size()-1; i++) {
+                    vector<string> nameValue;
+                    nameValue = ofSplitString(received[i], ": ");
+                    disc.setPosition(ofToInt(nameValue[0]), ofToFloat(nameValue[1]));
+                }
+            }
             
             else if (title == "chat"){
                 
@@ -899,11 +922,7 @@ void ofApp::update(){
                     else continue;
                 }
             }
-            //            else if (title == "zPosition"){
-            //                vector<string> nameValue;
-            //                nameValue = ofSplitString(received[1], ": ");
-            //                disc.setPosition(ofToInt(nameValue[0]), ofToFloat(nameValue[1]));
-            //            }
+        
         }
     }
     
