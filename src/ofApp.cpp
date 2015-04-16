@@ -7,7 +7,7 @@
  
  event button create
  
- move-stop-reset TCP
+ move-stop-reset TCP Ã
  move-stop-reset costs
  
  mute button
@@ -42,7 +42,7 @@ void ofApp::setup(){
         _ui->addLabel("Groove " + ofToString(i+1),0);
         _ui->addButton("outer", false);
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-        _ui->addLabelToggle("mute", false);
+        _ui->addLabelToggle("mute", disc.isMute(i));
         _ui->addLabel("rotation",2);
         _ui->addBiLabelSlider("rotation" + ofToString(i+1), "CCW", "CW", 10, -10, disc.getNetRotationSpeed(i));
         _ui->addLabel("size",2);
@@ -71,6 +71,7 @@ void ofApp::setup(){
         _ui->addButton("reset", disc.resetPerlin[i]);
         
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+        _ui->addSpacer();
         _ui->addToggle("move all", disc.isMoving(i));
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
         _ui->addButton("reset all", disc.resetPerlin[i]);
@@ -322,7 +323,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             if (toggle->getValue() == true) disc.setMoving(me->getDiscIndex(), 1);
             else disc.setMoving(me->getDiscIndex(), 0);
             
-            string movement = "movement//"+ofToString(me->getDiscIndex());
+            string movement = "move//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMoving(me->getDiscIndex()));
             client.send(movement);
         }
         else if(e.getName() == "reset"){
@@ -332,7 +333,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             ofxUIToggle *toggle = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
             toggle->setValue(false);
             
-            string movementReset = "movementReset//"+ofToString(me->getDiscIndex());
+            string movementReset = "moveReset//"+ofToString(me->getDiscIndex());
             client.send(movementReset);
         }
         else if(e.getName() == "move all"){
@@ -372,10 +373,29 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
                     toggleMoveAll->setValue(false);
                     toggleMove->setValue(false);
-                    disc.setMoving(i, 0);
                 }
                 string resetAll = "resetAll//";
                 client.send(resetAll);
+            }
+        }
+        else if(e.getName() == "mute"){
+            ofxUIToggle *toggle = e.getToggle();
+            if(me->getLife() > 0){
+                disc.setLife(costMute);
+                if(toggle->getValue()==true) {
+                    disc.setMute(me->getDiscIndex(), 1); //mute on
+                    soundChange("envelope", me->getDiscIndex(), 0);
+                }
+                else if(toggle->getValue()==false){
+                    disc.setMute(me->getDiscIndex(), 0); //mute off
+                    disc.setEnvelope(me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
+                    soundChange("envelope", me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
+                    toggle->setValue(false);
+                }
+                string change = "mute//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMute(me->getDiscIndex()));
+                client.send(change);
+                
+                cout<< change <<endl;
             }
         }
     }
@@ -570,9 +590,9 @@ void ofApp::update(){
                             soundChange("amountFreq", i, amountFreq);
                             soundChange("amountMod", i, amountMod);
                         }
-                        if(nameValue[0] == "mute"+ofToString(i) && ofToInt(nameValue[1]) == 1 ) {
-                            disc.toggleMute(i);
-                            if(disc.isMute(i) == 0) soundChange("envelope", i, disc.getTexture(i));
+                        if(nameValue[0] == "mute"+ofToString(i)) {
+                            disc.setMute(i, ofToInt(nameValue[1]));
+                            if(ofToInt(nameValue[1]) == 0) soundChange("envelope", i, disc.getTexture(i));
                             else soundChange("envelope", i, 0);
                         }
                         if(nameValue[0] == "perlin"+ofToString(i) && ofToInt(nameValue[1]) == 1 ) {
@@ -754,19 +774,22 @@ void ofApp::update(){
             }
             
             else if (title == "mute"){
-                int thisDisc = ofToInt(received[1]);
-                disc.toggleMute(thisDisc);
-                if(disc.isMute(thisDisc) == 0) soundChange("envelope", thisDisc, disc.getTexture(thisDisc));
+                vector<string> nameValue;
+                nameValue = ofSplitString(received[1], ": ");
+                int thisDisc = ofToInt(nameValue[0]);
+                disc.setMute(thisDisc, ofToInt(nameValue[1]));
+                if(ofToInt(nameValue[1]) == 0) soundChange("envelope", thisDisc, disc.getTexture(thisDisc));
                 else soundChange("envelope", thisDisc, 0);
             }
             
-            else if (title == "movement"){
-                int thisDisc = ofToInt(received[1]);
-                if (disc.isMoving(thisDisc) == 0) disc.setMoving(thisDisc, 1);
-                else disc.setMoving(thisDisc, 0);
+            else if (title == "move"){
+                vector<string> nameValue;
+                nameValue = ofSplitString(received[1], ": ");
+                int thisDisc = ofToInt(nameValue[0]);
+                disc.setMoving(thisDisc, ofToInt(nameValue[1]));
             }
             
-            else if (title == "movementReset"){
+            else if (title == "moveReset"){
                 int thisDisc = ofToInt(received[1]);
                 disc.resetPerlin[thisDisc] = 1;
             }
@@ -801,7 +824,6 @@ void ofApp::update(){
                     ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
                     toggleMoveAll->setValue(false);
                     toggleMove->setValue(false);
-                    disc.setMoving(i, 0);
                 }
             }
             
@@ -877,6 +899,7 @@ void ofApp::keyPressed(int key){
         else disc.setMoving(me->getDiscIndex(), 0);
     }
     if(key == 'o') disc.resetPerlin[me->getDiscIndex()] = 1;
+    
     if(key == 'c') chat->toggleVisible();
     
     if(key == 'a' && me->getDiscIndex() != -1) {
@@ -1016,15 +1039,15 @@ void ofApp::keyPressed(int key){
         if(me->getLife() > 0){
             disc.setLife(costMute);
             if(disc.isMute(me->getDiscIndex()) == 0) {
-                disc.toggleMute(me->getDiscIndex()); //mute on
+                disc.setMute(me->getDiscIndex(),1); //mute on
                 soundChange("envelope", me->getDiscIndex(), 0);
             }
             else{
-                disc.toggleMute(me->getDiscIndex()); //mute off
+                disc.setMute(me->getDiscIndex(),0); //mute off
                 disc.setEnvelope(me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
                 soundChange("envelope", me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
             }
-            string change = "mute//"+ofToString(me->getDiscIndex());
+            string change = "mute//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMute(me->getDiscIndex()));
             client.send(change);
         }
     }
@@ -1081,7 +1104,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 //        updateButtons->addEmbeddedWidget(new ofxUILabelToggle("Groove"+ofToString(me->getDiscIndex()+1)+" radius changed to "+ofToString((int)disc.getThickness(me->getDiscIndex())), false));
 //        updateButtons->getEmbeddedWidget(0)->setColorBack(me->getColor());
         
-        cout<< updateButtons->getEmbeddedWidgetsSize() <<endl;
+        cout<< lifeUpdate <<endl;
         
     }
     else if(densityChanged){

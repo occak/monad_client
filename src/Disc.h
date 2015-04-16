@@ -66,11 +66,11 @@ class Disc{
     float setEnvelope(int index, int type);
     
     int isMute(int index) const;
-    int toggleMute(int index);
+    void setMute(int index, int onOff);
     
     int isMoving(int index) const;
     void setMoving(int index, int moving);
-    
+//    
     float origin = 10;
     int selected = -1;
     vector<int> resetPerlin;
