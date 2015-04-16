@@ -11,7 +11,8 @@
  move-stop-reset costs Ã
  position update TCP Ã
  
- mute button
+ mute button Ã
+ update mute button in initialize and change Ã
  
  */
 
@@ -445,7 +446,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         else if(e.getName() == "mute" && i == me->getDiscIndex()){
             ofxUIToggle *toggle = e.getToggle();
             if(me->getLife() > 0){
-                disc.setLife(costMute);
+                me->setLife(me->getLife()-costMute);
                 if(toggle->getValue()==true) {
                     disc.setMute(me->getDiscIndex(), 1); //mute on
                     soundChange("envelope", me->getDiscIndex(), 0);
@@ -658,6 +659,10 @@ void ofApp::update(){
                             disc.setMute(i, ofToInt(nameValue[1]));
                             if(ofToInt(nameValue[1]) == 0) soundChange("envelope", i, disc.getTexture(i));
                             else soundChange("envelope", i, 0);
+                            //update ui
+                            ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
+                            ofxUILabelToggle *toggle = static_cast<ofxUILabelToggle*>(canvas->getWidget("mute"));
+                            toggle->setValue((bool)disc.isMute(i));
                         }
                         if(nameValue[0] == "perlin"+ofToString(i) && ofToInt(nameValue[1]) == 1 ) {
                             if (disc.isMoving(i) == 0) disc.setMoving(i, 1);
@@ -840,10 +845,14 @@ void ofApp::update(){
             else if (title == "mute"){
                 vector<string> nameValue;
                 nameValue = ofSplitString(received[1], ": ");
-                int thisDisc = ofToInt(nameValue[0]);
-                disc.setMute(thisDisc, ofToInt(nameValue[1]));
-                if(ofToInt(nameValue[1]) == 0) soundChange("envelope", thisDisc, disc.getTexture(thisDisc));
-                else soundChange("envelope", thisDisc, 0);
+                int index = ofToInt(nameValue[0]);
+                disc.setMute(index, ofToInt(nameValue[1]));
+                if(ofToInt(nameValue[1]) == 0) soundChange("envelope", index, disc.getTexture(index));
+                else soundChange("envelope", index, 0);
+                //update ui
+                ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
+                ofxUILabelToggle *toggle = static_cast<ofxUILabelToggle*>(canvas->getWidget("mute"));
+                toggle->setValue((bool)disc.isMute(index));
             }
             
             else if (title == "move"){
