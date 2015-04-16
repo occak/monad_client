@@ -3,14 +3,12 @@
 /*
  
  perlin cpp - changed to sin
+ groove move factor (rotationSpeed*thickness/density)
  
  event button create
  
  move-stop-reset TCP
- 
  move-stop-reset costs
- 
- groove move factor (rotationSpeed*thickness/density)
  
  mute button
  
