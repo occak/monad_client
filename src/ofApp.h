@@ -72,7 +72,7 @@ private:
     
     vector<ofxUICanvas *> ui;
     //update buttons not working
-    vector<ofxUILabelToggle *> updateButtonsArray;
+    vector<ofxUIToggle *> updateButtonsArray;
     ofxUICanvas *updateButtons;
     
     ofxUICanvas *chat;

@@ -75,14 +75,13 @@ void Sound::setup(Disc* disc){
         
         Generator filter = BPF12().input(groove).cutoff(filterFreq).Q(q);
         
-        Generator limiter = Limiter().input(filter);
-        
-        master = master + limiter;
+        master = master + filter;
     }
     ControlGenerator size = synth.addParameter("size", 0);
     ControlGenerator decay = synth.addParameter("decay", 0);
-    Generator reverb = Reverb().input(master).stereoWidth(1).wetLevel(.5).dryLevel(.75).roomSize(size).roomShape(size).density(size).decayTime(decay);
-
+    Generator limiter = Limiter().input(master).threshold(0.8);
+    Generator reverb = Reverb().input(limiter).stereoWidth(1).wetLevel(.5).dryLevel(.5).roomSize(size).roomShape(size).decayTime(decay);
+    
     synth.setOutputGen(reverb);
 }
 

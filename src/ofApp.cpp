@@ -91,11 +91,11 @@ void ofApp::setup(){
         
     }
     
-    updateButtons = new ofxUICanvas();
-    updateButtons->setPosition(0, ofGetHeight()/2);
-    updateButtons->setDrawBack(false);
-    updateButtons->setFontSize(OFX_UI_FONT_SMALL, 5.8);
-    ofAddListener(updateButtons->newGUIEvent, this, &ofApp::guiEvent);
+//    updateButtons = new ofxUICanvas();
+//    updateButtons->setPosition(0, ofGetHeight()/2);
+//    updateButtons->setDrawBack(false);
+//    updateButtons->setFontSize(OFX_UI_FONT_SMALL, 5.8);
+//    ofAddListener(updateButtons->newGUIEvent, this, &ofApp::guiEvent);
     
     chat = new ofxUICanvas();
     chat->setDrawBack(false);
@@ -579,14 +579,17 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 void ofApp::update(){
     
         disc.update();
-    
+    float size = 0;
     for(int i = 0; i< disc.getDiscIndex(); i++){
         float amountFreq = ofMap(abs(disc.getNetRotationSpeed(i)), 0, 10, 0, 5000);
         float amountMod = ofMap(abs(disc.getPosition(i)), 0, 50, 0, 5000);
         soundChange("amountFreq", i, amountFreq);
         soundChange("amountMod", i, amountMod);
+        size += abs(disc.getPosition(i));
     }
-    
+    float avgSize = ofMap(size/disc.getDiscIndex(), 0, 200, 0, 1);
+    sound.synth.setParameter("size", avgSize);
+    sound.synth.setParameter("decay", .001*size);
     if(client.isConnected()){
         string str = client.receive();
         if(str.length() > 0){
@@ -986,6 +989,10 @@ void ofApp::draw(){
         ofRect(groove.lifeBar[i+1]);
     }
     
+    for(int i = 0; i < updateButtonsArray.size(); i++){
+        updateButtonsArray[i]->draw();
+    }
+    
     ofPopMatrix();
     
     glDisable(GL_DEPTH_TEST);
@@ -1205,11 +1212,16 @@ void ofApp::mouseReleased(int x, int y, int button){
         client.send(lifeUpdate);
         
         //update buttons
-        ofxUILabelToggle* widget = new ofxUILabelToggle("Groove"+ofToString(me->getDiscIndex()+1)+" radius changed to "+ofToString(disc.getThickness(me->getDiscIndex())), false, 200, 50, 0, ofGetHeight()/2);
-        widget->setColorBack(me->getColor());
-        updateButtons->setWidgetPosition(OFX_UI_WIDGET_POSITION_UP);
+        ofxUILabelToggle* toggle = new ofxUILabelToggle("Groove"+ofToString(me->getDiscIndex()+1)+" radius changed to "+ofToString(disc.getThickness(me->getDiscIndex())), false, 200, 50, -ofGetWidth()/2, updateButtonsArray.size()*50);
+        toggle->setColorBack(me->getColor());
+        updateButtonsArray.push_back(toggle);
+        ofxUICanvas* canvas = (ofxUICanvas*) toggle;
+//        ofAddListener(toggle, this, &ofApp::gufiEvent);
+        cout<< updateButtonsArray.size() <<endl;
         
-        updateButtonsArray.push_back(widget);
+//        ofxUIWidget* widget = (ofxUIWidget*) toggle;
+//        widget->setPosition(OFX_UI_WIDGET_POSITION_UP);
+        
         
 //        updateButtons->addLabelToggle("Groove "+ofToString(me->getDiscIndex()+1)+" radius\n\nchanged to "+ofToString((int)disc.getThickness(me->getDiscIndex())), false, 200, 50)->setColorBack(me->getColor());
         
