@@ -47,6 +47,7 @@ class ofApp : public ofBaseApp{
             costRotation,
             costMute,
             costMove;
+    
     bool radiusChanged, textureChanged, densityChanged, rotationChanged, positionChanged = false;
 		
     
@@ -72,7 +73,7 @@ private:
     
     vector<ofxUICanvas *> ui;
     //update buttons not working
-    vector<ofxUIToggle *> updateButtonsArray;
+    vector<ofxUILabelToggle *> updateButtonsArray;
     ofxUICanvas *updateButtons;
     
     ofxUICanvas *chat;

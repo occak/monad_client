@@ -47,6 +47,7 @@ void ofApp::setup(){
         _ui->addButton("outer", false);
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
         _ui->addLabelToggle("mute", disc.isMute(i));
+        _ui->addSpacer();
         _ui->addLabel("rotation",2);
         _ui->addBiLabelSlider("rotation" + ofToString(i+1), "CCW", "CW", 10, -10, disc.getNetRotationSpeed(i));
         _ui->addLabel("size",2);
@@ -1212,11 +1213,11 @@ void ofApp::mouseReleased(int x, int y, int button){
         client.send(lifeUpdate);
         
         //update buttons
-        ofxUILabelToggle* toggle = new ofxUILabelToggle("Groove"+ofToString(me->getDiscIndex()+1)+" radius changed to "+ofToString(disc.getThickness(me->getDiscIndex())), false, 200, 50, -ofGetWidth()/2, updateButtonsArray.size()*50);
+        ofxUILabelToggle* toggle = new ofxUILabelToggle("Groove"+ofToString(me->getDiscIndex()+1)+" radius changed to "+ofToString(disc.getThickness(me->getDiscIndex())), false, 200, 50, -ofGetWidth()/2, updateButtonsArray.size()*55);
         toggle->setColorBack(me->getColor());
         updateButtonsArray.push_back(toggle);
         ofxUICanvas* canvas = (ofxUICanvas*) toggle;
-//        ofAddListener(toggle, this, &ofApp::gufiEvent);
+//        ofAddListener(canvas->newGUIEvent, this, &ofApp::guiEvent);
         cout<< updateButtonsArray.size() <<endl;
         
 //        ofxUIWidget* widget = (ofxUIWidget*) toggle;

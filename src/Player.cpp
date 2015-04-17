@@ -54,7 +54,7 @@ void Player::setColorByIndex(int index){
     // 161,24,87 - purple
     // 255,153,0 - orange
     // 50,153,187 - blue
-    // 121,189,154 - greenish
+    // 103,209,88 - green
     switch (index) {
         case 1:
             color.set(50,153,187);
@@ -66,7 +66,7 @@ void Player::setColorByIndex(int index){
             color.set(161,24,87);
             break;
         case 4:
-            color.set(121,189,154);
+            color.set(103,209,88);
             break;
             
         default:
