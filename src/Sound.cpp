@@ -18,16 +18,16 @@ void Sound::setup(Disc* disc){
     
     //
     //    vector<float> scale;
-    //    scale.push_back(ofRandom(25));
-    //    scale.push_back(ofRandom(25));
-    //    scale.push_back(ofRandom(25));
-    //    scale.push_back(ofRandom(25));
-    //    scale.push_back(ofRandom(25));
-    //    scale.push_back(ofRandom(25));
-    //    scale.push_back(ofRandom(25));
-    //    scale.push_back(ofRandom(25));
-    //    scale.push_back(ofRandom(25));
-    //    scale.push_back(ofRandom(25));
+//        scale.push_back(0);
+//        scale.push_back(0);
+//        scale.push_back(0);
+//        scale.push_back(0);
+//        scale.push_back(0);
+//        scale.push_back(0);
+//        scale.push_back(0);
+//        scale.push_back(0);
+//        scale.push_back(0);
+//        scale.push_back(0);
     
     for(int i = 0; i < disc->getDiscIndex(); i++){
         
@@ -85,10 +85,9 @@ void Sound::setup(Disc* disc){
     synth.setOutputGen(reverb);
 }
 
-void Sound::update(){
+void Sound::setScale(int index, float value){
     
-    for(int i = 0; i < disc->getDiscIndex(); i++){
-        
-    }
+    if(scale.size()>0) scale[index] = value;
+    else scale.push_back(value);
     
 }

@@ -701,9 +701,9 @@ void ofApp::update(){
                 vector<string> scaleValue;
                 scaleValue = ofSplitString(received[1], ": ");
                 for(int i = 0; i < scaleValue.size(); i++){
-                    sound.scale.push_back(ofToFloat(scaleValue[i]));
+                    sound.setScale(i, ofToFloat(scaleValue[i]));
                 }
-                
+                cout<< str <<endl;
                 //set up synths
                 sound.setup(&disc);
             }

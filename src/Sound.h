@@ -24,13 +24,16 @@ public:
     
     void setup(Disc* disc);
     void update();
-    vector<float> scale;
     
     Disc* disc;
     
     ofxTonicSynth synth;
     Generator master;
     
+    void setScale(int index, float value);
+    
+private:
+    vector<float> scale;
 };
 
 #endif /* defined(__groove_snd__Sound__) */
