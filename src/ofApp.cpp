@@ -281,7 +281,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         string input;
         if(text->getTextString() != ""){
             input = me->getIP() + "::" + text->getTextString()+"\n\n";
-            client.send("chat//" + input);
+            
         }
         conversation = input + conversation;
         ofxUITextArea *history = (ofxUITextArea *) chat->getWidget("chat");
