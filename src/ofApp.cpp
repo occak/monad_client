@@ -192,282 +192,6 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 
             }
         }
-        else if(e.getName() == "blank" && i == me->getDiscIndex()){
-            ofxUIToggle *toggle = e.getToggle();
-            int texture = disc.getTexture(me->getDiscIndex());
-            if(me->getLife()> 0 && texture != 0) {
-                
-                textureChanged = true;
-                disc.setTexture(me->getDiscIndex(), 0);
-                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
-                ofxUIToggle *toggle1 = static_cast <ofxUIToggle*> (canvas->getWidget("line"));
-                ofxUIToggle *toggle2 = static_cast <ofxUIToggle*> (canvas->getWidget("tri"));
-                ofxUIToggle *toggle3 = static_cast <ofxUIToggle*> (canvas->getWidget("saw"));
-                ofxUIToggle *toggle4 = static_cast <ofxUIToggle*> (canvas->getWidget("rect"));
-                toggle1->setValue(false);
-                toggle2->setValue(false);
-                toggle3->setValue(false);
-                toggle4->setValue(false);
-                
-            }
-            else toggle->setValue(true);
-            
-            //when texture is set to blank, rotation stops
-            disc.setRotationSpeed(me->getDiscIndex(), -disc.getNetRotationSpeed(me->getDiscIndex()));
-            //sound
-            soundChange("bpm", me->getDiscIndex(), 0);
-            soundChange("envelope", me->getDiscIndex(), 0);
-            
-            //send to server
-            string change = "texture//"+ ofToString(i)+": "+ ofToString(disc.getTexture(i));
-            client.send(change);
-        }
-        else if(e.getName() == "line" && i == me->getDiscIndex()){
-            ofxUIToggle *toggle = e.getToggle();
-            int texture = disc.getTexture(me->getDiscIndex());
-            if(me->getLife()> 0 && texture != 1) {
-                textureChanged = true;
-                disc.setTexture(me->getDiscIndex(), 1);
-                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
-                ofxUIToggle *toggle0 = static_cast <ofxUIToggle*> (canvas->getWidget("blank"));
-                ofxUIToggle *toggle2 = static_cast <ofxUIToggle*> (canvas->getWidget("tri"));
-                ofxUIToggle *toggle3 = static_cast <ofxUIToggle*> (canvas->getWidget("saw"));
-                ofxUIToggle *toggle4 = static_cast <ofxUIToggle*> (canvas->getWidget("rect"));
-                toggle0->setValue(false);
-                toggle2->setValue(false);
-                toggle3->setValue(false);
-                toggle4->setValue(false);
-            }
-            else toggle->setValue(true);
-            
-            //sound
-            soundChange("envelope", me->getDiscIndex(), 1);
-            
-            //send to server
-            string change = "texture//"+ ofToString(i)+": "+ ofToString(disc.getTexture(i));
-            client.send(change);
-            
-        }
-        else if(e.getName() == "tri" && i == me->getDiscIndex()){
-            ofxUIToggle *toggle = e.getToggle();
-            int texture = disc.getTexture(me->getDiscIndex());
-            if(me->getLife() > 0 && texture != 2) {
-                textureChanged = true;
-                disc.setTexture(me->getDiscIndex(), 2);
-                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
-                ofxUIToggle *toggle0 = static_cast <ofxUIToggle*> (canvas->getWidget("blank"));
-                ofxUIToggle *toggle1 = static_cast <ofxUIToggle*> (canvas->getWidget("line"));
-                ofxUIToggle *toggle3 = static_cast <ofxUIToggle*> (canvas->getWidget("saw"));
-                ofxUIToggle *toggle4 = static_cast <ofxUIToggle*> (canvas->getWidget("rect"));
-                toggle0->setValue(false);
-                toggle1->setValue(false);
-                toggle3->setValue(false);
-                toggle4->setValue(false);
-            }
-            else toggle->setValue(true);
-            
-            //sound
-            soundChange("envelope", me->getDiscIndex(), 2);
-            
-            //send to server
-            string change = "texture//"+ ofToString(i)+": "+ ofToString(disc.getTexture(i));
-            client.send(change);
-        }
-        else if(e.getName() == "saw" && i == me->getDiscIndex()){
-            ofxUIToggle *toggle = e.getToggle();
-            int texture = disc.getTexture(me->getDiscIndex());
-            if(me->getLife() > 0 && texture != 3) {
-                textureChanged = true;
-                disc.setTexture(me->getDiscIndex(), 3);
-                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
-                ofxUIToggle *toggle0 = static_cast <ofxUIToggle*> (canvas->getWidget("blank"));
-                ofxUIToggle *toggle1 = static_cast <ofxUIToggle*> (canvas->getWidget("line"));
-                ofxUIToggle *toggle2 = static_cast <ofxUIToggle*> (canvas->getWidget("tri"));
-                ofxUIToggle *toggle4 = static_cast <ofxUIToggle*> (canvas->getWidget("rect"));
-                toggle0->setValue(false);
-                toggle1->setValue(false);
-                toggle2->setValue(false);
-                toggle4->setValue(false);
-            }
-            else toggle->setValue(true);
-            
-            //sound
-            soundChange("envelope", me->getDiscIndex(), 3);
-            
-            //send to server
-            string change = "texture//"+ ofToString(i)+": "+ ofToString(disc.getTexture(i));
-            client.send(change);
-        }
-        else if(e.getName() == "rect" && i == me->getDiscIndex()){
-            ofxUIToggle *toggle = e.getToggle();
-            int texture = disc.getTexture(me->getDiscIndex());
-            if(me->getLife() > 0 && texture != 4) {
-                textureChanged = true;
-                disc.setTexture(me->getDiscIndex(), 4);
-                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
-                ofxUIToggle *toggle0 = static_cast <ofxUIToggle*> (canvas->getWidget("blank"));
-                ofxUIToggle *toggle1 = static_cast <ofxUIToggle*> (canvas->getWidget("line"));
-                ofxUIToggle *toggle2 = static_cast <ofxUIToggle*> (canvas->getWidget("tri"));
-                ofxUIToggle *toggle3 = static_cast <ofxUIToggle*> (canvas->getWidget("saw"));
-                toggle0->setValue(false);
-                toggle1->setValue(false);
-                toggle2->setValue(false);
-                toggle3->setValue(false);
-            }
-            else toggle->setValue(true);
-            
-            //sound
-            soundChange("envelope", me->getDiscIndex(), 4);
-            
-            //send to server
-            string change = "texture//"+ ofToString(i)+": "+ ofToString(disc.getTexture(i));
-            client.send(change);
-        }
-        else if(e.getName() == "move" && i == me->getDiscIndex()){
-            ofxUIToggle *toggle = e.getToggle();
-            if(me->getLife()>0){
-                if (toggle->getValue() == true) {
-                    me->setLife(me->getLife()-costMove);
-                    disc.setMoving(me->getDiscIndex(), 1);
-                }
-                else {
-                    disc.setMoving(me->getDiscIndex(), 0);
-                }
-                
-                string movement = "move//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMoving(me->getDiscIndex()));
-                client.send(movement);
-                
-                if (toggle->getValue() == false){
-                    string position = "zPosition//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getPosition(me->getDiscIndex()));
-                    string counter = "counter//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getCounter(me->getDiscIndex()));
-                    client.send(position);
-                    client.send(counter);
-                    
-                }
-                
-                //update server
-                string lifeUpdate = "life//";
-                lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-                lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
-                client.send(lifeUpdate);
-            }
-        }
-        else if(e.getName() == "reset" && i == me->getDiscIndex()){
-            ofxUIButton *button = e.getButton();
-            if(me->getLife()>0){
-                disc.resetPerlin[me->getDiscIndex()] = 1;
-                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
-                ofxUIToggle *toggle = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                toggle->setValue(false);
-                
-                string movementReset = "moveReset//"+ofToString(me->getDiscIndex());
-                client.send(movementReset);
-            }
-        }
-        else if(e.getName() == "move all" && i == me->getDiscIndex()){
-            ofxUIToggle *toggle = e.getToggle();
-            if(toggle->getValue() == true){
-                if(me->getLife()>0){
-                    int costFactor = 0;
-                    for(int j = 0; j<disc.getDiscIndex(); j++){
-                        ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
-                        ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (canvas->getWidget("move all"));
-                        ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                        toggleMoveAll->setValue(true);
-                        if(toggleMove->getValue()==false){
-                            toggleMove->setValue(true);
-                            disc.setMoving(j, 1);
-                            costFactor++;
-                        }
-                    }
-                    me->setLife(me->getLife()-(costMove*costFactor));
-                    string moveAll = "moveAll//";
-                    client.send(moveAll);
-                    
-                    //update server
-                    string lifeUpdate = "life//";
-                    lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-                    lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
-                    client.send(lifeUpdate);
-                }
-            }
-            if(toggle->getValue() == false){
-                if(me->getLife()>0){
-                    int costFactor = 0;
-                    string zPositionAll = "zPositionAll//";
-                    for(int i = 0; i<disc.getDiscIndex(); i++){
-                        ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
-                        ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (canvas->getWidget("move all"));
-                        ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                        toggleMoveAll->setValue(false);
-                        if(toggleMove->getValue()==true){
-                            toggleMove->setValue(false);
-                            disc.setMoving(i, 0);
-                            zPositionAll += ofToString(i)+": "+ofToString(disc.getPosition(i))+"//";
-                            costFactor++;
-                        }
-                    }
-                    me->setLife(me->getLife()-(costMove*costFactor));
-                    string stopAll = "stopAll//";
-                    client.send(stopAll);
-                    client.send(zPositionAll);
-                    
-                    //update server
-                    string lifeUpdate = "life//";
-                    lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-                    lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
-                    client.send(lifeUpdate);
-                }
-            }
-        }
-        else if(e.getName() == "reset all" && i == me->getDiscIndex()){
-            ofxUIButton *button = e.getButton();
-            if(button->getValue() == true){
-                if(me->getLife()>0){
-                    int costFactor = 0;
-                    for(int j = 0; j<disc.getDiscIndex(); j++){
-                        ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
-                        ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (canvas->getWidget("move all"));
-                        ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                        toggleMoveAll->setValue(false);
-                        if(disc.getPosition(j) != 0){
-                            toggleMove->setValue(false);
-                            disc.resetPerlin[j] = 1;
-                            costFactor++;
-                        }
-                    }
-                    me->setLife(me->getLife()-(costMove*costFactor));
-                    string resetAll = "resetAll//";
-                    client.send(resetAll);
-                    
-                    //update server
-                    string lifeUpdate = "life//";
-                    lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-                    lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
-                    client.send(lifeUpdate);
-                }
-            }
-        }
-        else if(e.getName() == "mute" && i == me->getDiscIndex()){
-            ofxUIToggle *toggle = e.getToggle();
-            if(me->getLife() > 0){
-                me->setLife(me->getLife()-costMute);
-                if(toggle->getValue()==true) {
-                    disc.setMute(me->getDiscIndex(), 1); //mute on
-                    soundChange("envelope", me->getDiscIndex(), 0);
-                }
-                else if(toggle->getValue()==false){
-                    disc.setMute(me->getDiscIndex(), 0); //mute off
-                    disc.setEnvelope(me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
-                    soundChange("envelope", me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
-                    toggle->setValue(false);
-                }
-                string change = "mute//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMute(me->getDiscIndex()));
-                client.send(change);
-                
-                cout<< change <<endl;
-            }
-        }
     }
     if(e.getKind() == OFX_UI_WIDGET_LABELTOGGLE && e.getName() != "mute"){
         
@@ -478,7 +202,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         else updateButton->setValue(true);
         
     }
-    if(e.getName() == "inner"){
+    else if(e.getName() == "inner"){
         ofxUIButton *button = e.getButton();
         
         int jump = 1;
@@ -514,7 +238,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         client.send(changeDisc);
         
     }
-    if(e.getName() == "outer"){
+    else if(e.getName() == "outer"){
         ofxUIButton *button = e.getButton();
         
         int jump = 1;
@@ -549,7 +273,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         changeDisc += "index: "+ofToString(me->getDiscIndex()) + "//";
         client.send(changeDisc);
     }
-    if( e.getKind() == OFX_UI_WIDGET_TEXTINPUT){
+    else if( e.getKind() == OFX_UI_WIDGET_TEXTINPUT){
         ofxUITextInput *text = (ofxUITextInput *) e.widget;
         string input;
         if(text->getTextString() != ""){
@@ -561,6 +285,282 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         ofxUITextArea *history = (ofxUITextArea *) chat->getWidget("chat");
         history->setTextString(conversation);
         
+    }
+    else if(e.getName() == "blank"){
+        ofxUIToggle *toggle = e.getToggle();
+        int texture = disc.getTexture(me->getDiscIndex());
+        if(me->getLife()> 0 && texture != 0) {
+            
+            textureChanged = true;
+            disc.setTexture(me->getDiscIndex(), 0);
+            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
+            ofxUIToggle *toggle1 = static_cast <ofxUIToggle*> (canvas->getWidget("line"));
+            ofxUIToggle *toggle2 = static_cast <ofxUIToggle*> (canvas->getWidget("tri"));
+            ofxUIToggle *toggle3 = static_cast <ofxUIToggle*> (canvas->getWidget("saw"));
+            ofxUIToggle *toggle4 = static_cast <ofxUIToggle*> (canvas->getWidget("rect"));
+            toggle1->setValue(false);
+            toggle2->setValue(false);
+            toggle3->setValue(false);
+            toggle4->setValue(false);
+            
+        }
+        else toggle->setValue(true);
+        
+        //when texture is set to blank, rotation stops
+        disc.setRotationSpeed(me->getDiscIndex(), -disc.getNetRotationSpeed(me->getDiscIndex()));
+        //sound
+        soundChange("bpm", me->getDiscIndex(), 0);
+        soundChange("envelope", me->getDiscIndex(), 0);
+        
+        //send to server
+        string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()));
+        client.send(change);
+    }
+    else if(e.getName() == "line"){
+        ofxUIToggle *toggle = e.getToggle();
+        int texture = disc.getTexture(me->getDiscIndex());
+        if(me->getLife()> 0 && texture != 1) {
+            textureChanged = true;
+            disc.setTexture(me->getDiscIndex(), 1);
+            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
+            ofxUIToggle *toggle0 = static_cast <ofxUIToggle*> (canvas->getWidget("blank"));
+            ofxUIToggle *toggle2 = static_cast <ofxUIToggle*> (canvas->getWidget("tri"));
+            ofxUIToggle *toggle3 = static_cast <ofxUIToggle*> (canvas->getWidget("saw"));
+            ofxUIToggle *toggle4 = static_cast <ofxUIToggle*> (canvas->getWidget("rect"));
+            toggle0->setValue(false);
+            toggle2->setValue(false);
+            toggle3->setValue(false);
+            toggle4->setValue(false);
+        }
+        else toggle->setValue(true);
+        
+        //sound
+        soundChange("envelope", me->getDiscIndex(), 1);
+        
+        //send to server
+        string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()));
+        client.send(change);
+        
+    }
+    else if(e.getName() == "tri"){
+        ofxUIToggle *toggle = e.getToggle();
+        int texture = disc.getTexture(me->getDiscIndex());
+        if(me->getLife() > 0 && texture != 2) {
+            textureChanged = true;
+            disc.setTexture(me->getDiscIndex(), 2);
+            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
+            ofxUIToggle *toggle0 = static_cast <ofxUIToggle*> (canvas->getWidget("blank"));
+            ofxUIToggle *toggle1 = static_cast <ofxUIToggle*> (canvas->getWidget("line"));
+            ofxUIToggle *toggle3 = static_cast <ofxUIToggle*> (canvas->getWidget("saw"));
+            ofxUIToggle *toggle4 = static_cast <ofxUIToggle*> (canvas->getWidget("rect"));
+            toggle0->setValue(false);
+            toggle1->setValue(false);
+            toggle3->setValue(false);
+            toggle4->setValue(false);
+        }
+        else toggle->setValue(true);
+        
+        //sound
+        soundChange("envelope", me->getDiscIndex(), 2);
+        
+        //send to server
+        string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()));
+        client.send(change);
+    }
+    else if(e.getName() == "saw"){
+        ofxUIToggle *toggle = e.getToggle();
+        int texture = disc.getTexture(me->getDiscIndex());
+        if(me->getLife() > 0 && texture != 3) {
+            textureChanged = true;
+            disc.setTexture(me->getDiscIndex(), 3);
+            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
+            ofxUIToggle *toggle0 = static_cast <ofxUIToggle*> (canvas->getWidget("blank"));
+            ofxUIToggle *toggle1 = static_cast <ofxUIToggle*> (canvas->getWidget("line"));
+            ofxUIToggle *toggle2 = static_cast <ofxUIToggle*> (canvas->getWidget("tri"));
+            ofxUIToggle *toggle4 = static_cast <ofxUIToggle*> (canvas->getWidget("rect"));
+            toggle0->setValue(false);
+            toggle1->setValue(false);
+            toggle2->setValue(false);
+            toggle4->setValue(false);
+        }
+        else toggle->setValue(true);
+        
+        //sound
+        soundChange("envelope", me->getDiscIndex(), 3);
+        
+        //send to server
+        string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()));
+        client.send(change);
+    }
+    else if(e.getName() == "rect"){
+        ofxUIToggle *toggle = e.getToggle();
+        int texture = disc.getTexture(me->getDiscIndex());
+        if(me->getLife() > 0 && texture != 4) {
+            textureChanged = true;
+            disc.setTexture(me->getDiscIndex(), 4);
+            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
+            ofxUIToggle *toggle0 = static_cast <ofxUIToggle*> (canvas->getWidget("blank"));
+            ofxUIToggle *toggle1 = static_cast <ofxUIToggle*> (canvas->getWidget("line"));
+            ofxUIToggle *toggle2 = static_cast <ofxUIToggle*> (canvas->getWidget("tri"));
+            ofxUIToggle *toggle3 = static_cast <ofxUIToggle*> (canvas->getWidget("saw"));
+            toggle0->setValue(false);
+            toggle1->setValue(false);
+            toggle2->setValue(false);
+            toggle3->setValue(false);
+        }
+        else toggle->setValue(true);
+        
+        //sound
+        soundChange("envelope", me->getDiscIndex(), 4);
+        
+        //send to server
+        string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()));
+        client.send(change);
+    }
+    else if(e.getName() == "move"){
+        ofxUIToggle *toggle = e.getToggle();
+        if(me->getLife()>0){
+            if (toggle->getValue() == true) {
+                me->setLife(me->getLife()-costMove);
+                disc.setMoving(me->getDiscIndex(), 1);
+            }
+            else {
+                disc.setMoving(me->getDiscIndex(), 0);
+            }
+            
+            string movement = "move//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMoving(me->getDiscIndex()));
+            client.send(movement);
+            
+            if (toggle->getValue() == false){
+                string position = "zPosition//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getPosition(me->getDiscIndex()));
+                string counter = "counter//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getCounter(me->getDiscIndex()));
+                client.send(position);
+                client.send(counter);
+                
+            }
+            
+            //update server
+            string lifeUpdate = "life//";
+            lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+            lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
+            client.send(lifeUpdate);
+        }
+    }
+    else if(e.getName() == "reset"){
+        ofxUIButton *button = e.getButton();
+        if(me->getLife()>0){
+            disc.resetPerlin[me->getDiscIndex()] = 1;
+            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
+            ofxUIToggle *toggle = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+            toggle->setValue(false);
+            
+            string movementReset = "moveReset//"+ofToString(me->getDiscIndex());
+            client.send(movementReset);
+        }
+    }
+    else if(e.getName() == "move all"){
+        ofxUIToggle *toggle = e.getToggle();
+        if(toggle->getValue() == true){
+            if(me->getLife()>0){
+                int costFactor = 0;
+                for(int j = 0; j<disc.getDiscIndex(); j++){
+                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
+                    ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (canvas->getWidget("move all"));
+                    ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                    toggleMoveAll->setValue(true);
+                    if(toggleMove->getValue()==false){
+                        toggleMove->setValue(true);
+                        disc.setMoving(j, 1);
+                        costFactor++;
+                    }
+                }
+                me->setLife(me->getLife()-(costMove*costFactor));
+                string moveAll = "moveAll//";
+                client.send(moveAll);
+                
+                //update server
+                string lifeUpdate = "life//";
+                lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+                lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
+                client.send(lifeUpdate);
+            }
+        }
+        if(toggle->getValue() == false){
+            if(me->getLife()>0){
+                int costFactor = 0;
+                string zPositionAll = "zPositionAll//";
+                for(int i = 0; i<disc.getDiscIndex(); i++){
+                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
+                    ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (canvas->getWidget("move all"));
+                    ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                    toggleMoveAll->setValue(false);
+                    if(toggleMove->getValue()==true){
+                        toggleMove->setValue(false);
+                        disc.setMoving(i, 0);
+                        zPositionAll += ofToString(i)+": "+ofToString(disc.getPosition(i))+"//";
+                        costFactor++;
+                    }
+                }
+                me->setLife(me->getLife()-(costMove*costFactor));
+                string stopAll = "stopAll//";
+                client.send(stopAll);
+                client.send(zPositionAll);
+                
+                //update server
+                string lifeUpdate = "life//";
+                lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+                lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
+                client.send(lifeUpdate);
+            }
+        }
+    }
+    else if(e.getName() == "reset all"){
+        ofxUIButton *button = e.getButton();
+        if(button->getValue() == true){
+            if(me->getLife()>0){
+                int costFactor = 0;
+                for(int j = 0; j<disc.getDiscIndex(); j++){
+                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
+                    ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (canvas->getWidget("move all"));
+                    ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                    toggleMoveAll->setValue(false);
+                    if(disc.getPosition(j) != 0){
+                        toggleMove->setValue(false);
+                        disc.resetPerlin[j] = 1;
+                        costFactor++;
+                    }
+                }
+                me->setLife(me->getLife()-(costMove*costFactor));
+                string resetAll = "resetAll//";
+                client.send(resetAll);
+                
+                //update server
+                string lifeUpdate = "life//";
+                lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+                lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
+                client.send(lifeUpdate);
+            }
+        }
+    }
+    else if(e.getName() == "mute"){
+        ofxUIToggle *toggle = e.getToggle();
+        if(me->getLife() > 0){
+            me->setLife(me->getLife()-costMute);
+            if(toggle->getValue()==true) {
+                disc.setMute(me->getDiscIndex(), 1); //mute on
+                soundChange("envelope", me->getDiscIndex(), 0);
+            }
+            else if(toggle->getValue()==false){
+                disc.setMute(me->getDiscIndex(), 0); //mute off
+                disc.setEnvelope(me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
+                soundChange("envelope", me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
+                toggle->setValue(false);
+            }
+            string change = "mute//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMute(me->getDiscIndex()));
+            client.send(change);
+            
+            cout<< change <<endl;
+        }
     }
 }
 
