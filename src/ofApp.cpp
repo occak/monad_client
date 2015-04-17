@@ -79,6 +79,9 @@ void ofApp::setup(){
         _ui->addToggle("move all", disc.isMoving(i));
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
         _ui->addButton("reset all", disc.resetPerlin[i]);
+        _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+        _ui->addSpacer();
+        _ui->addLabelToggle("chat", false);
         
         _ui->autoSizeToFitWidgets();
         _ui->setVisible(false);
@@ -193,7 +196,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             }
         }
     }
-    if(e.getKind() == OFX_UI_WIDGET_LABELTOGGLE && e.getName() != "mute"){
+    if(e.getKind() == OFX_UI_WIDGET_LABELTOGGLE && e.getName() != "mute" && e.getName() != "chat"){
         
         ofxUILabelToggle *updateButton = static_cast <ofxUILabelToggle*> (e.getToggle());
         if(updateButton->getValue() == true){
@@ -277,10 +280,9 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         ofxUITextInput *text = (ofxUITextInput *) e.widget;
         string input;
         if(text->getTextString() != ""){
-            input = me->getIP() + "::" + text->getTextString()+"\n";
+            input = me->getIP() + "::" + text->getTextString()+"\n\n";
+            client.send("chat//" + input);
         }
-        else input = "\n";
-        client.send("chat//" + input);
         conversation = input + conversation;
         ofxUITextArea *history = (ofxUITextArea *) chat->getWidget("chat");
         history->setTextString(conversation);
@@ -561,6 +563,15 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             
             cout<< change <<endl;
         }
+    }
+    else if(e.getName() == "chat"){
+        ofxUIToggle *toggle = e.getToggle();
+        for(int j = 0; j<disc.getDiscIndex(); j++){
+            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
+            ofxUIToggle *toggleChat = static_cast <ofxUIToggle*> (canvas->getWidget("chat"));
+            toggleChat->setValue(toggle->getValue());
+        }
+        chat->setVisible(toggle->getValue());
     }
 }
 
