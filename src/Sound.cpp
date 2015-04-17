@@ -77,8 +77,8 @@ void Sound::setup(Disc* disc){
         
         master = master + filter;
     }
-    ControlGenerator size = synth.addParameter("size", 0);
-    ControlGenerator decay = synth.addParameter("decay", 0);
+    ControlGenerator size = synth.addParameter("size", 0.01);
+    ControlGenerator decay = synth.addParameter("decay", 0.01);
     Generator limiter = Limiter().input(master).threshold(0.8);
     Generator reverb = Reverb().input(limiter).stereoWidth(1).wetLevel(.5).dryLevel(.5).roomSize(size).roomShape(size).decayTime(decay);
     

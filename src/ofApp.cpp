@@ -582,13 +582,13 @@ void ofApp::update(){
         disc.update();
     float size = 0;
     for(int i = 0; i< disc.getDiscIndex(); i++){
-        float amountFreq = ofMap(abs(disc.getNetRotationSpeed(i)), 0, 10, 0, 5000);
-        float amountMod = ofMap(abs(disc.getPosition(i)), 0, 50, 0, 5000);
+        float amountFreq = ofMap(abs(disc.getNetRotationSpeed(i)), 0, 10, 0, 10000);
+        float amountMod = ofMap(abs(disc.getPosition(i)), 0, 50, 0, 10000);
         soundChange("amountFreq", i, amountFreq);
         soundChange("amountMod", i, amountMod);
         size += abs(disc.getPosition(i));
     }
-    float avgSize = ofMap(size/disc.getDiscIndex(), 0, 200, 0, 1);
+    float avgSize = ofMap(size/disc.getDiscIndex(), 0, 200, 0.01, 1);
     sound.synth.setParameter("size", avgSize);
     sound.synth.setParameter("decay", .001*size);
     if(client.isConnected()){
@@ -693,7 +693,8 @@ void ofApp::update(){
                         }
                     }
                 }
-                
+                //set up synths
+                sound.setup(&disc);
             }
             
             else if (title == "scale"){
@@ -703,7 +704,6 @@ void ofApp::update(){
                 for(int i = 0; i < scaleValue.size(); i++){
                     sound.setScale(i, ofToFloat(scaleValue[i]));
                 }
-                cout<< str <<endl;
                 //set up synths
                 sound.setup(&disc);
             }
@@ -1213,12 +1213,12 @@ void ofApp::mouseReleased(int x, int y, int button){
         client.send(lifeUpdate);
         
         //update buttons
-        ofxUILabelToggle* toggle = new ofxUILabelToggle("Groove"+ofToString(me->getDiscIndex()+1)+" radius changed to "+ofToString(disc.getThickness(me->getDiscIndex())), false, 200, 50, -ofGetWidth()/2, updateButtonsArray.size()*55);
-        toggle->setColorBack(me->getColor());
-        updateButtonsArray.push_back(toggle);
-        ofxUICanvas* canvas = (ofxUICanvas*) toggle;
-//        ofAddListener(canvas->newGUIEvent, this, &ofApp::guiEvent);
-        cout<< updateButtonsArray.size() <<endl;
+//        ofxUILabelToggle* toggle = new ofxUILabelToggle("Groove"+ofToString(me->getDiscIndex()+1)+" radius changed to "+ofToString(disc.getThickness(me->getDiscIndex())), false, 200, 50, -ofGetWidth()/2, updateButtonsArray.size()*55);
+//        toggle->setColorBack(me->getColor());
+//        updateButtonsArray.push_back(toggle);
+//        ofxUICanvas* canvas = (ofxUICanvas*) toggle;
+////        ofAddListener(canvas->newGUIEvent, this, &ofApp::guiEvent);
+//        cout<< updateButtonsArray.size() <<endl;
         
 //        ofxUIWidget* widget = (ofxUIWidget*) toggle;
 //        widget->setPosition(OFX_UI_WIDGET_POSITION_UP);
