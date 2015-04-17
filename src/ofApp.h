@@ -71,7 +71,8 @@ private:
     vector<Player*> otherPlayers;
     
     vector<ofxUICanvas *> ui;
-//    vector<ofxUILabelToggle *> updateButtons;
+    //update buttons not working
+    vector<ofxUILabelToggle *> updateButtonsArray;
     ofxUICanvas *updateButtons;
     
     ofxUICanvas *chat;

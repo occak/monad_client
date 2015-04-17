@@ -2,7 +2,7 @@
 
 /*
  
- perlin cpp - changed to sin
+ perlin cpp - changed to sin Ã
  groove move factor (rotationSpeed*thickness/density)
  
  event button create
@@ -13,6 +13,7 @@
  
  mute button Ã
  update mute button in initialize and change Ã
+ change color maybe?
  
  */
 
@@ -1180,14 +1181,14 @@ void ofApp::mouseReleased(int x, int y, int button){
         client.send(lifeUpdate);
         
         //update buttons
-                ofxUILabelToggle* widget = new ofxUILabelToggle("Groove"+ofToString(me->getDiscIndex()+1)+" radius changed to "+ofToString(disc.getThickness(me->getDiscIndex())), false);
-                widget->setColorBack(me->getColor());
-                updateButtons->addWidget(widget);
+        ofxUILabelToggle* widget = new ofxUILabelToggle("Groove"+ofToString(me->getDiscIndex()+1)+" radius changed to "+ofToString(disc.getThickness(me->getDiscIndex())), false, 200, 50, 0, ofGetHeight()/2);
+        widget->setColorBack(me->getColor());
+        updateButtons->setWidgetPosition(OFX_UI_WIDGET_POSITION_UP);
         
-//        updateButtons->addEmbeddedWidget(new ofxUILabelToggle("Groove"+ofToString(me->getDiscIndex()+1)+" radius changed to "+ofToString((int)disc.getThickness(me->getDiscIndex())), false));
-//        updateButtons->getEmbeddedWidget(0)->setColorBack(me->getColor());
+        updateButtonsArray.push_back(widget);
         
-        cout<< lifeUpdate <<endl;
+//        updateButtons->addLabelToggle("Groove "+ofToString(me->getDiscIndex()+1)+" radius\n\nchanged to "+ofToString((int)disc.getThickness(me->getDiscIndex())), false, 200, 50)->setColorBack(me->getColor());
+        
         
     }
     else if(densityChanged){
