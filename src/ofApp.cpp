@@ -3,9 +3,10 @@
 /*
  
  perlin cpp - changed to sin Ã
- groove move factor (rotationSpeed*thickness/density)
+ groove move factor ~(rotationSpeed*thickness/density) Ã
  
  event button create
+ chat button
  
  move-stop-reset TCP Ã
  move-stop-reset costs Ã
@@ -338,7 +339,10 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 
                 if (toggle->getValue() == false){
                     string position = "zPosition//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getPosition(me->getDiscIndex()));
+                    string counter = "counter//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getCounter(me->getDiscIndex()));
                     client.send(position);
+                    client.send(counter);
+                    
                 }
                 
                 //update server
@@ -584,8 +588,8 @@ void ofApp::update(){
                 
                 //graphic values
                 for (int i = 0; i < disc.getDiscIndex(); i++) {
-                    for(int j = 0; j < 9; j++){
-                        nameValue = ofSplitString(received[j+(i*9)+2], ": ");
+                    for(int j = 0; j < 10; j++){
+                        nameValue = ofSplitString(received[j+(i*10)+2], ": ");
                         if(nameValue[0] == "radius"+ofToString(i)) {
                             disc.setRadius(i, ofToFloat(nameValue[1]));
                             //sound
@@ -655,6 +659,9 @@ void ofApp::update(){
 //                            float amountMod = ofMap(abs(disc.getPosition(i)), 0, 50, 0, 5000);
 //                            soundChange("amountFreq", i, amountFreq);
 //                            soundChange("amountMod", i, amountMod);
+                        }
+                        if(nameValue[0] == "counter"+ofToString(i)) {
+                            disc.setCounter(i, ofToFloat(nameValue[1]));
                         }
                         if(nameValue[0] == "mute"+ofToString(i)) {
                             disc.setMute(i, ofToInt(nameValue[1]));
@@ -913,6 +920,12 @@ void ofApp::update(){
                     nameValue = ofSplitString(received[i], ": ");
                     disc.setPosition(ofToInt(nameValue[0]), ofToFloat(nameValue[1]));
                 }
+            }
+            
+            else if (title == "counter"){
+                vector<string> nameValue;
+                nameValue = ofSplitString(received[1], ": ");
+                disc.setCounter(ofToInt(nameValue[0]), ofToInt(nameValue[1]));
             }
             
             else if (title == "chat"){

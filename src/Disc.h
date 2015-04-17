@@ -70,7 +70,10 @@ class Disc{
     
     int isMoving(int index) const;
     void setMoving(int index, int moving);
-//    
+    
+    int getCounter(int index) const;
+    void setCounter(int index, int value);
+//
     float origin = 10;
     int selected = -1;
     vector<int> resetPerlin;

@@ -56,13 +56,13 @@ void Player::setColorByIndex(int index){
     // 50,153,187 - blue
     switch (index) {
         case 1:
-            color.set(161,24,87);
+            color.set(50,153,187);
             break;
         case 2:
             color.set(255,153,0);
             break;
         case 3:
-            color.set(50,153,187);
+            color.set(161,24,87);
             break;
             
         default:
