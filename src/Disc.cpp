@@ -40,8 +40,7 @@ void Disc::setup(){
         // set depths, all zero by default
         zPosition.push_back(0.);
         
-        posOffset.push_back(ofRandom(0,100000));
-        
+        posOffset.push_back(180* (int)ofRandom(2));
         //sound
         vector<float> adsr;
         envelope.push_back(adsr);
@@ -74,8 +73,9 @@ void Disc::update(){
         float position = getPosition(i);
         
         float time = ofGetElapsedTimef();
-        float timeScale = .01;
-        float displacementScale = 100;
+        float timeScale = .01+0.05*abs(rotationSpeed[i]);
+        float displacementScale = (radii[i]-radii[i-1])/density[i];
+        cout<< displacementScale <<endl;
         float timeOffset = posOffset[i];
         
         // A typical design pattern for using Perlin noise uses a couple parameters:
@@ -88,7 +88,7 @@ void Disc::update(){
         
 //        position += (ofSignedNoise(time*timeScale+timeOffset)) * displacementScale;
         
-        position += (sin((counter[i]*timeScale)) * displacementScale) - (position/10);
+        position += (sin((counter[i]*timeScale)+timeOffset) * displacementScale) - (position/10);
 
         //update groove position
         setPosition(i, position);
