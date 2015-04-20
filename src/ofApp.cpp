@@ -497,9 +497,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 int costFactor = 0;
                 for(int j = 0; j<disc.getDiscIndex(); j++){
                     ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
-                    ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (canvas->getWidget("move all"));
                     ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                    toggleMoveAll->setValue(true);
                     if(toggleMove->getValue()==false){
                         toggleMove->setValue(true);
                         disc.setMoving(j, 1);
@@ -523,9 +521,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 string zPositionAll = "zPositionAll//";
                 for(int i = 0; i<disc.getDiscIndex(); i++){
                     ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
-                    ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (canvas->getWidget("move all"));
                     ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                    toggleMoveAll->setValue(false);
                     if(toggleMove->getValue()==true){
                         toggleMove->setValue(false);
                         disc.setMoving(i, 0);
