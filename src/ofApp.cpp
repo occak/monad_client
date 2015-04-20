@@ -26,7 +26,6 @@ void ofApp::setup(){
     
     // ask for server state
     client.send("hello//");
-    
     // set up values of objects
     disc.setup();
     
@@ -119,11 +118,11 @@ void ofApp::setup(){
         
     }
     
-//    updateButtons = new ofxUICanvas();
-//    updateButtons->setPosition(0, ofGetHeight()/2);
-//    updateButtons->setDrawBack(false);
-//    updateButtons->setFontSize(OFX_UI_FONT_SMALL, 5.8);
-//    ofAddListener(updateButtons->newGUIEvent, this, &ofApp::guiEvent);
+    updateButtons = new ofxUICanvas();
+    updateButtons->setPosition(0, ofGetHeight()/2-70);
+    updateButtons->setDrawBack(false);
+    updateButtons->setFontSize(OFX_UI_FONT_SMALL, 7);
+    ofAddListener(updateButtons->newGUIEvent, this, &ofApp::guiEvent);
     
     chat = new ofxUICanvas();
     chat->setDrawBack(false);
@@ -148,9 +147,9 @@ void ofApp::setup(){
     // set up game costs
     costRadius = 1;
     costDensity = 1;
-    costTexture = 1;
     costRotation = 1;
-    costMute = 5;
+    costTexture = 2;
+    costMute = 2;
     costMove = 2;
     
 }
@@ -162,6 +161,8 @@ void ofApp::exit(){
     playerOut = "goodbye//"+me->getIP();
     client.send(playerOut);
     
+    delete noDisc;
+    delete chat;
     for(int i = 0; i < disc.getDiscIndex(); i++){
         delete ui[i];
     }
@@ -340,6 +341,8 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         
         //when texture is set to blank, rotation stops
         disc.setRotationSpeed(me->getDiscIndex(), -disc.getNetRotationSpeed(me->getDiscIndex()));
+        
+        //set rotation slider to 0 - not working
 //        ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
 //        ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"));
 //        slider->setValue(0.);
@@ -625,9 +628,11 @@ void ofApp::update(){
         soundChange("amountMod", i, amountMod);
         size += abs(disc.getPosition(i));
     }
-    float avgSize = ofMap(size/disc.getDiscIndex(), 0, 200, 0.01, 1);
+    float avgSize = ofMap(size/disc.getDiscIndex(), 0, 200, 0.01, .5);
     sound.synth.setParameter("size", avgSize);
     sound.synth.setParameter("decay", .001*size);
+    
+    //TCP
     if(client.isConnected()){
         string str = client.receive();
         if(str.length() > 0){
@@ -732,6 +737,8 @@ void ofApp::update(){
                 }
                 //set up synths
                 sound.setup(&disc);
+                
+                me->setConnection(true);
             }
             
             else if (title == "scale"){
@@ -1263,8 +1270,12 @@ void ofApp::mouseReleased(int x, int y, int button){
 //        ofxUIWidget* widget = (ofxUIWidget*) toggle;
 //        widget->setPosition(OFX_UI_WIDGET_POSITION_UP);
         
-        
-//        updateButtons->addLabelToggle("Groove "+ofToString(me->getDiscIndex()+1)+" radius\n\nchanged to "+ofToString((int)disc.getThickness(me->getDiscIndex())), false, 200, 50)->setColorBack(me->getColor());
+//        updateButtons->addLabelToggle("Groove "+ofToString(me->getDiscIndex()+1)+" radius\nset to "+ofToString((int)disc.getThickness(me->getDiscIndex())), false, 200, 50)->setName(ofToString(ID));
+//        ofxUILabelToggle *toggle = (ofxUILabelToggle*) updateButtons->getWidget(ofToString(ID));
+//        toggle->setID(ID);
+//        toggle->setColorBack(me->getColor());
+//        updateButtons->autoSizeToFitWidgets();
+//        ID++;
         
         
     }

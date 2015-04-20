@@ -13,8 +13,12 @@ void Disc::setup(){
     life = 100;         // initial life value
     
     discIndex = 10;    // 10 discs
+    zMotion.setup();
+    for(int i = 0; i < 100; i++){
+        float p = zMotion.get(i,i);
+        cout<< p <<endl;
+    }
     
-
     for(int i = 0; i < discIndex; i++){
         
         // generate radius information of discs
@@ -69,6 +73,7 @@ void Disc::update(){
         }
         
     if(perlin[i] == 1){
+        
         
         float position = getPosition(i);
         

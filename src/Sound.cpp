@@ -64,7 +64,7 @@ void Sound::setup(Disc* disc){
         
         float cutoffTarget = ofMap(disc->getThickness(i), 15, 100, 0, 50);
         ControlGenerator cutoff = synth.addParameter("frequency"+ofToString(i), cutoffTarget);
-        ControlSnapToScale scaleSnapper = ControlSnapToScale().setScale(scale).input(40 + cutoff);
+        ControlSnapToScale scaleSnapper = ControlSnapToScale().setScale(scale).input(32 + cutoff);
         ControlGenerator filterFreq = ControlMidiToFreq().input(scaleSnapper);
         float qTarget = ofMap(disc->getRadius(i)-disc->getRadius(i-1), 15, 100, 10, 0);
         ControlGenerator q = synth.addParameter("q"+ofToString(i),qTarget).min(0).max(50);
@@ -74,8 +74,9 @@ void Sound::setup(Disc* disc){
         groove = snd * amplitude;
         
         Generator filter = BPF12().input(groove).cutoff(filterFreq).Q(q);
+        Generator delay = StereoDelay(0, .0025*i).input(filter).feedback(.01).delayTimeLeft(0).delayTimeRight(.0025*i);
         
-        master = master + filter;
+        master = master + delay;
     }
     ControlGenerator size = synth.addParameter("size", 0.01);
     ControlGenerator decay = synth.addParameter("decay", 0.01);

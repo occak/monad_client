@@ -13,7 +13,7 @@
 
 #include <stdio.h>
 #include "ofMain.h"
-//#include "ofxMSAPerlin.h"
+#include "ofxMSAPerlin.h"
 
 
 
@@ -105,6 +105,7 @@ private:
     // z-motion
     vector<int> perlin;
     vector<int> counter;
+    msa::Perlin zMotion;
 
     
     };
