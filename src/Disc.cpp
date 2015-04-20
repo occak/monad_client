@@ -78,7 +78,7 @@ void Disc::update(){
         float timeOffset = posOffset[i];
         
         position += (sin((counter[i]*timeScale)+timeOffset) * displacementScale) - (position/10);
-
+        
         //update groove position
         setPosition(i, position);
         counter[i]++;

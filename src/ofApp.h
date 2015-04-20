@@ -72,6 +72,7 @@ private:
     vector<Player*> otherPlayers;
     
     vector<ofxUICanvas *> ui;
+    ofxUICanvas *noDisc;
     //update buttons not working
     vector<ofxUILabelToggle *> updateButtonsArray;
     ofxUICanvas *updateButtons;

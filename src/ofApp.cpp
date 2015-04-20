@@ -6,16 +6,11 @@
  groove move factor ~(rotationSpeed*thickness/density) Ã
  
  event button create
- chat button
+
+ image button
  
- move-stop-reset TCP Ã
- move-stop-reset costs Ã
- position update TCP Ã
- 
- mute button Ã
- update mute button in initialize and change Ã
- change color maybe?
- 
+ rethink frequency - no scale snap
+
  */
 
 
@@ -36,15 +31,53 @@ void ofApp::setup(){
     disc.setup();
     
     //set up gui
+    
+    noDisc = new ofxUICanvas();
+    noDisc->addMultiImageToggle("inner","butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
+    noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+    noDisc->addLabel("None Selected",0);
+    ofxUILabel *label = (ofxUILabel*) noDisc->getWidget("None Selected");
+    noDisc->addWidgetPosition(label,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_CENTER);
+    noDisc->addMultiImageToggle("outer", "butonlar/buton-07.png",false, 20, 20);
+    ofxUIMultiImageToggle *toggle = (ofxUIMultiImageToggle*) noDisc->getWidget("outer");
+    noDisc->addWidgetPosition(toggle,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_RIGHT);
+    noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+    noDisc->addSpacer();
+    bool allMoving;
+    int i = 0;
+    while( i < disc.getDiscIndex()){
+        if (disc.isMoving(i) == true) {
+            allMoving = true;
+            i++;
+        }
+        else {
+            allMoving = false;
+            break;
+        }
+    }
+    noDisc->addToggle("move all", allMoving);
+    noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+    noDisc->addButton("reset all", disc.resetPerlin[i]);
+    noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+    noDisc->addSpacer();
+    noDisc->addLabelToggle("chat", false);
+    noDisc->autoSizeToFitWidgets();
+    noDisc->setVisible(true);
+    ofAddListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
+    
     for(int i = 0; i < disc.getDiscIndex(); i++){
         
         ofxUICanvas *_ui;
         
         _ui = new ofxUICanvas();
-        _ui->addButton("inner", false);
+        _ui->addMultiImageToggle("inner","butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
         _ui->addLabel("Groove " + ofToString(i+1),0);
-        _ui->addButton("outer", false);
+        ofxUILabel *label = (ofxUILabel*) _ui->getWidget("Groove " + ofToString(i+1));
+        _ui->addWidgetPosition(label,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_CENTER);
+        _ui->addMultiImageToggle("outer", "butonlar/buton-07.png",false, 20, 20);
+        ofxUIMultiImageToggle *toggle = (ofxUIMultiImageToggle*) _ui->getWidget("outer");
+        _ui->addWidgetPosition(toggle,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_RIGHT);
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
         _ui->addLabelToggle("mute", disc.isMute(i));
         _ui->addSpacer();
@@ -54,32 +87,26 @@ void ofApp::setup(){
         _ui->addBiLabelSlider("radius" + ofToString(i+1), "small", "large", 15, 100, disc.getRadius(i)-disc.getRadius(i-1));
         _ui->addLabel("density",2);
         _ui->addBiLabelSlider("density" + ofToString(i+1), "sparse", "dense", 30, 1, disc.getDensity(i));
-        
+        _ui->addSpacer();
         _ui->addLabel("texture", 1);
-        if(disc.getTexture(i)==0) _ui->addToggle("blank", true);
-        else _ui->addToggle("blank", false);
+        if(disc.getTexture(i)==0) _ui->addMultiImageButton("blank","butonlar/buton-01.png", true, 35,35);
+        else _ui->addMultiImageButton("blank","butonlar/buton-01.png", false, 35,35);
         
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-        if(disc.getTexture(i)==1) _ui->addToggle("line", true);
-        else _ui->addToggle("line", false);
-        if(disc.getTexture(i)==2) _ui->addToggle("tri", true);
-        else _ui->addToggle("tri", false);
-        if(disc.getTexture(i)==3) _ui->addToggle("saw", true);
-        else _ui->addToggle("saw", false);
-        if(disc.getTexture(i)==4) _ui->addToggle("rect", true);
-        else _ui->addToggle("rect", false);
+        if(disc.getTexture(i)==1) _ui->addMultiImageButton("line", "butonlar/buton-02.png", true, 35,35);
+        else _ui->addMultiImageButton("line", "butonlar/buton-02.png", false, 35,35);
+        if(disc.getTexture(i)==2) _ui->addMultiImageButton("tri", "butonlar/buton-03.png", true, 35,35);
+        else _ui->addMultiImageButton("tri", "butonlar/buton-03.png", false, 35,35);
+        if(disc.getTexture(i)==3) _ui->addMultiImageButton("saw", "butonlar/buton-04.png", true, 35,35);
+        else _ui->addMultiImageButton("saw", "butonlar/buton-04.png", false, 35,35);
+        if(disc.getTexture(i)==4) _ui->addMultiImageButton("rect", "butonlar/buton-05.png", true, 35,35);
+        else _ui->addMultiImageButton("rect", "butonlar/buton-05.png", false, 35,35);
         
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
         _ui->addLabel("depth",1);
         _ui->addToggle("move", disc.isMoving(i));
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
         _ui->addButton("reset", disc.resetPerlin[i]);
-        
-        _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-        _ui->addSpacer();
-        _ui->addToggle("move all", disc.isMoving(i));
-        _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-        _ui->addButton("reset all", disc.resetPerlin[i]);
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
         _ui->addSpacer();
         _ui->addLabelToggle("chat", false);
@@ -130,14 +157,14 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::exit(){
     
-    for(int i = 0; i < disc.getDiscIndex(); i++){
-        delete ui[i];
-    }
-    
     me->setConnection(false);
     string playerOut;
     playerOut = "goodbye//"+me->getIP();
     client.send(playerOut);
+    
+    for(int i = 0; i < disc.getDiscIndex(); i++){
+        delete ui[i];
+    }
     
 }
 //--------------------------------------------------------------
@@ -230,6 +257,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         button->setValue(false);
 
         //change ui
+        noDisc->setVisible(false);
         for(int i = 0; i < disc.getDiscIndex(); i++){
             ui[i]->setVisible(false);
         }
@@ -266,6 +294,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         button->setValue(false);
         
         //change ui
+        noDisc->setVisible(false);
         for(int i = 0; i < disc.getDiscIndex(); i++){
             ui[i]->setVisible(false);
         }
@@ -1085,6 +1114,7 @@ void ofApp::keyPressed(int key){
         else me->setDiscIndex(me->getDiscIndex() + jump - disc.getDiscIndex());
         
         //change ui
+        noDisc->setVisible(false);
         for(int i = 0; i < disc.getDiscIndex(); i++){
             ui[i]->setVisible(false);
         }
@@ -1121,6 +1151,7 @@ void ofApp::keyPressed(int key){
             ui[i]->setVisible(false);
         }
         ui[me->getDiscIndex()]->toggleVisible();
+        noDisc->setVisible(false);
         
         //send change to server
         string changeDisc = "otherPlayersIndex//";
@@ -1132,6 +1163,7 @@ void ofApp::keyPressed(int key){
     if(key == OF_KEY_BACKSPACE) {
         ui[me->getDiscIndex()]->setVisible(false);
         me->setDiscIndex(-1);
+        noDisc->setVisible(true);
         
         //send change to server
         string changeDisc = "otherPlayersIndex//";

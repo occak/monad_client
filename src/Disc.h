@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include "ofMain.h"
+//#include "ofxMSAPerlin.h"
 
 
 
@@ -106,7 +107,7 @@ private:
     vector<int> counter;
 
     
-};
+    };
 
 
 #endif /* defined(__multiDiscTest__Disc__) */
