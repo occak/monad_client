@@ -13,8 +13,8 @@ void Disc::setup(){
     life = 100;         // initial life value
     
     discIndex = 10;    // 10 discs
-    zMotion.setup();
-    for(int i = 0; i < 100; i++){
+    zMotion.setup(4,2,1.,716);
+    for(float i = 0.01; i < 2; i+=.01){
         float p = zMotion.get(i,i);
         cout<< p <<endl;
     }
@@ -26,9 +26,9 @@ void Disc::setup(){
         else radii.push_back(radii[i-1] + ofRandom(50) + 15.);
         
         // generate texture densities, rule out non-symmetrics
-        float thisDensity = ofRandom(15.) + 1;
-        while ((int) thisDensity == 7 || (int) thisDensity == 11 || (int) thisDensity == 13) {
-            thisDensity = ofRandom(15.) + 1;
+        float thisDensity = ofRandom(30) + 1;
+        while ((int) thisDensity % 360 != 0) {
+            thisDensity = ofRandom(30) + 1;
 //            cout << "recalculating" << endl;
         }
         density.push_back(thisDensity);

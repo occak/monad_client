@@ -1034,9 +1034,9 @@ void ofApp::draw(){
         ofRect(groove.lifeBar[i+1]);
     }
     
-    for(int i = 0; i < updateButtonsArray.size(); i++){
-        updateButtonsArray[i]->draw();
-    }
+//    for(int i = 0; i < updateButtonsArray.size(); i++){
+//        updateButtonsArray[i]->draw();
+//    }
     
     ofPopMatrix();
     
@@ -1270,12 +1270,37 @@ void ofApp::mouseReleased(int x, int y, int button){
 //        ofxUIWidget* widget = (ofxUIWidget*) toggle;
 //        widget->setPosition(OFX_UI_WIDGET_POSITION_UP);
         
-//        updateButtons->addLabelToggle("Groove "+ofToString(me->getDiscIndex()+1)+" radius\nset to "+ofToString((int)disc.getThickness(me->getDiscIndex())), false, 200, 50)->setName(ofToString(ID));
-//        ofxUILabelToggle *toggle = (ofxUILabelToggle*) updateButtons->getWidget(ofToString(ID));
-//        toggle->setID(ID);
-//        toggle->setColorBack(me->getColor());
-//        updateButtons->autoSizeToFitWidgets();
-//        ID++;
+        ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(me->getDiscIndex()+1)+" radius\nset to "+ofToString((int)disc.getThickness(me->getDiscIndex())), false, 200, 50);
+        
+        
+//         = (ofxUILabelToggle*) updateButtons->getWidget(ofToString(ID));
+        
+        toggle->setColorBack(me->getColor());
+        updateButtonsArray.push_back(toggle);
+        
+        
+        
+        if(updateButtonsArray.size() > 3){
+            ofxUILabelToggle *toggle0 = updateButtonsArray.front();
+            updateButtons->removeWidget(toggle0);
+            updateButtonsArray.erase(updateButtonsArray.begin());
+        }
+        
+        updateButtons->clearWidgets();
+        for(int i = updateButtonsArray.size()-1; i >= 0; i--){
+            ofxUILabelToggle *thisToggle = updateButtonsArray[i];
+            
+            thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
+            
+            if( thisToggle->getValue() == false){
+                thisToggle->setColorBack(me->getColor());
+            }
+            updateButtonsArray[i] = thisToggle;
+        }
+            //        toggle->setID(ID);
+            //        toggle;
+            updateButtons->autoSizeToFitWidgets();
+        ID++;
         
         
     }
