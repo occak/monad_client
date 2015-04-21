@@ -4,6 +4,7 @@
  
  perlin cpp - changed to sin Ã
  groove move factor ~(rotationSpeed*thickness/density) Ã
+ change back to perlin
  
  event button create
 
@@ -20,16 +21,16 @@ void ofApp::setup(){
     ofSetVerticalSync(true);
     ofBackground(255);
     
-    initialize = new ofxUICanvas();
-    initialize->setPosition(ofGetWidth()/2, ofGetHeight()/2);
-    initialize->addTextInput("IP", "");
-    initialize->addTextInput("port", "");
+//    initialize = new ofxUICanvas();
+//    initialize->setPosition(ofGetWidth()/2, ofGetHeight()/2);
+//    initialize->addTextInput("IP", "");
+//    initialize->addTextInput("port", "");
 //    while(true){
 //        cout<< "girdi" <<endl;
 //    }
     
     //set up network
-    client.setup("127.0.0.1", 10002);
+    client.setup("81.213.183.64", 10002);
     client.setMessageDelimiter("varianet");
     
     // ask for server state
@@ -169,11 +170,12 @@ void ofApp::exit(){
     playerOut = "goodbye//"+me->getIP();
     client.send(playerOut);
     
-    delete noDisc;
-    delete chat;
+
     for(int i = 0; i < disc.getDiscIndex(); i++){
         delete ui[i];
     }
+    delete noDisc;
+    delete chat;
     
 }
 //--------------------------------------------------------------
@@ -247,7 +249,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             
             Player* _player = new Player();
             for(int i = 0; i < otherPlayers.size(); i++){
-                if(otherPlayers[i]->getColor() == updateButton->getColorBack()) _player = otherPlayers[i];
+                if(otherPlayers[i]->getColor() == updateButton->getColorBack()) otherPlayers[i] = _player;
                 else continue;
             }
             _player->setLife(_player->getLife()+5);
@@ -798,6 +800,7 @@ void ofApp::update(){
             
             else if (title == "otherPlayers"){
                 Player* _player = new Player();
+                
                 for(int i = 1; i < received.size(); i++ ){
                     vector<string> playerData;
                     playerData = ofSplitString(received[i], ": ");
@@ -878,11 +881,12 @@ void ofApp::update(){
                 //update buttons
                 
                 ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" rotation\nset to "+ofToString((int)disc.getNetRotationSpeed(index)), false, 200, 50);
-                Player* _player = new Player();
+                
+                Player* _player = NULL;
                 for(int i = 0; i < otherPlayers.size(); i++){
-                    if(otherPlayers[i]->getIP() == received[2]) _player = otherPlayers[i];
-                    else continue;
+                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
                 }
+                if(_player == NULL) cout<< "_player eslesmedi" <<endl;
                 toggle->setColorBack(_player->getColor());
                 updateButtonsArray.push_back(toggle);
                 

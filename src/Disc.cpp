@@ -13,11 +13,8 @@ void Disc::setup(){
     life = 100;         // initial life value
     
     discIndex = 10;    // 10 discs
-    zMotion.setup(4,2,1.,716);
-    for(float i = 0.01; i < 2; i+=.01){
-        float p = zMotion.get(i,i);
-        cout<< p <<endl;
-    }
+    
+//    barPerlin = new Perlin(234,10);
     
     for(int i = 0; i < discIndex; i++){
         
@@ -58,6 +55,9 @@ void Disc::setup(){
         resetPerlin.push_back(0);
         counter.push_back(0);
         
+    
+        msa::Perlin* _zMotion = new msa::Perlin(4,2,1.,1);
+        zMotion.push_back(_zMotion);
     }
    
 }
@@ -77,16 +77,22 @@ void Disc::update(){
         
         float position = getPosition(i);
         
-        float time = ofGetElapsedTimef();
+//        float time = ofGetElapsedTimef();
         float timeScale = .11-0.01*abs(rotationSpeed[i]);
-        float displacementScale = 1 + 5 * (radii[i]-radii[i-1])/density[i];
+//        float displacementScale = 1 + 5 * (radii[i]-radii[i-1])/density[i];
+        float displacementScale = 10;
         float timeOffset = posOffset[i];
         
-        position += (sin((counter[i]*timeScale)+timeOffset) * displacementScale) - (position/10);
+        //        position += (sin((counter[i]*timeScale)+timeOffset) * displacementScale) - (position/10);
+                position += zMotion[i]->get(counter[i],0.) * displacementScale;
+//        position += barPerlin->perlin((float)counter[i]) * displacementScale;
+//                cout<< barPerlin->perlin(counter[i]) <<endl;
+//            cout<< counter[i] <<endl;
         
+//        cout<< position <<endl;
         //update groove position
         setPosition(i, position);
-        counter[i]++;
+        counter[i] +=.01;
         
         }
         resetPerlin[i] = 0;
