@@ -63,6 +63,9 @@ private:
     
     bool fullScreen;
     bool mReleased;
+    bool TCPsetup = false;
+    string IP;
+    int port;
     
     Groove groove;
     Disc disc;
@@ -76,7 +79,7 @@ private:
     //update buttons not working
     vector<ofxUILabelToggle *> updateButtonsArray;
     ofxUICanvas *updateButtons;
-//    ofxUICanvas *initialize;
+    ofxUICanvas *initialize;
     
     ofxUICanvas *chat;
     string conversation;

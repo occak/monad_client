@@ -84,13 +84,14 @@ void Disc::update(){
         float timeOffset = posOffset[i];
         
         //        position += (sin((counter[i]*timeScale)+timeOffset) * displacementScale) - (position/10);
-                position += zMotion[i]->get(counter[i],0.) * displacementScale;
-//        position += barPerlin->perlin((float)counter[i]) * displacementScale;
-//                cout<< barPerlin->perlin(counter[i]) <<endl;
-//            cout<< counter[i] <<endl;
+        position += zMotion[i]->get(counter[i],0.) * displacementScale;
+        //        position += barPerlin->perlin((float)counter[i]) * displacementScale;
+        //                cout<< barPerlin->perlin(counter[i]) <<endl;
+        //            cout<< counter[i] <<endl;
         
-//        cout<< position <<endl;
+        //        cout<< position <<endl;
         //update groove position
+        
         setPosition(i, position);
         counter[i] +=.01;
         
@@ -201,7 +202,7 @@ float Disc::getRotationSpeed(int index) const{
 void Disc::setRotationSpeed(int index, float addSpeed){
     
     rotationSpeed[index+1] -= addSpeed; //outer disc rotates relative to the inner disc
-    return rotationSpeed[index] += addSpeed;
+    rotationSpeed[index] += addSpeed;
     
 }
 //----------------------------------

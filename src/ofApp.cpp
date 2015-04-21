@@ -21,20 +21,28 @@ void ofApp::setup(){
     ofSetVerticalSync(true);
     ofBackground(255);
     
-//    initialize = new ofxUICanvas();
-//    initialize->setPosition(ofGetWidth()/2, ofGetHeight()/2);
-//    initialize->addTextInput("IP", "");
-//    initialize->addTextInput("port", "");
+    initialize = new ofxUICanvas();
+    initialize->setPosition(ofGetWidth()/2-100, ofGetHeight()/2-10);
+    initialize->addLabel("IP:");
+    initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+    initialize->addTextInput("IP", "");
+    initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+    initialize->addLabel("port:");
+    initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+    initialize->addTextInput("port", "");
+    initialize->autoSizeToFitWidgets();
+    ofAddListener(initialize->newGUIEvent, this, &ofApp::guiEvent);
+    
 //    while(true){
 //        cout<< "girdi" <<endl;
 //    }
     
     //set up network
-    client.setup("81.213.183.64", 10002);
-    client.setMessageDelimiter("varianet");
-    
-    // ask for server state
-    client.send("hello//");
+//    client.setup("127.0.0.1", 10002);
+//    client.setMessageDelimiter("varianet");
+//    
+//    // ask for server state
+//    client.send("hello//");
     // set up values of objects
     disc.setup();
     
@@ -51,21 +59,9 @@ void ofApp::setup(){
     noDisc->addWidgetPosition(toggle,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_RIGHT);
     noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
     noDisc->addSpacer();
-    bool allMoving;
-    int i = 0;
-    while( i < disc.getDiscIndex()){
-        if (disc.isMoving(i) == true) {
-            allMoving = true;
-            i++;
-        }
-        else {
-            allMoving = false;
-            break;
-        }
-    }
-    noDisc->addToggle("move all", allMoving);
+    noDisc->addToggle("move all", false);
     noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    noDisc->addButton("reset all", disc.resetPerlin[i]);
+    noDisc->addButton("reset all", false);
     noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
     noDisc->addSpacer();
     noDisc->addLabelToggle("chat", false);
@@ -181,7 +177,30 @@ void ofApp::exit(){
 //--------------------------------------------------------------
 void ofApp::guiEvent(ofxUIEventArgs &e)
 {
-    
+    if(TCPsetup == false){
+        if(e.getName() == "IP"){
+            ofxUITextInput *text = (ofxUITextInput *) e.widget;
+            if(text->getTextString() != ""){
+                IP = text->getTextString();
+                cout<< IP <<endl;
+            }
+        }
+        if(e.getName() == "port"){
+            ofxUITextInput *text = (ofxUITextInput *) e.widget;
+            if(text->getTextString() != ""){
+                port = ofToInt(text->getTextString());
+                cout<< port <<endl;
+            }
+        }
+        if (IP != "" && port != 0) {
+            client.setup(IP, port);
+            client.setMessageDelimiter("varianet");
+            
+            // ask for server state
+            client.send("hello//");
+        }
+    }
+    else{
     for(int i = 0; i < disc.getDiscIndex(); i++){
         if(e.getName() == "rotation" + ofToString(i+1)){
             ofxUISlider *slider = e.getSlider();
@@ -560,17 +579,19 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         }
         if(toggle->getValue() == false){
             if(me->getLife()>0){
+                
                 int costFactor = 0;
                 string zPositionAll = "zPositionAll//";
+                
                 for(int i = 0; i<disc.getDiscIndex(); i++){
                     ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
                     ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
                     if(toggleMove->getValue()==true){
                         toggleMove->setValue(false);
                         disc.setMoving(i, 0);
-                        zPositionAll += ofToString(i)+": "+ofToString(disc.getPosition(i))+"//";
                         costFactor++;
                     }
+                    zPositionAll += ofToString(i)+": "+ofToString(disc.getPosition(i))+"//";
                 }
                 me->setLife(me->getLife()-(costMove*costFactor));
                 string stopAll = "stopAll//";
@@ -644,6 +665,8 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             toggleChat->setValue(toggle->getValue());
         }
         chat->setVisible(toggle->getValue());
+    }
+        
     }
 }
 
@@ -766,10 +789,28 @@ void ofApp::update(){
                         }
                     }
                 }
+                //toggle move all button if all grooves are moving
+                bool allMoving;
+                int i = 0;
+                while( i < disc.getDiscIndex()){
+                    if (disc.isMoving(i) == true) {
+                        allMoving = true;
+                        i++;
+                    }
+                    else {
+                        allMoving = false;
+                        break;
+                    }
+                }
+                ofxUIToggle *moveAll = (ofxUIToggle*) noDisc->getWidget("move all");
+                moveAll->setValue(allMoving);
+                
                 //set up synths
                 sound.setup(&disc);
                 
                 me->setConnection(true);
+                TCPsetup = true;
+                initialize->setVisible(false);
             }
             
             else if (title == "scale"){
@@ -1071,7 +1112,7 @@ void ofApp::update(){
         }
     }
     
-    groove.update();
+    if(TCPsetup) groove.update();
 }
 //--------------------------------------------------------------
 void ofApp::draw(){
@@ -1083,23 +1124,21 @@ void ofApp::draw(){
     
     ofTranslate(ofGetWidth()/2, ofGetHeight()/2);
     
-    cam.begin();
-    groove.draw();
-    cam.end();
-    
-    ofSetColor(me->getColor());
-    ofFill();
-    ofRect(groove.lifeBar[0]);
-    
-    for(int i = 0; i < otherPlayers.size(); i++){
-        ofSetColor(otherPlayers[i]->getColor());
+    if(TCPsetup){
+        cam.begin();
+        groove.draw();
+        cam.end();
+        
+        ofSetColor(me->getColor());
         ofFill();
-        ofRect(groove.lifeBar[i+1]);
+        ofRect(groove.lifeBar[0]);
+        
+        for(int i = 0; i < otherPlayers.size(); i++){
+            ofSetColor(otherPlayers[i]->getColor());
+            ofFill();
+            ofRect(groove.lifeBar[i+1]);
+        }
     }
-    
-//    for(int i = 0; i < updateButtonsArray.size(); i++){
-//        updateButtonsArray[i]->draw();
-//    }
     
     ofPopMatrix();
     
@@ -1111,7 +1150,7 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     
-    if(chat->hasKeyboardFocus())
+    if(chat->hasKeyboardFocus() || initialize->hasKeyboardFocus())
     {
         return;
     }
