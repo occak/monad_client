@@ -195,7 +195,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 soundChange("bpm", i, beatSpeed*beatDensity);
                 
                 //send to server
-                string change = "rotationSpeed//"+ ofToString(i)+": "+ ofToString(newRotation);
+                string change = "rotationSpeed//"+ ofToString(i)+": "+ ofToString(newRotation)+"//"+me->getIP();
                 client.send(change);
                 
             }
@@ -244,7 +244,19 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         
         ofxUILabelToggle *updateButton = static_cast <ofxUILabelToggle*> (e.getToggle());
         if(updateButton->getValue() == true){
-            me->setLife(me->getLife()+5);
+            
+            Player* _player = new Player();
+            for(int i = 0; i < otherPlayers.size(); i++){
+                if(otherPlayers[i]->getColor() == updateButton->getColorBack()) _player = otherPlayers[i];
+                else continue;
+            }
+            _player->setLife(_player->getLife()+5);
+            //send update
+            string lifeUpdate = "life//";
+            lifeUpdate += "IP: "+ofToString(_player->getIP()) + "//";
+            lifeUpdate += "life: "+ofToString(_player->getLife()) + "//";
+            client.send(lifeUpdate);
+            
         }
         else updateButton->setValue(true);
         
@@ -323,15 +335,18 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         client.send(changeDisc);
     }
     else if( e.getKind() == OFX_UI_WIDGET_TEXTINPUT){
+        
         ofxUITextInput *text = (ofxUITextInput *) e.widget;
         string input;
         if(text->getTextString() != ""){
             input = me->getIP() + "::" + text->getTextString()+"\n\n";
-            
         }
         conversation = input + conversation;
         ofxUITextArea *history = (ofxUITextArea *) chat->getWidget("chat");
         history->setTextString(conversation);
+        
+        string sendText = "chat//"+input;
+        client.send(sendText);
         
     }
     else if(e.getName() == "blank"){
@@ -394,7 +409,6 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             client.send(change);
         }
         else toggle->setValue(true);
-
         
     }
     else if(e.getName() == "tri"){
@@ -860,6 +874,36 @@ void ofApp::update(){
                 ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[index]);
                 ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(index+1)));
                 slider->setValue(disc.getNetRotationSpeed(index));
+                
+                //update buttons
+                
+                ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" rotation\nset to "+ofToString((int)disc.getNetRotationSpeed(index)), false, 200, 50);
+                Player* _player = new Player();
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    if(otherPlayers[i]->getIP() == received[2]) _player = otherPlayers[i];
+                    else continue;
+                }
+                toggle->setColorBack(_player->getColor());
+                updateButtonsArray.push_back(toggle);
+                
+                if(updateButtonsArray.size() > 8){
+                    ofxUILabelToggle *toggle0 = updateButtonsArray.front();
+                    updateButtons->removeWidget(toggle0);
+                    updateButtonsArray.erase(updateButtonsArray.begin());
+                }
+                
+                updateButtons->clearWidgets();
+                for(int i = updateButtonsArray.size()-1; i >= 0; i--){
+                    ofxUILabelToggle *thisToggle = updateButtonsArray[i];
+                    
+                    thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
+                    
+                    if( thisToggle->getValue() == false){
+                        thisToggle->setColorBack(me->getColor());
+                    }
+                    updateButtonsArray[i] = thisToggle;
+                }
+                updateButtons->autoSizeToFitWidgets();
             }
             
             else if (title == "radius"){
@@ -1275,32 +1319,17 @@ void ofApp::mouseReleased(int x, int y, int button){
         client.send(lifeUpdate);
         
         //update buttons
-//        ofxUILabelToggle* toggle = new ofxUILabelToggle("Groove"+ofToString(me->getDiscIndex()+1)+" radius changed to "+ofToString(disc.getThickness(me->getDiscIndex())), false, 200, 50, -ofGetWidth()/2, updateButtonsArray.size()*55);
-//        toggle->setColorBack(me->getColor());
-//        updateButtonsArray.push_back(toggle);
-//        ofxUICanvas* canvas = (ofxUICanvas*) toggle;
-////        ofAddListener(canvas->newGUIEvent, this, &ofApp::guiEvent);
-//        cout<< updateButtonsArray.size() <<endl;
-        
-//        ofxUIWidget* widget = (ofxUIWidget*) toggle;
-//        widget->setPosition(OFX_UI_WIDGET_POSITION_UP);
         
         ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(me->getDiscIndex()+1)+" radius\nset to "+ofToString((int)disc.getThickness(me->getDiscIndex())), false, 200, 50);
-        
-        
-//         = (ofxUILabelToggle*) updateButtons->getWidget(ofToString(ID));
         
         toggle->setColorBack(me->getColor());
         updateButtonsArray.push_back(toggle);
         
-        
-        
-        if(updateButtonsArray.size() > 3){
+        if(updateButtonsArray.size() > 8){
             ofxUILabelToggle *toggle0 = updateButtonsArray.front();
             updateButtons->removeWidget(toggle0);
             updateButtonsArray.erase(updateButtonsArray.begin());
         }
-        
         
         updateButtons->clearWidgets();
         for(int i = updateButtonsArray.size()-1; i >= 0; i--){
@@ -1313,11 +1342,7 @@ void ofApp::mouseReleased(int x, int y, int button){
             }
             updateButtonsArray[i] = thisToggle;
         }
-            //        toggle->setID(ID);
-            //        toggle;
             updateButtons->autoSizeToFitWidgets();
-        ID++;
-        
         
     }
     else if(densityChanged){

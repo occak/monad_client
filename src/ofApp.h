@@ -64,8 +64,6 @@ private:
     bool fullScreen;
     bool mReleased;
     
-    int ID = 0;
-    
     Groove groove;
     Disc disc;
     Sound sound;
