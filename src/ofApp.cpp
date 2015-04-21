@@ -20,6 +20,14 @@ void ofApp::setup(){
     ofSetVerticalSync(true);
     ofBackground(255);
     
+    initialize = new ofxUICanvas();
+    initialize->setPosition(ofGetWidth()/2, ofGetHeight()/2);
+    initialize->addTextInput("IP", "");
+    initialize->addTextInput("port", "");
+//    while(true){
+//        cout<< "girdi" <<endl;
+//    }
+    
     //set up network
     client.setup("127.0.0.1", 10002);
     client.setMessageDelimiter("varianet");
@@ -182,8 +190,9 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 
                 //change sound
                 float netSpeed = abs(disc.getNetRotationSpeed(i));
-                float beat = ofMap(netSpeed, 0, 10, 0, 1000);
-                soundChange("bpm", i, beat);
+                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
+                float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 1);
+                soundChange("bpm", i, beatSpeed*beatDensity);
                 
                 //send to server
                 string change = "rotationSpeed//"+ ofToString(i)+": "+ ofToString(newRotation);
@@ -212,11 +221,17 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 densityChanged = true;
                 disc.setDensity(i, slider->getScaledValue());
                 
-                //change sound
+                //change envelope
                 float envelopeCoeff = ofMap(disc.getDensity(i), 1, 30, 1, 5);
-                float pulseRatio = ofMap(disc.getDensity(i), 1, 30, 0.001, 1);
+                float pulseRatio = ofMap(disc.getDensity(i), 1, 30, 0.005, 1);
                 soundChange("envelopeWidth", i, envelopeCoeff);
                 soundChange("pulseLength", i, pulseRatio);
+                
+                //change metronome
+                float netSpeed = abs(disc.getNetRotationSpeed(i));
+                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
+                float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 1);
+                soundChange("bpm", i, beatSpeed*beatDensity);
                 
                 //send to server
                 string change = "density//"+ ofToString(i)+": "+ ofToString(slider->getScaledValue());
@@ -1285,6 +1300,7 @@ void ofApp::mouseReleased(int x, int y, int button){
             updateButtons->removeWidget(toggle0);
             updateButtonsArray.erase(updateButtonsArray.begin());
         }
+        
         
         updateButtons->clearWidgets();
         for(int i = updateButtonsArray.size()-1; i >= 0; i--){

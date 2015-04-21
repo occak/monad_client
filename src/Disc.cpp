@@ -27,10 +27,10 @@ void Disc::setup(){
         
         // generate texture densities, rule out non-symmetrics
         float thisDensity = ofRandom(30) + 1;
-        while ((int) thisDensity % 360 != 0) {
-            thisDensity = ofRandom(30) + 1;
-//            cout << "recalculating" << endl;
-        }
+//        while ((int) thisDensity % 360 != 0) {
+//            thisDensity = ofRandom(30) + 1;
+////            cout << "recalculating" << endl;
+//        }
         density.push_back(thisDensity);
 //        cout << (int) thisDensity << endl;
         
@@ -285,16 +285,16 @@ float Disc::setEnvelope(int index, int type) {
             
         case 1:         // texture 1 - click
             attack = 0.001;
-            decay = 0.001;
+            decay = 0;
             sustain = 0;
-            release = 0;
+            release = 0.001;
             break;
             
         case 2:         // texture 2 - triangle
-            attack = 0.05;
+            attack = 0.01;
             decay = 0;
             sustain = 0;
-            release = 0.05;
+            release = 0.01;
             break;
             
         case 3:         // texture 3 - note
@@ -305,10 +305,10 @@ float Disc::setEnvelope(int index, int type) {
             break;
             
         case 4:         // texture 4 - rect
-            attack = 0;
+            attack = 0.001;
             decay = 0;
             sustain = 0.05;
-            release = 0;
+            release = 0.001;
             break;
             
         default:

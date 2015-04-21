@@ -78,6 +78,7 @@ private:
     //update buttons not working
     vector<ofxUILabelToggle *> updateButtonsArray;
     ofxUICanvas *updateButtons;
+    ofxUICanvas *initialize;
     
     ofxUICanvas *chat;
     string conversation;

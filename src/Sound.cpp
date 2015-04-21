@@ -39,7 +39,7 @@ void Sound::setup(Disc* disc){
         ControlGenerator bpm =  synth.addParameter("bpm"+ofToString(i), 0);
         ControlGenerator metronome = ControlMetro().bpm(bpm);
         
-        float pulseRatio = ofMap(disc->getDensity(i), 1, 30, 0.001, 1);
+        float pulseRatio = ofMap(disc->getDensity(i), 1, 30, 0.005, 1);
         ControlGenerator pulseLength = synth.addParameter("pulseLength"+ofToString(i), pulseRatio);
         ControlGenerator pulse = ControlPulse().length(pulseLength).input(metronome);
         
