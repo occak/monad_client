@@ -22,8 +22,6 @@ class Disc{
     
     void setup();
     void update();
-    void drawTexture();
-    void selectDisc(int x, int y);
     
     //getter&setter functions
     
@@ -71,6 +69,11 @@ class Disc{
     
     int getCounter(int index) const;
     void setCounter(int index, int value);
+    
+    int getSeed(int index) const;
+    void setSeed(int index, int value);
+    
+    void zMotionSetup(int index, int seed);
 //
     float origin = 10;
     int selected = -1;

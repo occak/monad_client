@@ -59,9 +59,9 @@ void Disc::setup(){
         msa::Perlin* _zMotion = new msa::Perlin(4,2,1.,1);
         zMotion.push_back(_zMotion);
     }
-   
 }
 
+//----------------------------------
 void Disc::update(){
     
     for(int i = 0; i < discIndex; i++){
@@ -100,11 +100,7 @@ void Disc::update(){
     }
     
 }
-//----------------------------------
 
-void Disc::selectDisc(int x, int y){
-    
-}
 //----------------------------------
 
 int Disc::getDiscIndex() const{
@@ -117,12 +113,7 @@ int Disc::setDiscIndex(int value){
     
     return discIndex = value;
 }
-//----------------------------------
 
-void Disc::drawTexture(){
-    
-
-}
 //----------------------------------
 
 int Disc::getTexture(int index) const{
@@ -153,9 +144,9 @@ float Disc::setRadius(int index, float size){
 float Disc::getThickness(int index) const{
     
     return radii[index]-radii[index-1];
-    
 }
 
+//----------------------------------
 void Disc::setThickness(int index, float size){
     
     float change = size - (radii[index]-radii[index-1]); // change in the difference of size between the inner circle
@@ -195,7 +186,6 @@ float Disc::setRotation(int index, float newRotation){
 float Disc::getRotationSpeed(int index) const{
     
     return rotationSpeed[index];
-    
 }
 //----------------------------------
 
@@ -203,7 +193,6 @@ void Disc::setRotationSpeed(int index, float addSpeed){
     
     rotationSpeed[index+1] -= addSpeed; //outer disc rotates relative to the inner disc
     rotationSpeed[index] += addSpeed;
-    
 }
 //----------------------------------
 
@@ -231,7 +220,6 @@ void Disc::setNetRotationSpeed(int index, float newSpeed){
         rotationSpeed[index+1] -= newSpeed - allBelow; //outer disc rotates relative to the inner disc
     }
     else rotationSpeed[0] = newSpeed;
-    
 }
 //----------------------------------
 
@@ -274,7 +262,6 @@ float Disc::setLife(float cost){
 float Disc::getEnvelope(int index, int section) const{
     
     return envelope[index][section];
-
 }
 
 //----------------------------------
@@ -328,47 +315,62 @@ float Disc::setEnvelope(int index, int type) {
     adsr.push_back(release);
 
     envelope[index] = adsr;
-    
 }
 
 //----------------------------------
 int Disc::isMute(int index) const{
     
     return mute[index];
-    
 }
 
 //----------------------------------
 void Disc::setMute(int index, int onOff){
     
     mute[index] = onOff;
-    
 }
 
 //----------------------------------
 int Disc::isMoving(int index) const{
     
     return perlin[index];
-    
 }
 
 //----------------------------------
 void Disc::setMoving(int index, int moving){
     
     perlin[index] = moving;
-    
 }
 
+//----------------------------------
 int Disc::getCounter(int index) const{
+    
     return counter[index];
 }
+
+//----------------------------------
 void Disc::setCounter(int index, int value){
+    
     counter[index] = value;
 }
 
+//----------------------------------
+int Disc::getSeed(int index) const{
+    
+    return seed[index];
+}
 
+//----------------------------------
+void Disc::setSeed(int index, int value){
+    
+    seed[index] = value;
+}
 
-
+//----------------------------------
+void Disc::zMotionSetup(int index, int seed){
+    
+    zMotion[index] = new msa::Perlin(4,2,.5,seed);
+    
+}
 
 
 

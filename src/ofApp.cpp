@@ -182,14 +182,12 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             ofxUITextInput *text = (ofxUITextInput *) e.widget;
             if(text->getTextString() != ""){
                 IP = text->getTextString();
-                cout<< IP <<endl;
             }
         }
         if(e.getName() == "port"){
             ofxUITextInput *text = (ofxUITextInput *) e.widget;
             if(text->getTextString() != ""){
                 port = ofToInt(text->getTextString());
-                cout<< port <<endl;
             }
         }
         if (IP != "" && port != 0) {
@@ -763,13 +761,9 @@ void ofApp::update(){
                         if(nameValue[0] == "zPosition"+ofToString(i)) {
                             disc.setPosition (i, ofToFloat(nameValue[1]));
                         }
-                        if(nameValue[0] == "posOffset"+ofToString(i)) {
-                            disc.setPosOffset (i, ofToFloat(nameValue[1]));
-                            //sound
-//                            float amountFreq = ofMap(abs(disc.getNetRotationSpeed(i)), 0, 10, 0, 5000);
-//                            float amountMod = ofMap(abs(disc.getPosition(i)), 0, 50, 0, 5000);
-//                            soundChange("amountFreq", i, amountFreq);
-//                            soundChange("amountMod", i, amountMod);
+                        if(nameValue[0] == "seed"+ofToString(i)) {
+                            disc.setSeed(i, ofToInt(nameValue[1]));
+                            disc.zMotionSetup(i, ofToInt(nameValue[1]));
                         }
                         if(nameValue[0] == "counter"+ofToString(i)) {
                             disc.setCounter(i, ofToFloat(nameValue[1]));
