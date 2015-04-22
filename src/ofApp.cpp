@@ -894,7 +894,7 @@ void ofApp::update(){
                     }
                     else if (playerData[0] == "IP" && playerData[1] == me->getIP()) _player = me;
                     
-                    if (playerData[0] == "life" && _player != NULL) _player->setLife(_player->getLife()+ofToFloat(playerData[1]));
+                    if (playerData[0] == "life" && _player != NULL) _player->setLife(ofToFloat(playerData[1]));
                 }
             }
             

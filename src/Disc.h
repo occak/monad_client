@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include "ofMain.h"
 #include "ofxMSAPerlin.h"
-#include "barPerlin.h"
+//#include "barPerlin.h"
 
 class Disc{
 
@@ -108,7 +108,7 @@ private:
     vector<int> seed;
     vector<msa::Perlin *> zMotion;
     
-    Perlin *barPerlin;
+//    Perlin *barPerlin;
     
     };
 
