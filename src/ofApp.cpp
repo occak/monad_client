@@ -204,7 +204,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             ofxUISlider *slider = e.getSlider();
             if(me->getLife()>0 && mReleased == false){
                 rotationChanged = true;
-                float newRotation = slider->getScaledValue()-disc.getNetRotationSpeed(i);
+                newRotation = slider->getScaledValue()-disc.getNetRotationSpeed(i);
                 disc.setRotationSpeed(i, newRotation);
                 
                 //change sound
@@ -214,8 +214,9 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 soundChange("bpm", i, beatSpeed*beatDensity);
                 
                 //send to server
-                string change = "rotationSpeed//"+ ofToString(i)+": "+ ofToString(newRotation)+"//"+me->getIP();
-                client.send(change);
+                //                string change = "rotationSpeed//"+ ofToString(i)+": "+ ofToString(newRotation)+"//"+me->getIP();
+                //                client.send(change);
+                //                cout<< change <<endl;
                 
             }
         }
@@ -226,12 +227,12 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 disc.setThickness(i, slider->getScaledValue());
                 
                 //change sound
-                float q = ofMap(disc.getRadius(i)-disc.getRadius(i-1), 15, 100, 10, 0);
+                float q = ofMap(disc.getThickness(i), 15, 100, 10, 0);
                 soundChange("q", i, q);
                 
                 //send to server
-                string change = "radius//"+ofToString(i)+": "+ofToString(slider->getScaledValue());
-                client.send(change);
+//                string change = "radius//"+ofToString(i)+": "+ofToString(slider->getScaledValue());
+//                client.send(change);
             }
         }
         else if(e.getName() == "density" + ofToString(i+1)){
@@ -253,8 +254,8 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 soundChange("bpm", i, beatSpeed*beatDensity);
                 
                 //send to server
-                string change = "density//"+ ofToString(i)+": "+ ofToString(slider->getScaledValue());
-                client.send(change);
+//                string change = "density//"+ ofToString(i)+": "+ ofToString(slider->getScaledValue());
+//                client.send(change);
                 
             }
         }
@@ -395,12 +396,13 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 //        ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
 //        ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"));
 //        slider->setValue(0.);
+        
         //sound
         soundChange("bpm", me->getDiscIndex(), 0);
         soundChange("envelope", me->getDiscIndex(), 0);
         
         //send to server
-        string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()));
+        string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()))+"//"+me->getIP();
         client.send(change);
     }
     else if(e.getName() == "line"){
@@ -424,7 +426,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             soundChange("envelope", me->getDiscIndex(), 1);
             
             //send to server
-            string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()));
+            string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()))+"//"+me->getIP();
             client.send(change);
         }
         else toggle->setValue(true);
@@ -450,7 +452,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             soundChange("envelope", me->getDiscIndex(), 2);
             
             //send to server
-            string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()));
+            string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()))+"//"+me->getIP();
             client.send(change);
         }
         else toggle->setValue(true);
@@ -477,7 +479,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             soundChange("envelope", me->getDiscIndex(), 3);
             
             //send to server
-            string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()));
+            string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()))+"//"+me->getIP();
             client.send(change);
         }
         else toggle->setValue(true);
@@ -503,7 +505,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             soundChange("envelope", me->getDiscIndex(), 4);
             
             //send to server
-            string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()));
+            string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()))+"//"+me->getIP();
             client.send(change);
         }
         else toggle->setValue(true);
@@ -1355,6 +1357,11 @@ void ofApp::mouseReleased(int x, int y, int button){
         lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
         client.send(lifeUpdate);
         
+        string change = "radius//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getThickness(me->getDiscIndex()))+"//"+me->getIP();
+        client.send(change);
+        
+        
+        
         //update buttons
         
         ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(me->getDiscIndex()+1)+" radius\nset to "+ofToString((int)disc.getThickness(me->getDiscIndex())), false, 200, 50);
@@ -1391,6 +1398,9 @@ void ofApp::mouseReleased(int x, int y, int button){
         lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
         lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
         client.send(lifeUpdate);
+        
+        string change = "density//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getDensity(me->getDiscIndex()))+"//"+me->getIP();
+        client.send(change);
     }
     else if(textureChanged){
         textureChanged = false;
@@ -1401,6 +1411,9 @@ void ofApp::mouseReleased(int x, int y, int button){
         lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
         lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
         client.send(lifeUpdate);
+        
+        string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()))+"//"+me->getIP();
+        client.send(change);
     }
     else if(rotationChanged){
         rotationChanged = false;
@@ -1411,6 +1424,10 @@ void ofApp::mouseReleased(int x, int y, int button){
         lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
         lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
         client.send(lifeUpdate);
+    
+        //send to server
+        string change = "rotationSpeed//"+ ofToString(me->getDiscIndex())+": "+ ofToString(newRotation)+"//"+me->getIP();
+        client.send(change);
     }
 }
 

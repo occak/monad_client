@@ -67,6 +67,8 @@ private:
     string IP;
     int port;
     
+    float newRotation;
+    
     Groove groove;
     Disc disc;
     Sound sound;
