@@ -55,7 +55,7 @@ void Disc::setup(){
         resetPerlin.push_back(0);
         counter.push_back(0);
         
-    
+        seed.push_back(0);
         msa::Perlin* _zMotion = new msa::Perlin(4,2,1.,1);
         zMotion.push_back(_zMotion);
     }

@@ -1033,34 +1033,34 @@ void ofApp::update(){
             }
             
             else if (title == "moveAll"){
+                ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (noDisc->getWidget("move all"));
+                toggleMoveAll->setValue(true);
                 for(int i = 0; i<disc.getDiscIndex(); i++){
                     ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
-                    ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (canvas->getWidget("move all"));
                     ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                    toggleMoveAll->setValue(true);
                     toggleMove->setValue(true);
                     disc.setMoving(i, 1);
                 }
             }
             
             else if (title == "stopAll"){
+                ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (noDisc->getWidget("move all"));
+                toggleMoveAll->setValue(false);
                 for(int i = 0; i<disc.getDiscIndex(); i++){
                     ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
-                    ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (canvas->getWidget("move all"));
                     ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                    toggleMoveAll->setValue(false);
                     toggleMove->setValue(false);
                     disc.setMoving(i, 0);
                 }
             }
             
             else if (title == "resetAll"){
+                ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (noDisc->getWidget("move all"));
+                toggleMoveAll->setValue(false);
                 for(int i = 0; i<disc.getDiscIndex(); i++){
                     disc.resetPerlin[i] = 1;
                     ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
-                    ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (canvas->getWidget("move all"));
                     ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                    toggleMoveAll->setValue(false);
                     toggleMove->setValue(false);
                 }
             }
