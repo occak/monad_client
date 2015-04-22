@@ -915,17 +915,17 @@ void ofApp::update(){
                 ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(index+1)));
                 slider->setValue(disc.getNetRotationSpeed(index));
                 
-                //update buttons
+                ///////////update buttons/////////////
                 
-                ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" rotation\nset to "+ofToString((int)disc.getNetRotationSpeed(index)), false, 200, 50);
+                ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" rotation\nset to "+ofToString(disc.getNetRotationSpeed(index)), false, 200, 50);
+                updateButtonsArray.push_back(toggle);
                 
                 Player* _player = NULL;
                 for(int i = 0; i < otherPlayers.size(); i++){
                     if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
                 }
-                if(_player == NULL) cout<< "_player eslesmedi" <<endl;
+                if(_player == NULL) cout<< "_player is not matched" <<endl;
                 toggle->setColorBack(_player->getColor());
-                updateButtonsArray.push_back(toggle);
                 
                 if(updateButtonsArray.size() > 8){
                     ofxUILabelToggle *toggle0 = updateButtonsArray.front();
@@ -939,12 +939,14 @@ void ofApp::update(){
                     
                     thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
                     
-                    if( thisToggle->getValue() == false){
-                        thisToggle->setColorBack(me->getColor());
-                    }
+//                    if( thisToggle->getValue() == false){
+//                        thisToggle->setColorBack(me->getColor());
+//                    }
                     updateButtonsArray[i] = thisToggle;
                 }
                 updateButtons->autoSizeToFitWidgets();
+                
+                ///////////////////////////////////////////
             }
             
             else if (title == "radius"){
@@ -1364,29 +1366,29 @@ void ofApp::mouseReleased(int x, int y, int button){
         
         //update buttons
         
-        ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(me->getDiscIndex()+1)+" radius\nset to "+ofToString((int)disc.getThickness(me->getDiscIndex())), false, 200, 50);
-        
-        toggle->setColorBack(me->getColor());
-        updateButtonsArray.push_back(toggle);
-        
-        if(updateButtonsArray.size() > 8){
-            ofxUILabelToggle *toggle0 = updateButtonsArray.front();
-            updateButtons->removeWidget(toggle0);
-            updateButtonsArray.erase(updateButtonsArray.begin());
-        }
-        
-        updateButtons->clearWidgets();
-        for(int i = updateButtonsArray.size()-1; i >= 0; i--){
-            ofxUILabelToggle *thisToggle = updateButtonsArray[i];
-            
-            thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
-            
-            if( thisToggle->getValue() == false){
-                thisToggle->setColorBack(me->getColor());
-            }
-            updateButtonsArray[i] = thisToggle;
-        }
-            updateButtons->autoSizeToFitWidgets();
+//        ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(me->getDiscIndex()+1)+" radius\nset to "+ofToString((int)disc.getThickness(me->getDiscIndex())), false, 200, 50);
+//        
+//        toggle->setColorBack(me->getColor());
+//        updateButtonsArray.push_back(toggle);
+//        
+//        if(updateButtonsArray.size() > 8){
+//            ofxUILabelToggle *toggle0 = updateButtonsArray.front();
+//            updateButtons->removeWidget(toggle0);
+//            updateButtonsArray.erase(updateButtonsArray.begin());
+//        }
+//        
+//        updateButtons->clearWidgets();
+//        for(int i = updateButtonsArray.size()-1; i >= 0; i--){
+//            ofxUILabelToggle *thisToggle = updateButtonsArray[i];
+//            
+//            thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
+//            
+//            if( thisToggle->getValue() == false){
+//                thisToggle->setColorBack(me->getColor());
+//            }
+//            updateButtonsArray[i] = thisToggle;
+//        }
+//            updateButtons->autoSizeToFitWidgets();
         
     }
     else if(densityChanged){
