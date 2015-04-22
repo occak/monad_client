@@ -930,16 +930,14 @@ void ofApp::update(){
                     updateButtons->removeWidget(toggle0);
                     updateButtonsArray.erase(updateButtonsArray.begin());
                 }
-                
                 updateButtons->clearWidgets();
                 for(int i = updateButtonsArray.size()-1; i >= 0; i--){
                     ofxUILabelToggle *thisToggle = updateButtonsArray[i];
                     
                     thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
-                    
-//                    if( thisToggle->getValue() == false){
-//                        thisToggle->setColorBack(me->getColor());
-//                    }
+                    if( thisToggle->getValue() == false){
+                        thisToggle->setColorBack(updateButtonsArray[i]->getColorBack());
+                    }
                     updateButtonsArray[i] = thisToggle;
                 }
                 updateButtons->autoSizeToFitWidgets();
@@ -961,6 +959,37 @@ void ofApp::update(){
                 ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
                 ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("radius"+ofToString(index+1)));
                 slider->setValue(disc.getRadius(index)-disc.getRadius(index-1));
+                
+                ///////////update buttons/////////////
+                
+                ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" size\nset to "+ofToString(disc.getThickness(index)), false, 200, 50);
+                updateButtonsArray.push_back(toggle);
+                
+                Player* _player = NULL;
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                }
+                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                toggle->setColorBack(_player->getColor());
+                
+                if(updateButtonsArray.size() > 8){
+                    ofxUILabelToggle *toggle0 = updateButtonsArray.front();
+                    updateButtons->removeWidget(toggle0);
+                    updateButtonsArray.erase(updateButtonsArray.begin());
+                }
+                updateButtons->clearWidgets();
+                for(int i = updateButtonsArray.size()-1; i >= 0; i--){
+                    ofxUILabelToggle *thisToggle = updateButtonsArray[i];
+                    
+                    thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
+                    if( thisToggle->getValue() == false){
+                        thisToggle->setColorBack(updateButtonsArray[i]->getColorBack());
+                    }
+                    updateButtonsArray[i] = thisToggle;
+                }
+                updateButtons->autoSizeToFitWidgets();
+                
+                ///////////////////////////////////////////
             }
             
             else if (title == "density"){
@@ -979,6 +1008,37 @@ void ofApp::update(){
                 ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
                 ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("density"+ofToString(index+1)));
                 slider->setValue(disc.getDensity(index));
+                
+                ///////////update buttons/////////////
+                
+                ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" density\nset to "+ofToString(disc.getDensity(index)), false, 200, 50);
+                updateButtonsArray.push_back(toggle);
+                
+                Player* _player = NULL;
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                }
+                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                toggle->setColorBack(_player->getColor());
+                
+                if(updateButtonsArray.size() > 8){
+                    ofxUILabelToggle *toggle0 = updateButtonsArray.front();
+                    updateButtons->removeWidget(toggle0);
+                    updateButtonsArray.erase(updateButtonsArray.begin());
+                }
+                updateButtons->clearWidgets();
+                for(int i = updateButtonsArray.size()-1; i >= 0; i--){
+                    ofxUILabelToggle *thisToggle = updateButtonsArray[i];
+                    
+                    thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
+                    if( thisToggle->getValue() == false){
+                        thisToggle->setColorBack(updateButtonsArray[i]->getColorBack());
+                    }
+                    updateButtonsArray[i] = thisToggle;
+                }
+                updateButtons->autoSizeToFitWidgets();
+                
+                ///////////////////////////////////////////
             }
             
             else if (title == "texture"){
@@ -1007,6 +1067,44 @@ void ofApp::update(){
                 else toggle3->setValue(false);
                 if(disc.getTexture(index) == 4) toggle4->setValue(true);
                 else toggle4->setValue(false);
+                
+                ///////////update buttons/////////////
+                
+                string texture;
+                if(disc.getTexture(index) == 0) texture = "blank";
+                if(disc.getTexture(index) == 1) texture = "line";
+                if(disc.getTexture(index) == 2) texture = "tri";
+                if(disc.getTexture(index) == 3) texture = "saw";
+                if(disc.getTexture(index) == 4) texture = "rect";
+                
+                ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" texture\nset to "+texture, false, 200, 50);
+                updateButtonsArray.push_back(toggle);
+                
+                Player* _player = NULL;
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                }
+                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                toggle->setColorBack(_player->getColor());
+                
+                if(updateButtonsArray.size() > 8){
+                    ofxUILabelToggle *toggle0 = updateButtonsArray.front();
+                    updateButtons->removeWidget(toggle0);
+                    updateButtonsArray.erase(updateButtonsArray.begin());
+                }
+                updateButtons->clearWidgets();
+                for(int i = updateButtonsArray.size()-1; i >= 0; i--){
+                    ofxUILabelToggle *thisToggle = updateButtonsArray[i];
+                    
+                    thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
+                    if( thisToggle->getValue() == false){
+                        thisToggle->setColorBack(updateButtonsArray[i]->getColorBack());
+                    }
+                    updateButtonsArray[i] = thisToggle;
+                }
+                updateButtons->autoSizeToFitWidgets();
+                
+                ///////////////////////////////////////////
             }
             
             else if (title == "mute"){
