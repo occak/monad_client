@@ -23,7 +23,7 @@ void ofApp::setup(){
     
     initialize = new ofxUICanvas();
     initialize->setPosition(ofGetWidth()/2-100, ofGetHeight()/2-10);
-    initialize->addLabel("IP:");
+    initialize->addLabel("IP :");
     initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
     initialize->addTextInput("IP", "");
     initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
@@ -267,8 +267,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             
             Player* _player = new Player();
             for(int i = 0; i < otherPlayers.size(); i++){
-                if(otherPlayers[i]->getColor() == updateButton->getColorBack()) otherPlayers[i] = _player;
-                else continue;
+                if(otherPlayers[i]->getColor() == updateButton->getColorBack()) _player = otherPlayers[i];
             }
             _player->setLife(_player->getLife()+5);
             //send update
@@ -882,26 +881,25 @@ void ofApp::update(){
             }
             
             else if (title == "life"){
+                Player *_player = NULL;
                 for(int i = 1; i < received.size(); i++ ){
-                    vector<string> playerData;
-                    int thisPlayer;
-                    playerData = ofSplitString(received[i], ": ");
-                    if (playerData[0] == "IP"){
+                    vector<string> playerData = ofSplitString(received[i], ": ");;
+                    if (playerData[0] == "IP" && playerData[1] != me->getIP()){
                         for (int j = 0; j < otherPlayers.size(); j++) {
                             if(playerData[1] == otherPlayers[j]->getIP()) {
-                                thisPlayer = j;
+                                _player = otherPlayers[j];
                                 break;
                             }
                         }
                     }
-                    if (playerData[0] == "life") otherPlayers[thisPlayer]->setLife(ofToFloat(playerData[1]));
-                    cout<< received[i] <<endl;
+                    else if (playerData[0] == "IP" && playerData[1] == me->getIP()) _player = me;
+                    
+                    if (playerData[0] == "life" && _player != NULL) _player->setLife(_player->getLife()+ofToFloat(playerData[1]));
                 }
             }
             
             else if (title == "rotationSpeed"){
-                vector<string> nameValue;
-                nameValue = ofSplitString(received[1], ": ");
+                vector<string> nameValue = ofSplitString(received[1], ": ");;
                 int index = ofToInt(nameValue[0]);
                 disc.setRotationSpeed(index, ofToFloat(nameValue[1]));
                 
