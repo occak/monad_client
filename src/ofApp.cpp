@@ -371,7 +371,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
     else if(e.getName() == "blank"){
         ofxUIToggle *toggle = e.getToggle();
         int texture = disc.getTexture(me->getDiscIndex());
-        if(me->getLife()> 0 && texture != 0) {
+        if(me->getLife()> 0 && texture != 0 && toggle->getValue() == true) {
             
             textureChanged = true;
             disc.setTexture(me->getDiscIndex(), 0);
@@ -407,7 +407,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
     else if(e.getName() == "line"){
         ofxUIToggle *toggle = e.getToggle();
         int texture = disc.getTexture(me->getDiscIndex());
-        if(me->getLife()> 0 && texture != 1) {
+        if(me->getLife()> 0 && texture != 1 && toggle->getValue() == true) {
             textureChanged = true;
             disc.setTexture(me->getDiscIndex(), 1);
             ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
@@ -434,7 +434,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
     else if(e.getName() == "tri"){
         ofxUIToggle *toggle = e.getToggle();
         int texture = disc.getTexture(me->getDiscIndex());
-        if(me->getLife() > 0 && texture != 2) {
+        if(me->getLife() > 0 && texture != 2 && toggle->getValue() == true) {
             textureChanged = true;
             disc.setTexture(me->getDiscIndex(), 2);
             ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
@@ -460,7 +460,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
     else if(e.getName() == "saw"){
         ofxUIToggle *toggle = e.getToggle();
         int texture = disc.getTexture(me->getDiscIndex());
-        if(me->getLife() > 0 && texture != 3) {
+        if(me->getLife() > 0 && texture != 3 && toggle->getValue() == true) {
             textureChanged = true;
             disc.setTexture(me->getDiscIndex(), 3);
             ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
@@ -487,7 +487,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
     else if(e.getName() == "rect"){
         ofxUIToggle *toggle = e.getToggle();
         int texture = disc.getTexture(me->getDiscIndex());
-        if(me->getLife() > 0 && texture != 4) {
+        if(me->getLife() > 0 && texture != 4 && toggle->getValue() == true) {
             textureChanged = true;
             disc.setTexture(me->getDiscIndex(), 4);
             ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
@@ -712,11 +712,18 @@ void ofApp::update(){
                         }
                         if(nameValue[0] == "density"+ofToString(i)) {
                             disc.setDensity (i, ofToFloat(nameValue[1]));
+                            
                             //sound
                             float envelopeCoeff = ofMap(disc.getDensity(i), 1, 30, 1, 5);
                             float pulseRatio = ofMap(disc.getDensity(i), 1, 30, 0.001, 1);
                             soundChange("envelopeWidth", i, envelopeCoeff);
                             soundChange("pulseLength", i, pulseRatio);
+                            
+                            float netSpeed = abs(disc.getNetRotationSpeed(i));
+                            float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
+                            float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 1);
+                            soundChange("bpm", i, beatSpeed*beatDensity);
+                            
                             //ui
                             ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
                             ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("density"+ofToString(i+1)));
@@ -925,22 +932,7 @@ void ofApp::update(){
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
                 toggle->setColorBack(_player->getColor());
                 
-                if(updateButtonsArray.size() > 8){
-                    ofxUILabelToggle *toggle0 = updateButtonsArray.front();
-                    updateButtons->removeWidget(toggle0);
-                    updateButtonsArray.erase(updateButtonsArray.begin());
-                }
-                updateButtons->clearWidgets();
-                for(int i = updateButtonsArray.size()-1; i >= 0; i--){
-                    ofxUILabelToggle *thisToggle = updateButtonsArray[i];
-                    
-                    thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
-                    if( thisToggle->getValue() == false){
-                        thisToggle->setColorBack(updateButtonsArray[i]->getColorBack());
-                    }
-                    updateButtonsArray[i] = thisToggle;
-                }
-                updateButtons->autoSizeToFitWidgets();
+                refreshUpdateButtons();
                 
                 ///////////////////////////////////////////
             }
@@ -972,22 +964,7 @@ void ofApp::update(){
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
                 toggle->setColorBack(_player->getColor());
                 
-                if(updateButtonsArray.size() > 8){
-                    ofxUILabelToggle *toggle0 = updateButtonsArray.front();
-                    updateButtons->removeWidget(toggle0);
-                    updateButtonsArray.erase(updateButtonsArray.begin());
-                }
-                updateButtons->clearWidgets();
-                for(int i = updateButtonsArray.size()-1; i >= 0; i--){
-                    ofxUILabelToggle *thisToggle = updateButtonsArray[i];
-                    
-                    thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
-                    if( thisToggle->getValue() == false){
-                        thisToggle->setColorBack(updateButtonsArray[i]->getColorBack());
-                    }
-                    updateButtonsArray[i] = thisToggle;
-                }
-                updateButtons->autoSizeToFitWidgets();
+                refreshUpdateButtons();
                 
                 ///////////////////////////////////////////
             }
@@ -1021,22 +998,7 @@ void ofApp::update(){
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
                 toggle->setColorBack(_player->getColor());
                 
-                if(updateButtonsArray.size() > 8){
-                    ofxUILabelToggle *toggle0 = updateButtonsArray.front();
-                    updateButtons->removeWidget(toggle0);
-                    updateButtonsArray.erase(updateButtonsArray.begin());
-                }
-                updateButtons->clearWidgets();
-                for(int i = updateButtonsArray.size()-1; i >= 0; i--){
-                    ofxUILabelToggle *thisToggle = updateButtonsArray[i];
-                    
-                    thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
-                    if( thisToggle->getValue() == false){
-                        thisToggle->setColorBack(updateButtonsArray[i]->getColorBack());
-                    }
-                    updateButtonsArray[i] = thisToggle;
-                }
-                updateButtons->autoSizeToFitWidgets();
+                refreshUpdateButtons();
                 
                 ///////////////////////////////////////////
             }
@@ -1087,22 +1049,7 @@ void ofApp::update(){
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
                 toggle->setColorBack(_player->getColor());
                 
-                if(updateButtonsArray.size() > 8){
-                    ofxUILabelToggle *toggle0 = updateButtonsArray.front();
-                    updateButtons->removeWidget(toggle0);
-                    updateButtonsArray.erase(updateButtonsArray.begin());
-                }
-                updateButtons->clearWidgets();
-                for(int i = updateButtonsArray.size()-1; i >= 0; i--){
-                    ofxUILabelToggle *thisToggle = updateButtonsArray[i];
-                    
-                    thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
-                    if( thisToggle->getValue() == false){
-                        thisToggle->setColorBack(updateButtonsArray[i]->getColorBack());
-                    }
-                    updateButtonsArray[i] = thisToggle;
-                }
-                updateButtons->autoSizeToFitWidgets();
+                refreshUpdateButtons();
                 
                 ///////////////////////////////////////////
             }
@@ -1611,5 +1558,27 @@ void ofApp::soundChange(string name, int index, float value) {
     }
     
     else sound.synth.setParameter(name+ofToString(index), value);
+    
+}
+
+//--------------------------------------------------------------
+void ofApp::refreshUpdateButtons(){
+    
+    if(updateButtonsArray.size() > 8){
+        ofxUILabelToggle *toggle0 = updateButtonsArray.front();
+        updateButtons->removeWidget(toggle0);
+        updateButtonsArray.erase(updateButtonsArray.begin());
+    }
+    updateButtons->clearWidgets();
+    for(int i = updateButtonsArray.size()-1; i >= 0; i--){
+        ofxUILabelToggle *thisToggle = updateButtonsArray[i];
+        
+        thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
+        if( thisToggle->getValue() == false){
+            thisToggle->setColorBack(updateButtonsArray[i]->getColorBack());
+        }
+        updateButtonsArray[i] = thisToggle;
+    }
+    updateButtons->autoSizeToFitWidgets();
     
 }

@@ -48,7 +48,13 @@ class ofApp : public ofBaseApp{
             costMute,
             costMove;
     
-    bool radiusChanged, textureChanged, densityChanged, rotationChanged, positionChanged = false;
+    bool radiusChanged,
+    textureChanged,
+    densityChanged,
+    rotationChanged,
+    positionChanged = false;
+    
+    void refreshUpdateButtons();
 		
     
     ofEasyCam cam;
