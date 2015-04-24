@@ -64,7 +64,7 @@ void ofApp::setup(){
     noDisc->addButton("reset all", false);
     noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
     noDisc->addSpacer();
-    noDisc->addLabelToggle("chat", false);
+    noDisc->addLabelToggle("chat", true);
     noDisc->autoSizeToFitWidgets();
     noDisc->setVisible(true);
     ofAddListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
@@ -113,7 +113,7 @@ void ofApp::setup(){
         _ui->addButton("reset", disc.resetPerlin[i]);
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
         _ui->addSpacer();
-        _ui->addLabelToggle("chat", false);
+        _ui->addLabelToggle("chat", true);
         
         _ui->autoSizeToFitWidgets();
         _ui->setVisible(false);
@@ -138,7 +138,7 @@ void ofApp::setup(){
     conversation = "";
     chat->addTextInput("chatInput", "", OFX_UI_FONT_LARGE)->setAutoUnfocus(false);
     chat->addTextArea("chat", "", OFX_UI_FONT_LARGE);
-    chat->setVisible(false);
+    chat->setVisible(true);
     
     ofAddListener(chat->newGUIEvent, this, &ofApp::guiEvent);
     
@@ -710,6 +710,20 @@ void ofApp::update(){
                             ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("radius"+ofToString(i+1)));
                             slider->setValue(disc.getRadius(i)-disc.getRadius(i-1));
                         }
+                        if(nameValue[0] == "rotation"+ofToString(i)) {
+                            disc.setRotation (i, ofToFloat(nameValue[1]));
+                        }
+                        if(nameValue[0] == "rotationSpeed"+ofToString(i)) {
+                            disc.setNetRotationSpeed (i, ofToFloat(nameValue[1]));
+                            //sound
+                            float netSpeed = abs(disc.getNetRotationSpeed(i));
+                            float beat = ofMap(netSpeed, 0, 10, 0, 1000);
+                            soundChange("bpm", i, beat);
+                            //ui
+                            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
+                            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(i+1)));
+                            slider->setValue(ofToFloat(nameValue[1]));
+                        }
                         if(nameValue[0] == "density"+ofToString(i)) {
                             disc.setDensity (i, ofToFloat(nameValue[1]));
                             
@@ -728,20 +742,6 @@ void ofApp::update(){
                             ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
                             ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("density"+ofToString(i+1)));
                             slider->setValue(disc.getDensity(i));
-                        }
-                        if(nameValue[0] == "rotation"+ofToString(i)) {
-                            disc.setRotation (i, ofToFloat(nameValue[1]));
-                        }
-                        if(nameValue[0] == "rotationSpeed"+ofToString(i)) {
-                            disc.setNetRotationSpeed (i, ofToFloat(nameValue[1]));
-                            //sound
-                            float netSpeed = abs(disc.getNetRotationSpeed(i));
-                            float beat = ofMap(netSpeed, 0, 10, 0, 1000);
-                            soundChange("bpm", i, beat);
-                            //ui
-                            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
-                            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(i+1)));
-                            slider->setValue(ofToFloat(nameValue[1]));
                         }
                         if(nameValue[0] == "texture"+ofToString(i)) {
                             disc.setTexture (i, ofToFloat(nameValue[1]));
@@ -785,20 +785,20 @@ void ofApp::update(){
                             ofxUILabelToggle *toggle = static_cast<ofxUILabelToggle*>(canvas->getWidget("mute"));
                             toggle->setValue((bool)disc.isMute(i));
                         }
-                        if(nameValue[0] == "perlin"+ofToString(i) && ofToInt(nameValue[1]) == 1 ) {
+                        if(nameValue[0] == "move"+ofToString(i) && ofToInt(nameValue[1]) == 1) {
                             if (disc.isMoving(i) == 0) disc.setMoving(i, 1);
                             else disc.setMoving(i, 0);
+                            //update ui
+                            ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
+                            ofxUILabelToggle *toggle = static_cast<ofxUILabelToggle*>(canvas->getWidget("move"));
+                            toggle->setValue((bool)disc.isMoving(i));
                         }
                     }
                 }
                 //toggle move all button if all grooves are moving
-                bool allMoving;
-                int i = 0;
-                while( i < disc.getDiscIndex()){
-                    if (disc.isMoving(i) == true) {
-                        allMoving = true;
-                        i++;
-                    }
+                bool allMoving = false;
+                for(int i = 0; i < disc.getDiscIndex(); i++){
+                    if (disc.isMoving(i)) allMoving = true;
                     else {
                         allMoving = false;
                         break;
@@ -842,6 +842,7 @@ void ofApp::update(){
             }
             
             else if (title == "otherPlayers"){
+                
                 Player* _player = new Player();
                 
                 for(int i = 1; i < received.size(); i++ ){
@@ -855,10 +856,9 @@ void ofApp::update(){
                                 exists = true;
                                 break;
                             }
-                            else continue;
                         }
                         if (exists == false){
-                         otherPlayers.push_back(_player);
+                            otherPlayers.push_back(_player);
                             _player->setIP(playerData[1]);
                         }
                     }

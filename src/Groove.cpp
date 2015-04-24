@@ -82,7 +82,6 @@ void Groove::update(){
     // update mesh position
     for(int i = 0; i < disc->getDiscIndex(); i++){
         
-        
         float angle = 0;
         float inc = (360/70);
         for (int j = 0; j < mesh[i].getNumVertices(); j += 2 ) {
@@ -100,7 +99,6 @@ void Groove::update(){
             mesh[i].setVertex(j+1, vert2);
             
             angle += inc;
-            
         }
     }
 }

@@ -9,8 +9,6 @@
 #include "Disc.h"
 
 void Disc::setup(){
-
-    life = 100;         // initial life value
     
     discIndex = 10;    // 10 discs
     
