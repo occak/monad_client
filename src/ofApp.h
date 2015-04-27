@@ -44,7 +44,8 @@ class ofApp : public ofBaseApp{
             costDensity,
             costRotation,
             costMute,
-            costMove;
+            costMove,
+            reward;
     
     bool radiusChanged,
     textureChanged,

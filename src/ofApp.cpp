@@ -154,6 +154,7 @@ void ofApp::setup(){
     costTexture = 1;
     costMute = 1;
     costMove = 1;
+    reward = 2;
     
 }
 //--------------------------------------------------------------
@@ -267,7 +268,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             for(int i = 0; i < otherPlayers.size(); i++){
                 if(otherPlayers[i]->getColor() == updateButton->getColorBack()) _player = otherPlayers[i];
             }
-            _player->setLife(_player->getLife()+5);
+            _player->setLife(_player->getLife()+reward);
             //send update
             string lifeUpdate = "life//";
             lifeUpdate += "IP: "+ofToString(_player->getIP()) + "//";
