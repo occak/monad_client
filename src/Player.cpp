@@ -83,6 +83,8 @@ float Player::getLife() const{
 
 void Player::setLife(float newLife){
     
+    if(newLife > 100) newLife = 100;
+    if(newLife < 0) newLife = 0;
     life = newLife;
     
 }

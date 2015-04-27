@@ -52,7 +52,11 @@ class ofApp : public ofBaseApp{
     textureChanged,
     densityChanged,
     rotationChanged,
-    positionChanged = false;
+    positionChanged,
+    moveChanged,
+    moveReset,
+    moveAllChanged,
+    muteChanged = false;
     
     void refreshUpdateButtons();
 		
