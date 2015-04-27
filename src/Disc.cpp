@@ -78,7 +78,7 @@ void Disc::update(){
 //        float time = ofGetElapsedTimef();
         float timeScale = .11-0.01*abs(rotationSpeed[i]);
 //        float displacementScale = 1 + 5 * (radii[i]-radii[i-1])/density[i];
-        float displacementScale = 50;
+        float displacementScale = 15;
         float timeOffset = posOffset[i];
         
         //        position += (sin((counter[i]*timeScale)+timeOffset) * displacementScale) - (position/10);
@@ -91,7 +91,7 @@ void Disc::update(){
         //update groove position
         
         setPosition(i, position);
-        counter[i] +=.005;
+        counter[i] +=.001;
         
         }
         resetPerlin[i] = 0;

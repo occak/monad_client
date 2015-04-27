@@ -208,14 +208,11 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 
                 //change sound
                 float netSpeed = abs(disc.getNetRotationSpeed(i));
-                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
+                float frequency = ofMap(netSpeed, 0, 10, 50, 1500);
+                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 100);
                 float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 1);
+                soundChange("freq", i, frequency);
                 soundChange("bpm", i, beatSpeed*beatDensity);
-                
-                //send to server
-                //                string change = "rotationSpeed//"+ ofToString(i)+": "+ ofToString(newRotation)+"//"+me->getIP();
-                //                client.send(change);
-                //                cout<< change <<endl;
                 
             }
         }
@@ -248,7 +245,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 
                 //change metronome
                 float netSpeed = abs(disc.getNetRotationSpeed(i));
-                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
+                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 150);
                 float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 1);
                 soundChange("bpm", i, beatSpeed*beatDensity);
                 
@@ -627,14 +624,14 @@ void ofApp::update(){
     float size = 0;
     for(int i = 0; i< disc.getDiscIndex(); i++){
         float amountFreq = ofMap(abs(disc.getNetRotationSpeed(i)), 0, 10, 0, 10000);
-        float amountMod = ofMap(abs(disc.getPosition(i)), 0, 50, 0, 10000);
+        float amountMod = ofMap(abs(disc.getPosition(i)), 0, 20, 0, 10000);
         soundChange("amountFreq", i, amountFreq);
         soundChange("amountMod", i, amountMod);
         size += abs(disc.getPosition(i));
     }
-    float avgSize = ofMap(size/disc.getDiscIndex(), 0, 200, 0.01, .5);
+    float avgSize = ofMap(size/disc.getDiscIndex(), 0, 20, 0.01, .5);
     sound.synth.setParameter("size", avgSize);
-    sound.synth.setParameter("decay", .001*size);
+//    sound.synth.setParameter("decay", .001*size);
     
     //TCP
     if(client.isConnected()){
@@ -668,8 +665,9 @@ void ofApp::update(){
                             disc.setNetRotationSpeed (i, ofToFloat(nameValue[1]));
                             //sound
                             float netSpeed = abs(disc.getNetRotationSpeed(i));
-                            float beat = ofMap(netSpeed, 0, 10, 0, 1000);
-                            soundChange("bpm", i, beat);
+                            float beatSpeed = ofMap(netSpeed, 0, 10, 0, 150);
+                            float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 1);
+                            soundChange("bpm", i, beatSpeed*beatDensity);
                             //ui
                             ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
                             ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(i+1)));
@@ -685,7 +683,7 @@ void ofApp::update(){
                             soundChange("pulseLength", i, pulseRatio);
                             
                             float netSpeed = abs(disc.getNetRotationSpeed(i));
-                            float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
+                            float beatSpeed = ofMap(netSpeed, 0, 10, 0, 150);
                             float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 1);
                             soundChange("bpm", i, beatSpeed*beatDensity);
                             
@@ -867,10 +865,11 @@ void ofApp::update(){
                 int index = ofToInt(nameValue[0]);
                 disc.setRotationSpeed(index, ofToFloat(nameValue[1]));
                 
-                //change sound
+                //sound
                 float netSpeed = abs(disc.getNetRotationSpeed(index));
-                float beat = ofMap(netSpeed, 0, 10, 0, 1000);
-                soundChange("bpm", index, beat);
+                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 150);
+                float beatDensity = ofMap(disc.getDensity(index), 1, 30, 30, 1);
+                soundChange("bpm", index, beatSpeed*beatDensity);
                 
                 //update ui
                 ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[index]);
@@ -1265,48 +1264,48 @@ void ofApp::keyPressed(int key){
     
     if(key == 'a' && me->getDiscIndex() != -1) {
         
-        if(disc.getLife() > 0) {
-            disc.setLife(costRotation);     // reduce life
-            disc.setRotationSpeed(me->getDiscIndex(), +.05);
-            
-            //update ui
-            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
-            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
-            slider->setValue(disc.getNetRotationSpeed(me->getDiscIndex()));
-            
-            //change sound
-            float netSpeed = abs(disc.getNetRotationSpeed(me->getDiscIndex()));
-            float beat = ofMap(netSpeed, 0, 10, 0, 1000);
-            sound.synth.setParameter("bpm"+ofToString(me->getDiscIndex()), beat);
-            
-            //send to server
-            float newRotation = slider->getScaledValue()-disc.getNetRotationSpeed(me->getDiscIndex());
-            string change = "rotationSpeed//"+ ofToString(me->getDiscIndex())+": "+ ofToString(+0.05);
-            client.send(change);
-        }
+//        if(disc.getLife() > 0) {
+//            disc.setLife(costRotation);     // reduce life
+//            disc.setRotationSpeed(me->getDiscIndex(), +.05);
+//            
+//            //update ui
+//            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
+//            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
+//            slider->setValue(disc.getNetRotationSpeed(me->getDiscIndex()));
+//            
+//            //change sound
+//            float netSpeed = abs(disc.getNetRotationSpeed(me->getDiscIndex()));
+//            float beat = ofMap(netSpeed, 0, 10, 0, 1000);
+//            sound.synth.setParameter("bpm"+ofToString(me->getDiscIndex()), beat);
+//            
+//            //send to server
+//            float newRotation = slider->getScaledValue()-disc.getNetRotationSpeed(me->getDiscIndex());
+//            string change = "rotationSpeed//"+ ofToString(me->getDiscIndex())+": "+ ofToString(+0.05);
+//            client.send(change);
+//        }
     }
     
     if(key == 'd' && me->getDiscIndex() != -1 ) {
         
-        if(disc.getLife() > 0) {
-            disc.setLife(costRotation);     // reduce life
-            disc.setRotationSpeed(me->getDiscIndex(), -.05);
-            
-            //update ui
-            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
-            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
-            slider->setValue(disc.getNetRotationSpeed(me->getDiscIndex()));
-            
-            //change sound
-            float netSpeed = abs(disc.getNetRotationSpeed(me->getDiscIndex()));
-            float beat = ofMap(netSpeed, 0, 10, 0, 1000);
-            sound.synth.setParameter("bpm"+ofToString(me->getDiscIndex()), beat);
-            
-            //send to server
-            float newRotation = slider->getScaledValue()-disc.getNetRotationSpeed(me->getDiscIndex());
-            string change = "rotationSpeed//"+ ofToString(me->getDiscIndex())+": "+ ofToString(-0.05);
-            client.send(change);
-        }
+//        if(disc.getLife() > 0) {
+//            disc.setLife(costRotation);     // reduce life
+//            disc.setRotationSpeed(me->getDiscIndex(), -.05);
+//            
+//            //update ui
+//            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
+//            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
+//            slider->setValue(disc.getNetRotationSpeed(me->getDiscIndex()));
+//            
+//            //change sound
+//            float netSpeed = abs(disc.getNetRotationSpeed(me->getDiscIndex()));
+//            float beat = ofMap(netSpeed, 0, 10, 0, 1000);
+//            sound.synth.setParameter("bpm"+ofToString(me->getDiscIndex()), beat);
+//            
+//            //send to server
+//            float newRotation = slider->getScaledValue()-disc.getNetRotationSpeed(me->getDiscIndex());
+//            string change = "rotationSpeed//"+ ofToString(me->getDiscIndex())+": "+ ofToString(-0.05);
+//            client.send(change);
+//        }
     }
     
     if(key == 'w'){
