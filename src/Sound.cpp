@@ -75,9 +75,9 @@ void Sound::setup(Disc* disc){
     
 }
 
-void Sound::setScale(int index, float value){
-    
-    if(scale.size()>0) scale[index] = value;
-    else scale.push_back(value);
-    
-}
+//void Sound::setScale(int index, float value){
+//    
+//    if(scale.size()>0) scale[index] = value;
+//    else scale.push_back(value);
+//    
+//}

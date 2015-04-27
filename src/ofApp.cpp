@@ -744,16 +744,16 @@ void ofApp::update(){
                 initialize->setVisible(false);
             }
             
-            else if (title == "scale"){
-                //sound values
-                vector<string> scaleValue;
-                scaleValue = ofSplitString(received[1], ": ");
-                for(int i = 0; i < scaleValue.size(); i++){
-                    sound.setScale(i, ofToFloat(scaleValue[i]));
-                }
-                //set up synths
-                sound.setup(&disc);
-            }
+//            else if (title == "scale"){
+//                //sound values
+//                vector<string> scaleValue;
+//                scaleValue = ofSplitString(received[1], ": ");
+//                for(int i = 0; i < scaleValue.size(); i++){
+//                    sound.setScale(i, ofToFloat(scaleValue[i]));
+//                }
+//                //set up synths
+//                sound.setup(&disc);
+//            }
             
             else if (title == "playerInfo" ){
                 Player* _player = new Player();
