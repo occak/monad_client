@@ -143,8 +143,6 @@ void ofApp::setup(){
     ofAddListener(chat->newGUIEvent, this, &ofApp::guiEvent);
     
     //set up audio stream & synth network
-    phase = 0;
-    volume = 0;
     ofSoundStreamSetup(2, 0); // 2 out, 0 in
     
     //    sound.setup(&disc);

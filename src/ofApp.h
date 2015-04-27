@@ -31,8 +31,6 @@ class ofApp : public ofBaseApp{
     
     //audio
     void audioOut( float * output, int bufferSize, int nChannels );
-    double phase;
-    float volume;
     
     void soundChange(string name, int index, float value);
     
