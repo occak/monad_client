@@ -22,7 +22,8 @@ bool Player::isConnected() const{
 }
 
 void Player::setConnection(bool connection){
-    
+
+    if(connection == false) discIndex = -1;
     connected = connection;
     
 }

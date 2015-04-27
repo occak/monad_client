@@ -1,16 +1,7 @@
 #include "ofApp.h"
 
 /*
- 
- perlin cpp - changed to sin Ã
- groove move factor ~(rotationSpeed*thickness/density) Ã
- change back to perlin
- 
- event button create
 
- image button Ã
- 
- rethink frequency - no scale snap
 
  */
 
@@ -32,22 +23,14 @@ void ofApp::setup(){
     initialize->addTextInput("port", "");
     initialize->autoSizeToFitWidgets();
     ofAddListener(initialize->newGUIEvent, this, &ofApp::guiEvent);
-    
-//    while(true){
-//        cout<< "girdi" <<endl;
-//    }
-    
-    //set up network
-//    client.setup("127.0.0.1", 10002);
-//    client.setMessageDelimiter("varianet");
-//    
-//    // ask for server state
-//    client.send("hello//");
+
     // set up values of objects
     disc.setup();
     
-    //set up gui
+    //set up synths
+    sound.setup(&disc);
     
+    //set up gui
     noDisc = new ofxUICanvas();
     noDisc->addMultiImageToggle("inner","butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
     noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
@@ -203,7 +186,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             ofxUISlider *slider = e.getSlider();
             if(me->getLife()>0 && mReleased == false){
                 rotationChanged = true;
-                newRotation = slider->getScaledValue()-disc.getNetRotationSpeed(i);
+                float newRotation = slider->getScaledValue()-disc.getNetRotationSpeed(i);
                 disc.setRotationSpeed(i, newRotation);
                 
                 //change sound
@@ -756,9 +739,6 @@ void ofApp::update(){
                 ofxUIToggle *moveAll = (ofxUIToggle*) noDisc->getWidget("move all");
                 moveAll->setValue(allMoving);
                 
-                //set up synths
-                sound.setup(&disc);
-                
                 me->setConnection(true);
                 TCPsetup = true;
                 initialize->setVisible(false);
@@ -861,6 +841,7 @@ void ofApp::update(){
             }
             
             else if (title == "rotationSpeed"){
+                cout<<str<<endl;
                 vector<string> nameValue = ofSplitString(received[1], ": ");;
                 int index = ofToInt(nameValue[0]);
                 disc.setRotationSpeed(index, ofToFloat(nameValue[1]));
@@ -1441,6 +1422,7 @@ void ofApp::mouseDragged(int x, int y, int button){
 void ofApp::mousePressed(int x, int y, int button){
     
     mReleased = false;
+    if(me != NULL) thisRotation = disc.getNetRotationSpeed(me->getDiscIndex());
     
 }
 
@@ -1492,6 +1474,11 @@ void ofApp::mouseReleased(int x, int y, int button){
     else if(rotationChanged){
         rotationChanged = false;
         me->setLife(me->getLife()-costRotation);
+        
+        //update ui
+        ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
+        ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
+        float newRotation = slider->getValue() - thisRotation;
         
         //update server
         string lifeUpdate = "life//";

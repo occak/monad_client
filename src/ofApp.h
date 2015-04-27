@@ -76,7 +76,8 @@ private:
     string IP;
     int port;
     
-    float newRotation;
+//    float newRotation;
+    float thisRotation;
     
     Groove groove;
     Disc disc;
