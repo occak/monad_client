@@ -501,7 +501,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     }
                 }
                 me->setLife(me->getLife()-(costMove*costFactor));
-                string moveAll = "moveAll//";
+                string moveAll = "moveAll//"+me->getIP();
                 client.send(moveAll);
                 
                 //update server
@@ -526,7 +526,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     zPositionAll += ofToString(i)+": "+ofToString(disc.getPosition(i))+"//";
                 }
                 me->setLife(me->getLife()-(costMove*costFactor));
-                string stopAll = "stopAll//";
+                string stopAll = "stopAll//"+me->getIP();
                 client.send(stopAll);
                 client.send(zPositionAll);
                 
@@ -557,7 +557,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 toggleMoveAll->setValue(false);
                 
                 me->setLife(me->getLife()-(costMove*costFactor));
-                string resetAll = "resetAll//";
+                string resetAll = "resetAll//"+me->getIP();
                 client.send(resetAll);
                 
                 //update server
@@ -1093,7 +1093,7 @@ void ofApp::update(){
                 
                 Player* _player = NULL;
                 for(int i = 0; i < otherPlayers.size(); i++){
-                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                    if(received[1] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
                 }
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
                 newToggle->setColorBack(_player->getColor());
@@ -1118,7 +1118,7 @@ void ofApp::update(){
                 
                 Player* _player = NULL;
                 for(int i = 0; i < otherPlayers.size(); i++){
-                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                    if(received[1] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
                 }
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
                 newToggle->setColorBack(_player->getColor());
@@ -1143,7 +1143,7 @@ void ofApp::update(){
                 
                 Player* _player = NULL;
                 for(int i = 0; i < otherPlayers.size(); i++){
-                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                    if(received[1] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
                 }
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
                 newToggle->setColorBack(_player->getColor());
