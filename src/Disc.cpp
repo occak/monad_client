@@ -160,7 +160,7 @@ int Disc::getDensity(int index) const{
 }
 //----------------------------------
 
-int Disc::setDensity(int index, int newDensity) {
+int Disc::setDensity(int index, float newDensity) {
     
     return density[index] = newDensity;
 }

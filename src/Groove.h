@@ -12,6 +12,10 @@
 #define __multiDiscTest__Groove__
 
 #include <stdio.h>
+#include <math.h>
+#include <iostream>
+#include <string>
+#include <sstream>
 #include "ofMain.h"
 #include "Disc.h"
 #include "Player.h"

@@ -35,7 +35,7 @@ class Disc{
     void setThickness(int index, float size);
     
     int getDensity(int index) const;
-    int setDensity(int index, int newDensity);
+    int setDensity(int index, float newDensity);
     
     float getRotation(int index) const;
     float setRotation(int index, float newRotation);
@@ -91,7 +91,7 @@ private:
     
     vector<int> discSelected;
     vector<float> radii;
-    vector<int> density;
+    vector<float> density;
     
     vector<float> zPosition;
     vector<float> posOffset;

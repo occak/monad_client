@@ -93,14 +93,12 @@ void ofApp::setup(){
         _ui->addBiLabelSlider("density" + ofToString(i+1), "sparse", "dense", 30, 1, disc.getDensity(i));
         _ui->addLabel("size",2);
         _ui->addBiLabelSlider("radius" + ofToString(i+1), "small", "large", 15, 100, disc.getRadius(i)-disc.getRadius(i-1));
-        _ui->addSpacer();
         
         _ui->addLabel("z-motion",1);
         _ui->addToggle("move", disc.isMoving(i));
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
         _ui->addButton("reset", disc.resetPerlin[i]);
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-        _ui->addSpacer();
         _ui->addLabelToggle("mute", disc.isMute(i));
         _ui->addSpacer();
         _ui->addLabelToggle("chat", true);
@@ -224,6 +222,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 ofxUISlider *slider = e.getSlider();
                 if(me->getLife()> 0 && mReleased == false) {
                     densityChanged = true;
+                    cout<< slider->getScaledValue() <<endl;
                     disc.setDensity(i, slider->getScaledValue());
                     
                     //change envelope
@@ -274,17 +273,16 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 occupied = false;
                 for(int i = 0; i < otherPlayers.size(); i++){
                     int destination = me->getDiscIndex() - jump;
-                    if( destination > disc.getDiscIndex()) destination += disc.getDiscIndex();
+                    if( destination < 0 ) destination += disc.getDiscIndex() + 1;
                     if(otherPlayers[i]->getDiscIndex() == destination) {
                         occupied = true;
                         jump++;
                         break;
                     }
-                    else continue;
                 }
             }
             if(me->getDiscIndex() - jump > -1) me->setDiscIndex(me->getDiscIndex() - jump);
-            else me->setDiscIndex(me->getDiscIndex() - jump + disc.getDiscIndex());
+            else me->setDiscIndex(me->getDiscIndex() - jump + disc.getDiscIndex() + 1);
             
             button->setValue(false);
             
@@ -317,7 +315,6 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                         jump++;
                         break;
                     }
-                    else continue;
                 }
             }
             
@@ -609,6 +606,27 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 //--------------------------------------------------------------
 void ofApp::update(){
     
+    if(moveChanged){
+        moveChanged = false;
+        me->setLife(me->getLife()-costMove);
+        
+        //update server
+        string lifeUpdate = "life//";
+        lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+        lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
+        client.send(lifeUpdate);
+        
+        string movement = "move//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMoving(me->getDiscIndex()))+"//"+me->getIP();
+        client.send(movement);
+        
+        if (disc.isMoving(me->getDiscIndex()) == 0){
+            string position = "zPosition//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getPosition(me->getDiscIndex()));
+            string counter = "counter//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getCounter(me->getDiscIndex()));
+            client.send(position);
+            client.send(counter);
+        }
+    }
+    
     disc.update();
     float size = 0;
     for(int i = 0; i< disc.getDiscIndex(); i++){
@@ -831,7 +849,6 @@ void ofApp::update(){
                         }
                     }
                     if (playerData[0] == "index") otherPlayers[thisPlayer]->setDiscIndex(ofToInt(playerData[1]));
-                    cout<< received[i] <<endl;
                 }
             }
             
@@ -854,7 +871,6 @@ void ofApp::update(){
             }
             
             else if (title == "rotationSpeed"){
-                cout<<str<<endl;
                 vector<string> nameValue = ofSplitString(received[1], ": ");;
                 int index = ofToInt(nameValue[0]);
                 disc.setRotationSpeed(index, ofToFloat(nameValue[1]));
@@ -1312,12 +1328,11 @@ void ofApp::keyPressed(int key){
             for(int i = 0; i < otherPlayers.size(); i++){
                 int destination = me->getDiscIndex() + jump;
                 if( destination > disc.getDiscIndex()) destination -= disc.getDiscIndex();
-                if(otherPlayers[i]->getDiscIndex() == destination) {
+                if( otherPlayers[i]->getDiscIndex() == destination) {
                     occupied = true;
                     jump++;
                     break;
                 }
-                else continue;
             }
         }
         
@@ -1345,17 +1360,16 @@ void ofApp::keyPressed(int key){
             occupied = false;
             for(int i = 0; i < otherPlayers.size(); i++){
                 int destination = me->getDiscIndex() - jump;
-                if( destination > disc.getDiscIndex()) destination += disc.getDiscIndex();
-                if(otherPlayers[i]->getDiscIndex() == destination) {
+                if( destination < 0 ) destination += disc.getDiscIndex() + 1;
+                if( otherPlayers[i]->getDiscIndex() == destination) {
                     occupied = true;
                     jump++;
                     break;
                 }
-                else continue;
             }
         }
         if(me->getDiscIndex() - jump > -1) me->setDiscIndex(me->getDiscIndex() - jump);
-        else me->setDiscIndex(me->getDiscIndex() - jump + disc.getDiscIndex());
+        else me->setDiscIndex(me->getDiscIndex() - jump + disc.getDiscIndex() + 1);
         
         //change ui
         for(int i = 0; i < disc.getDiscIndex(); i++){
@@ -1518,26 +1532,8 @@ void ofApp::mouseReleased(int x, int y, int button){
         string change = "mute//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMute(me->getDiscIndex()))+"//"+me->getIP();
         client.send(change);
     }
-    else if(moveChanged){
-        moveChanged = false;
-        me->setLife(me->getLife()-costMove);
-        
-        //update server
-        string lifeUpdate = "life//";
-        lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-        lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
-        client.send(lifeUpdate);
-        
-        string movement = "move//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMoving(me->getDiscIndex()))+"//"+me->getIP();
-        client.send(movement);
-        
-        if (disc.isMoving(me->getDiscIndex()) == 0){
-            string position = "zPosition//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getPosition(me->getDiscIndex()));
-            string counter = "counter//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getCounter(me->getDiscIndex()));
-            client.send(position);
-            client.send(counter);
-        }
-    }
+//    moveChanged is in update()
+    
     else if(moveReset){
         moveReset = false;
         me->setLife(me->getLife()-costMove);

@@ -167,7 +167,7 @@ void Groove::draw(){
                 
                 for(int a = 0; a < 360; a++){
                     
-                    if(a % disc->getDensity(i) == 0){
+                    if(fmodf(a, disc->getDensity(i)) == 0){
                         
                         ofLine( disc->getRadius(i-1)*cos(a*PI/180) ,  //x1
                                disc->getRadius(i-1)*sin(a*PI/180),    //y1
@@ -185,7 +185,7 @@ void Groove::draw(){
                 
                 for(int a = 0; a < 360; a++){
                     
-                    if(a % disc->getDensity(i) == 0){
+                    if(fmodf(a, disc->getDensity(i)) == 0){
                         
                         ofSetPolyMode(OF_POLY_WINDING_ODD);
                         ofBeginShape();
@@ -211,7 +211,7 @@ void Groove::draw(){
                 
                 for(int a = 0; a < 360; a++){
                     
-                    if(a % disc->getDensity(i) == 0){
+                    if(fmodf(a, disc->getDensity(i)) == 0){
                         
                         ofSetPolyMode(OF_POLY_WINDING_ODD);
                         ofBeginShape();
@@ -241,7 +241,7 @@ void Groove::draw(){
                 
                 for(int a = 0; a < 360; a++){
                     
-                    if(space == false && a % disc->getDensity(i) == 0){
+                    if(space == false && fmodf(a, disc->getDensity(i)) == 0){
                         
                         ofSetPolyMode(OF_POLY_WINDING_ODD);
                         ofBeginShape();
@@ -269,7 +269,7 @@ void Groove::draw(){
                         
                         space = true;
                     }
-                    else if (space == true && a % disc->getDensity(i) == 0) space = false;
+                    else if (space == true && fmodf(a, disc->getDensity(i)) == 0) space = false;
                     
                 }
                 break;
