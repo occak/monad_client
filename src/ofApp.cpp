@@ -9,6 +9,8 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     
+    ofSetDataPathRoot("../Resources/data/");
+    
     ofSetVerticalSync(true);
     ofBackground(255);
     
@@ -18,9 +20,6 @@ void ofApp::setup(){
     initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
     initialize->addTextInput("IP", "");
     initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-    initialize->addLabel("port:");
-    initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    initialize->addTextInput("port", "");
     initialize->autoSizeToFitWidgets();
     ofAddListener(initialize->newGUIEvent, this, &ofApp::guiEvent);
 
@@ -66,19 +65,11 @@ void ofApp::setup(){
         ofxUIMultiImageToggle *toggle = (ofxUIMultiImageToggle*) _ui->getWidget("outer");
         _ui->addWidgetPosition(toggle,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_RIGHT);
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-        _ui->addLabelToggle("mute", disc.isMute(i));
         _ui->addSpacer();
-        _ui->addLabel("rotation",2);
-        _ui->addBiLabelSlider("rotation" + ofToString(i+1), "CCW", "CW", 10, -10, disc.getNetRotationSpeed(i));
-        _ui->addLabel("size",2);
-        _ui->addBiLabelSlider("radius" + ofToString(i+1), "small", "large", 15, 100, disc.getRadius(i)-disc.getRadius(i-1));
-        _ui->addLabel("density",2);
-        _ui->addBiLabelSlider("density" + ofToString(i+1), "sparse", "dense", 30, 1, disc.getDensity(i));
-        _ui->addSpacer();
+        
         _ui->addLabel("texture", 1);
         if(disc.getTexture(i)==0) _ui->addMultiImageButton("blank","butonlar/buton-01.png", true, 35,35);
         else _ui->addMultiImageButton("blank","butonlar/buton-01.png", false, 35,35);
-        
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
         if(disc.getTexture(i)==1) _ui->addMultiImageButton("line", "butonlar/buton-02.png", true, 35,35);
         else _ui->addMultiImageButton("line", "butonlar/buton-02.png", false, 35,35);
@@ -88,13 +79,24 @@ void ofApp::setup(){
         else _ui->addMultiImageButton("saw", "butonlar/buton-04.png", false, 35,35);
         if(disc.getTexture(i)==4) _ui->addMultiImageButton("rect", "butonlar/buton-05.png", true, 35,35);
         else _ui->addMultiImageButton("rect", "butonlar/buton-05.png", false, 35,35);
-        
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-        _ui->addLabel("depth",1);
+        _ui->addSpacer();
+       
+        _ui->addLabel("rotation speed",2);
+        _ui->addBiLabelSlider("rotation" + ofToString(i+1), "CCW", "CW", 10, -10, disc.getNetRotationSpeed(i));
+        _ui->addLabel("density",2);
+        _ui->addBiLabelSlider("density" + ofToString(i+1), "sparse", "dense", 30, 1, disc.getDensity(i));
+        _ui->addLabel("size",2);
+        _ui->addBiLabelSlider("radius" + ofToString(i+1), "small", "large", 15, 100, disc.getRadius(i)-disc.getRadius(i-1));
+        _ui->addSpacer();
+        
+        _ui->addLabel("z-motion",1);
         _ui->addToggle("move", disc.isMoving(i));
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
         _ui->addButton("reset", disc.resetPerlin[i]);
         _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+        _ui->addSpacer();
+        _ui->addLabelToggle("mute", disc.isMute(i));
         _ui->addSpacer();
         _ui->addLabelToggle("chat", true);
         
@@ -166,14 +168,8 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 IP = text->getTextString();
             }
         }
-        if(e.getName() == "port"){
-            ofxUITextInput *text = (ofxUITextInput *) e.widget;
-            if(text->getTextString() != ""){
-                port = ofToInt(text->getTextString());
-            }
-        }
-        if (IP != "" && port != 0) {
-            client.setup(IP, port);
+        if (IP != "") {
+            client.setup(IP, 10002);
             client.setMessageDelimiter("varianet");
             
             // ask for server state
@@ -184,7 +180,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
     for(int i = 0; i < disc.getDiscIndex(); i++){
         if(e.getName() == "rotation" + ofToString(i+1)){
             ofxUISlider *slider = e.getSlider();
-            if(me->getLife()>0 && mReleased == false){
+            if(me->getLife() > 0 && mReleased == false && disc.getTexture(i) != 0) {
                 rotationChanged = true;
                 float newRotation = slider->getScaledValue()-disc.getNetRotationSpeed(i);
                 disc.setRotationSpeed(i, newRotation);
@@ -192,12 +188,13 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 //change sound
                 float netSpeed = abs(disc.getNetRotationSpeed(i));
                 float frequency = ofMap(netSpeed, 0, 10, 50, 1500);
-                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 100);
-                float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 1);
+                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
+                float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 2);
                 soundChange("freq", i, frequency);
                 soundChange("bpm", i, beatSpeed*beatDensity);
                 
             }
+            else if (disc.getTexture(i) == 0) slider->setValue(0);
         }
         else if(e.getName() == "radius" + ofToString(i+1)){
             ofxUISlider *slider = e.getSlider();
@@ -228,8 +225,8 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 
                 //change metronome
                 float netSpeed = abs(disc.getNetRotationSpeed(i));
-                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 150);
-                float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 1);
+                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
+                float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 2);
                 soundChange("bpm", i, beatSpeed*beatDensity);
                 
                 //send to server
@@ -612,7 +609,7 @@ void ofApp::update(){
         soundChange("amountMod", i, amountMod);
         size += abs(disc.getPosition(i));
     }
-    float avgSize = ofMap(size/disc.getDiscIndex(), 0, 20, 0.01, .5);
+    float avgSize = ofMap(size/disc.getDiscIndex(), 0, 20, 0.01, .1);
     sound.synth.setParameter("size", avgSize);
 //    sound.synth.setParameter("decay", .001*size);
     
@@ -648,8 +645,10 @@ void ofApp::update(){
                             disc.setNetRotationSpeed (i, ofToFloat(nameValue[1]));
                             //sound
                             float netSpeed = abs(disc.getNetRotationSpeed(i));
-                            float beatSpeed = ofMap(netSpeed, 0, 10, 0, 150);
-                            float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 1);
+                            float frequency = ofMap(netSpeed, 0, 10, 50, 1500);
+                            float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
+                            float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 2);
+                            soundChange("freq", i, frequency);
                             soundChange("bpm", i, beatSpeed*beatDensity);
                             //ui
                             ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
@@ -666,8 +665,10 @@ void ofApp::update(){
                             soundChange("pulseLength", i, pulseRatio);
                             
                             float netSpeed = abs(disc.getNetRotationSpeed(i));
-                            float beatSpeed = ofMap(netSpeed, 0, 10, 0, 150);
-                            float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 1);
+                            float frequency = ofMap(netSpeed, 0, 10, 50, 1500);
+                            float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
+                            float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 2);
+                            soundChange("freq", i, frequency);
                             soundChange("bpm", i, beatSpeed*beatDensity);
                             
                             //ui
@@ -792,7 +793,7 @@ void ofApp::update(){
                         }
                         _player->setConnection(true);
                         
-                        conversation = "***"+_player->getIP()+" is online***"+"\n\n";
+                        conversation = "***"+_player->getIP()+" is online***"+"\n\n" + conversation;
                         ofxUITextArea *history = (ofxUITextArea *) chat->getWidget("chat");
                         history->setTextString(conversation);
                     }
@@ -848,8 +849,10 @@ void ofApp::update(){
                 
                 //sound
                 float netSpeed = abs(disc.getNetRotationSpeed(index));
-                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 150);
-                float beatDensity = ofMap(disc.getDensity(index), 1, 30, 30, 1);
+                float frequency = ofMap(netSpeed, 0, 10, 50, 1500);
+                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
+                float beatDensity = ofMap(disc.getDensity(index), 1, 30, 30, 2);
+                soundChange("freq", index, frequency);
                 soundChange("bpm", index, beatSpeed*beatDensity);
                 
                 //update ui
@@ -1183,7 +1186,7 @@ void ofApp::update(){
                     }
                     else continue;
                 }
-                conversation = "***"+received[1]+" is offline***"+"\n\n";
+                conversation = "***"+received[1]+" is offline***"+"\n\n" + conversation;
                 ofxUITextArea *history = (ofxUITextArea *) chat->getWidget("chat");
                 history->setTextString(conversation);
             }
@@ -1380,20 +1383,20 @@ void ofApp::keyPressed(int key){
         disc.setPosition(me->getDiscIndex(), disc.getPosition(me->getDiscIndex())-1);
     }
     if(key == 'm' && me->getDiscIndex() != -1 ) {
-        if(me->getLife() > 0){
-            disc.setLife(costMute);
-            if(disc.isMute(me->getDiscIndex()) == 0) {
-                disc.setMute(me->getDiscIndex(),1); //mute on
-                soundChange("envelope", me->getDiscIndex(), 0);
-            }
-            else{
-                disc.setMute(me->getDiscIndex(),0); //mute off
-                disc.setEnvelope(me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
-                soundChange("envelope", me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
-            }
-            string change = "mute//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMute(me->getDiscIndex()));
-            client.send(change);
-        }
+//        if(me->getLife() > 0){
+//            disc.setLife(costMute);
+//            if(disc.isMute(me->getDiscIndex()) == 0) {
+//                disc.setMute(me->getDiscIndex(),1); //mute on
+//                soundChange("envelope", me->getDiscIndex(), 0);
+//            }
+//            else{
+//                disc.setMute(me->getDiscIndex(),0); //mute off
+//                disc.setEnvelope(me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
+//                soundChange("envelope", me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
+//            }
+//            string change = "mute//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMute(me->getDiscIndex()));
+//            client.send(change);
+//        }
     }
     
     
@@ -1618,6 +1621,14 @@ void ofApp::soundChange(string name, int index, float value) {
             sound.synth.setParameter("sustain"+ofToString(index),disc.getEnvelope(index, 2));
             sound.synth.setParameter("release"+ofToString(index),disc.getEnvelope(index, 3));
         }
+        
+        float volCoeff = 1;
+        if(disc.getTexture(index) == 1) volCoeff = 1.1;
+        else if(disc.getTexture(index) == 2) volCoeff = .25;
+        else if(disc.getTexture(index) == 3) volCoeff = .25;
+        else if(disc.getTexture(index) == 4) volCoeff = 1;
+        
+        sound.synth.setParameter("volBalance"+ofToString(index), volCoeff);
     }
     
     else sound.synth.setParameter(name+ofToString(index), value);

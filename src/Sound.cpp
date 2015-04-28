@@ -56,7 +56,15 @@ void Sound::setup(Disc* disc){
         
         Generator modulation = SineWave().freq(amountFreq) * amountMod;
         Generator snd = SawtoothWave().freq(freq+modulation);
-        groove = snd * amplitude;
+        
+        float volCoeff = 1;
+        if(disc->getTexture(i) == 1) volCoeff = 1.1;
+        else if(disc->getTexture(i) == 2) volCoeff = .25;
+        else if(disc->getTexture(i) == 3) volCoeff = .25;
+        else if(disc->getTexture(i) == 4) volCoeff = 1;
+        
+        ControlGenerator volumeBalance = synth.addParameter("volBalance"+ofToString(i), volCoeff);
+        groove = snd * amplitude * volumeBalance;
         
         float qTarget = ofMap(disc->getThickness(i), 15, 100, 10, 0);
         ControlGenerator q = synth.addParameter("q"+ofToString(i),qTarget).max(10);
@@ -67,10 +75,10 @@ void Sound::setup(Disc* disc){
         master = master + delay;
     }
     
-    ControlGenerator size = synth.addParameter("size", 0.01).max(0.5).min(0);
+    ControlGenerator size = synth.addParameter("size", 0.01).max(0.1).min(0.01);
     ControlGenerator decay = synth.addParameter("decay", 0.01);
     Generator limiter = Limiter().input(master).threshold(0.8);
-    Generator reverb = Reverb().input(limiter).stereoWidth(.5).roomSize(.5).wetLevel(size).dryLevel(.5);
+    Generator reverb = Reverb().input(limiter).stereoWidth(.5).roomSize(.5).wetLevel(size).dryLevel(1.);
     synth.setOutputGen(reverb);
     
 }
