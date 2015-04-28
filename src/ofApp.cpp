@@ -143,10 +143,10 @@ void ofApp::setup(){
     costRadius = 1;
     costDensity = 1;
     costRotation = 1;
-    costTexture = 1;
+    costTexture = 2;
     costMute = 1;
     costMove = 1;
-    reward = 2;
+    reward = 3;
     
 }
 //--------------------------------------------------------------
@@ -833,6 +833,7 @@ void ofApp::update(){
                     if (playerData[0] == "life") _player->setLife(ofToFloat(playerData[1]));
                     if (playerData[0] == "index") _player->setDiscIndex(ofToInt(playerData[1]));
                 }
+                cout<< str <<endl;
                 groove.setup(&disc, me, otherPlayers);
                 
             }
