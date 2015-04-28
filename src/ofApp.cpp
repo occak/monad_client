@@ -35,7 +35,6 @@ void ofApp::setup(){
     
     //set up gui
     noDisc = new ofxUICanvas();
-    if (me != NULL) noDisc->setColorBack(me->getColor());
     noDisc->addMultiImageToggle("inner","butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
     noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
     noDisc->addLabel("None Selected",0);
@@ -46,14 +45,15 @@ void ofApp::setup(){
     noDisc->addWidgetPosition(toggle,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_RIGHT);
     noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
     noDisc->addSpacer();
-    noDisc->addToggle("move all", false)->setColorBack(233);
+    noDisc->addToggle("move all", false);
     noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    noDisc->addButton("reset all", false)->setColorBack(233);
+    noDisc->addButton("reset all", false);
     noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
     noDisc->addSpacer();
     noDisc->addLabelToggle("chat", true);
     noDisc->autoSizeToFitWidgets();
     if (me == NULL) noDisc->setVisible(false);
+    if (me != NULL) noDisc->setColorBack(me->getColor());
     ofAddListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
     
     for(int i = 0; i < disc.getDiscIndex(); i++){
