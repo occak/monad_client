@@ -13,6 +13,7 @@ void ofApp::setup(){
     
     ofSetVerticalSync(true);
     ofBackground(255);
+    ofSetFrameRate(30);
     
     initialize = new ofxUICanvas();
     initialize->setPosition(ofGetWidth()/2-100, ofGetHeight()/2-10);
@@ -1503,7 +1504,7 @@ void ofApp::mouseReleased(int x, int y, int button){
         lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
         client.send(lifeUpdate);
         
-        string change = "mute//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMute(me->getDiscIndex()));
+        string change = "mute//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMute(me->getDiscIndex()))+"//"+me->getIP();
         client.send(change);
     }
     else if(moveChanged){
@@ -1516,7 +1517,7 @@ void ofApp::mouseReleased(int x, int y, int button){
         lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
         client.send(lifeUpdate);
         
-        string movement = "move//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMoving(me->getDiscIndex()));
+        string movement = "move//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMoving(me->getDiscIndex()))+"//"+me->getIP();
         client.send(movement);
         
         if (disc.isMoving(me->getDiscIndex()) == 0){
@@ -1536,7 +1537,7 @@ void ofApp::mouseReleased(int x, int y, int button){
         lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
         client.send(lifeUpdate);
         
-        string movementReset = "moveReset//"+ofToString(me->getDiscIndex());
+        string movementReset = "moveReset//"+ofToString(me->getDiscIndex())+"//"+me->getIP();
         client.send(movementReset);
     }
     // cost calculation and server notifications of move/stop/resetAll button are handled in guiEvent
