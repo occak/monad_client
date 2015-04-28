@@ -163,6 +163,7 @@ void ofApp::exit(){
     }
     delete noDisc;
     delete chat;
+    delete initialize;
     
 }
 //--------------------------------------------------------------
