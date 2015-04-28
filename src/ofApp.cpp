@@ -274,7 +274,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 occupied = false;
                 for(int i = 0; i < otherPlayers.size(); i++){
                     int destination = me->getDiscIndex() - jump;
-                    if( destination < 0 ) destination += disc.getDiscIndex() + 1;
+                    if( destination < 0 ) destination += disc.getDiscIndex();
                     if(otherPlayers[i]->getDiscIndex() == destination) {
                         occupied = true;
                         jump++;
@@ -283,7 +283,8 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 }
             }
             if(me->getDiscIndex() - jump > -1) me->setDiscIndex(me->getDiscIndex() - jump);
-            else me->setDiscIndex(me->getDiscIndex() - jump + disc.getDiscIndex() + 1);
+            else if(me->getDiscIndex() != -1) me->setDiscIndex(me->getDiscIndex() - jump + disc.getDiscIndex());
+            else me->setDiscIndex(me->getDiscIndex() - jump + disc.getDiscIndex()+1);
             
             button->setValue(false);
             
@@ -1361,7 +1362,7 @@ void ofApp::keyPressed(int key){
             occupied = false;
             for(int i = 0; i < otherPlayers.size(); i++){
                 int destination = me->getDiscIndex() - jump;
-                if( destination < 0 ) destination += disc.getDiscIndex() + 1;
+                if( destination < 0 ) destination += disc.getDiscIndex();
                 if( otherPlayers[i]->getDiscIndex() == destination) {
                     occupied = true;
                     jump++;
@@ -1370,6 +1371,7 @@ void ofApp::keyPressed(int key){
             }
         }
         if(me->getDiscIndex() - jump > -1) me->setDiscIndex(me->getDiscIndex() - jump);
+        else if(me->getDiscIndex() != -1) me->setDiscIndex(me->getDiscIndex() - jump + disc.getDiscIndex());
         else me->setDiscIndex(me->getDiscIndex() - jump + disc.getDiscIndex() + 1);
         
         //change ui
