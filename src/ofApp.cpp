@@ -1200,7 +1200,7 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
-    ofBackgroundGradient(255, 233);
+    ofBackgroundGradient(230, 250);
     glEnable(GL_DEPTH_TEST);
     
     ofPushMatrix();
