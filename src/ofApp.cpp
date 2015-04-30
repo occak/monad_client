@@ -1390,15 +1390,17 @@ void ofApp::keyPressed(int key){
     }
     
     if(key == OF_KEY_BACKSPACE) {
-        ui[me->getDiscIndex()]->setVisible(false);
-        me->setDiscIndex(-1);
-        noDisc->setVisible(true);
-        
-        //send change to server
-        string changeDisc = "otherPlayersIndex//";
-        changeDisc += "IP: "+ofToString(me->getIP()) + "//";
-        changeDisc += "index: "+ofToString(me->getDiscIndex()) + "//";
-        client.send(changeDisc);
+        if(me->getDiscIndex() != -1){
+            ui[me->getDiscIndex()]->setVisible(false);
+            me->setDiscIndex(-1);
+            noDisc->setVisible(true);
+            
+            //send change to server
+            string changeDisc = "otherPlayersIndex//";
+            changeDisc += "IP: "+ofToString(me->getIP()) + "//";
+            changeDisc += "index: "+ofToString(me->getDiscIndex()) + "//";
+            client.send(changeDisc);
+        }
     }
     
     if(key == 'f') {
