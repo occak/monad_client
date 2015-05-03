@@ -126,7 +126,7 @@ void ofApp::setup(){
     int chatWidth = 600;
     chat->setPosition(ofGetWidth()/2-chatWidth/2, 0);
     chat->setDimensions(chatWidth, ofGetHeight());
-    chat->setColorFill(ofxUIColor(0,200,0));
+    chat->setColorFill(ofxUIColor(133,150,133));
     conversation = "";
     chat->addTextInput("chatInput", "(type something...)", OFX_UI_FONT_LARGE)->setAutoUnfocus(false);
     chat->addTextArea("chat", "", OFX_UI_FONT_LARGE);
@@ -206,7 +206,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             }
             else if(e.getName() == "radius" + ofToString(i+1)){
                 ofxUISlider *slider = e.getSlider();
-                if(me->getLife()> 0 && mReleased == false) {
+                if(me->getLife() > 0 && mReleased == false) {
                     radiusChanged = true;
                     disc.setThickness(i, slider->getScaledValue());
                     
@@ -223,7 +223,6 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 ofxUISlider *slider = e.getSlider();
                 if(me->getLife()> 0 && mReleased == false) {
                     densityChanged = true;
-                    cout<< slider->getScaledValue() <<endl;
                     disc.setDensity(i, slider->getScaledValue());
                     
                     //change envelope
@@ -245,6 +244,8 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 }
             }
         }
+        
+        //update buttons
         if(e.getKind() == OFX_UI_WIDGET_LABELTOGGLE && e.getName() != "mute" && e.getName() != "chat"){
             
             ofxUILabelToggle *updateButton = static_cast <ofxUILabelToggle*> (e.getToggle());
@@ -638,7 +639,8 @@ void ofApp::update(){
         soundChange("amountMod", i, amountMod);
         size += abs(disc.getPosition(i));
     }
-    float avgSize = ofMap(size/disc.getDiscIndex(), 0, 20, 0.01, .1);
+    float avgSize = ofMap(size/disc.getDiscIndex(), 0, 1000, 0.01, .1);
+    if(avgSize > 1000) avgSize = 0.1;
     sound.synth.setParameter("size", avgSize);
     //    sound.synth.setParameter("decay", .001*size);
     
@@ -833,7 +835,6 @@ void ofApp::update(){
                     if (playerData[0] == "life") _player->setLife(ofToFloat(playerData[1]));
                     if (playerData[0] == "index") _player->setDiscIndex(ofToInt(playerData[1]));
                 }
-                cout<< str <<endl;
                 groove.setup(&disc, me, otherPlayers);
                 
             }
@@ -1268,17 +1269,17 @@ void ofApp::keyPressed(int key){
         return;
     }
     
-    if(key == ' ') groove.turn = !groove.turn;
-    if(key == 'p'){
-        if (disc.isMoving(me->getDiscIndex()) == 0) disc.setMoving(me->getDiscIndex(), 1);
-        else disc.setMoving(me->getDiscIndex(), 0);
-    }
-    if(key == 'o') disc.resetPerlin[me->getDiscIndex()] = 1;
+//    if(key == ' ') groove.turn = !groove.turn;
+//    if(key == 'p'){
+//        if (disc.isMoving(me->getDiscIndex()) == 0) disc.setMoving(me->getDiscIndex(), 1);
+//        else disc.setMoving(me->getDiscIndex(), 0);
+//    }
+//    if(key == 'o') disc.resetPerlin[me->getDiscIndex()] = 1;
     
     if(key == 'c') chat->toggleVisible();
     
-    if(key == 'a' && me->getDiscIndex() != -1) {
-        
+//    if(key == 'a' && me->getDiscIndex() != -1) {
+    
         //        if(disc.getLife() > 0) {
         //            disc.setLife(costRotation);     // reduce life
         //            disc.setRotationSpeed(me->getDiscIndex(), +.05);
@@ -1298,10 +1299,10 @@ void ofApp::keyPressed(int key){
         //            string change = "rotationSpeed//"+ ofToString(me->getDiscIndex())+": "+ ofToString(+0.05);
         //            client.send(change);
         //        }
-    }
+//    }
     
-    if(key == 'd' && me->getDiscIndex() != -1 ) {
-        
+//    if(key == 'd' && me->getDiscIndex() != -1 ) {
+    
         //        if(disc.getLife() > 0) {
         //            disc.setLife(costRotation);     // reduce life
         //            disc.setRotationSpeed(me->getDiscIndex(), -.05);
@@ -1321,7 +1322,7 @@ void ofApp::keyPressed(int key){
         //            string change = "rotationSpeed//"+ ofToString(me->getDiscIndex())+": "+ ofToString(-0.05);
         //            client.send(change);
         //        }
-    }
+//    }
     
     if(key == 'w'){
         int jump = 1;
@@ -1408,13 +1409,13 @@ void ofApp::keyPressed(int key){
         ofSetFullscreen(fullScreen);
     }
     
-    if(key == 'i' && me->getDiscIndex() != -1 ) {
-        disc.setPosition(me->getDiscIndex(), disc.getPosition(me->getDiscIndex())+1);
-    }
-    if(key == 'k' && me->getDiscIndex() != -1 ) {
-        disc.setPosition(me->getDiscIndex(), disc.getPosition(me->getDiscIndex())-1);
-    }
-    if(key == 'm' && me->getDiscIndex() != -1 ) {
+//    if(key == 'i' && me->getDiscIndex() != -1 ) {
+//        disc.setPosition(me->getDiscIndex(), disc.getPosition(me->getDiscIndex())+1);
+//    }
+//    if(key == 'k' && me->getDiscIndex() != -1 ) {
+//        disc.setPosition(me->getDiscIndex(), disc.getPosition(me->getDiscIndex())-1);
+//    }
+//    if(key == 'm' && me->getDiscIndex() != -1 ) {
         //        if(me->getLife() > 0){
         //            disc.setLife(costMute);
         //            if(disc.isMute(me->getDiscIndex()) == 0) {
@@ -1429,7 +1430,7 @@ void ofApp::keyPressed(int key){
         //            string change = "mute//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMute(me->getDiscIndex()));
         //            client.send(change);
         //        }
-    }
+//    }
     
     
     
