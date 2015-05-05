@@ -631,18 +631,13 @@ void ofApp::update(){
     }
     
     disc.update();
-    float size = 0;
     for(int i = 0; i< disc.getDiscIndex(); i++){
         float amountFreq = ofMap(abs(disc.getNetRotationSpeed(i)), 0, 10, 0, 10000);
         float amountMod = ofMap(abs(disc.getPosition(i)), 0, 20, 0, 10000);
         soundChange("amountFreq", i, amountFreq);
         soundChange("amountMod", i, amountMod);
-        size += abs(disc.getPosition(i));
     }
-    float avgSize = ofMap(size/disc.getDiscIndex(), 0, 1000, 0.01, .1);
-    if(avgSize > 1000) avgSize = 0.1;
-    sound.synth.setParameter("size", avgSize);
-    //    sound.synth.setParameter("decay", .001*size);
+
     
     //TCP
     if(client.isConnected()){
@@ -779,16 +774,6 @@ void ofApp::update(){
                 //                sound.setup(&disc);
             }
             
-            //            else if (title == "scale"){
-            //                //sound values
-            //                vector<string> scaleValue;
-            //                scaleValue = ofSplitString(received[1], ": ");
-            //                for(int i = 0; i < scaleValue.size(); i++){
-            //                    sound.setScale(i, ofToFloat(scaleValue[i]));
-            //                }
-            //                //set up synths
-            //                sound.setup(&disc);
-            //            }
             
             else if (title == "playerInfo" ){
                 Player* _player = new Player();
@@ -1241,6 +1226,18 @@ void ofApp::draw(){
     if(TCPsetup){
         cam.begin();
         groove.draw();
+        
+        if(cam.getDistance() > 1000){
+        cout<< cam.getDistance() <<endl;
+        float wetLevel = ofMap(cam.getDistance(), 1000, 5000, .01, .5);
+        float masterLevel = ofMap(cam.getDistance(), 1000, 5000, .99, .1);
+        ofClamp(wetLevel, 0.01, .5);
+        ofClamp(masterLevel, .1, .99);
+
+        sound.synth.setParameter("wet", wetLevel);
+        sound.synth.setParameter("master", masterLevel);
+        }
+        
         cam.end();
         
         ofSetColor(me->getColor());

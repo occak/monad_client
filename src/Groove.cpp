@@ -107,7 +107,7 @@ void Groove::update(){
 void Groove::draw(){
     
     
-    ofSetColor(33);
+    ofSetColor(50);
     ofFill();
     ofSetSphereResolution(20);
     ofDrawSphere(0, 0, disc->origin);
@@ -124,9 +124,9 @@ void Groove::draw(){
         mesh[i].draw();
         
         //draw circles
-        ofSetLineWidth(3);
+        ofSetLineWidth(2);
         ofNoFill();
-        ofSetColor(33);
+        ofSetColor(50);
         if( i != me->getDiscIndex() && disc->isMute(i) == 1) ofSetColor(ofColor::lightGrey);
         if( otherPlayers.size() > 0){
             for (int j = 0; j < otherPlayers.size(); j++) {
