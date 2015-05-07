@@ -345,6 +345,7 @@
 		BB64A42D06174B2614FAA75B /* DelayUtils.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = DelayUtils.h; path = "../../openFrameworks/of_v0.8.4_osx_release/addons/ofxTonic-master/src/Tonic/DelayUtils.h"; sourceTree = SOURCE_ROOT; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../openFrameworks/of_v0.8.4_osx_release/libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
 		BC30920A3770AF92ABC0D364 /* StereoDelay.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = StereoDelay.cpp; path = "../../openFrameworks/of_v0.8.4_osx_release/addons/ofxTonic-master/src/Tonic/StereoDelay.cpp"; sourceTree = SOURCE_ROOT; };
+		BE7C2E091AFBDC040098737C /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = monad_client/Images.xcassets; sourceTree = "<group>"; };
 		BF525F0887A63B5E6FC5578E /* Noise.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = Noise.cpp; path = "../../openFrameworks/of_v0.8.4_osx_release/addons/ofxTonic-master/src/Tonic/Noise.cpp"; sourceTree = SOURCE_ROOT; };
 		BFFBEE0796BE9DCF4DB9F0DA /* RampedValue.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = RampedValue.cpp; path = "../../openFrameworks/of_v0.8.4_osx_release/addons/ofxTonic-master/src/Tonic/RampedValue.cpp"; sourceTree = SOURCE_ROOT; };
 		C1910DD3D4BF040CF1C667D8 /* barPerlin.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = barPerlin.h; path = src/barPerlin.h; sourceTree = SOURCE_ROOT; };
@@ -702,6 +703,7 @@
 		E4B69B4A0A3A1720003C02F2 = {
 			isa = PBXGroup;
 			children = (
+				BE7C2E091AFBDC040098737C /* Images.xcassets */,
 				E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */,
 				E4EB6923138AFD0F00A09F29 /* Project.xcconfig */,
 				E4B69E1C0A3A1BDC003C02F2 /* src */,
@@ -1165,6 +1167,7 @@
 		E4B69B600A3A1757003C02F2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1251,6 +1254,7 @@
 		E4B69B610A3A1757003C02F2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (

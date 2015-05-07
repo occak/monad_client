@@ -8,8 +8,6 @@
 	<string>English</string>
 	<key>CFBundleExecutable</key>
 	<string>monad_clientDebug</string>
-	<key>CFBundleIconFile</key>
-	<string>icon-debug.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>cc.openFrameworks.ofapp</string>
 	<key>CFBundleInfoDictionaryVersion</key>
