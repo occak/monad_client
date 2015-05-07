@@ -185,7 +185,7 @@ void Disc::setRotation(int index, float newRotation){
     if (rotation[index] > 360.) rotation[index] -= 360;
     rotation[index];
 }
-//----------------------------------
+//---------------------------------
 
 float Disc::getRotationSpeed(int index) const{
     
@@ -194,8 +194,9 @@ float Disc::getRotationSpeed(int index) const{
 //----------------------------------
 
 void Disc::setRotationSpeed(int index, float addSpeed){
-    
+    if(index<discIndex-1){
     rotationSpeed[index+1] -= addSpeed; //outer disc rotates relative to the inner disc
+    }
     rotationSpeed[index] += addSpeed;
 }
 //----------------------------------
@@ -225,7 +226,7 @@ void Disc::setNetRotationSpeed(int index, float newSpeed){
 			rotationSpeed[index+1] -= newSpeed - allBelow; //outer disc rotates relative to the inner disc
 		}
     }
-    else rotationSpeed[0] = newSpeed;
+    else rotationSpeed[index] = newSpeed;
 }
 //----------------------------------
 

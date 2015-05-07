@@ -132,12 +132,20 @@ void Groove::draw(){
         if( otherPlayers.size() > 0){
             for (int j = 0; j < otherPlayers.size(); j++) {
                 if( i == otherPlayers[j]->getDiscIndex() && disc->isMute(otherPlayers[j]->getDiscIndex()) == 0) ofSetColor(otherPlayers[j]->getColor());
-                else if( i == otherPlayers[j]->getDiscIndex() && disc->isMute(otherPlayers[j]->getDiscIndex()) == 1) ofSetColor(ofColor::lightPink);
-                else continue;
+                else if( i == otherPlayers[j]->getDiscIndex() && disc->isMute(otherPlayers[j]->getDiscIndex()) == 1){
+                    ofColor pale = otherPlayers[j]->getColor();
+                    pale.setSaturation(pale.getSaturation()-40);
+                    ofSetColor(pale);
+                }
             }
         }
         if( i == me->getDiscIndex() && disc->isMute(me->getDiscIndex()) == 0) ofSetColor(me->getColor());
-        if( i == me->getDiscIndex() && disc->isMute(me->getDiscIndex()) == 1) ofSetColor(ofColor::lightPink);
+        if( i == me->getDiscIndex() && disc->isMute(me->getDiscIndex()) == 1) {
+            ofColor pale = me->getColor();
+            pale.setSaturation(pale.getSaturation() - 110);
+//            pale.setHue(pale.getHue() - 10);
+            ofSetColor(pale);
+        }
         
         ofSetCircleResolution(70);
         ofCircle(0,0,disc->getPosition(i), disc->getRadius(i-1));
