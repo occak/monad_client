@@ -10,6 +10,8 @@
 
 void Disc::setup(){
     
+	selected = -1;
+	origin = 10;
     discIndex = 10;    // 10 discs
     
 //    barPerlin = new Perlin(234,10);
@@ -107,9 +109,9 @@ int Disc::getDiscIndex() const{
 }
 //----------------------------------
 
-int Disc::setDiscIndex(int value){
+void Disc::setDiscIndex(int value){
     
-    return discIndex = value;
+    discIndex = value;
 }
 
 //----------------------------------
@@ -120,7 +122,7 @@ int Disc::getTexture(int index) const{
 }
 //----------------------------------
 
-int Disc::setTexture(int index, int type) {
+void Disc::setTexture(int index, int type) {
     
     texture[index] = type;
 }
@@ -133,21 +135,25 @@ float Disc::getRadius(int index) const{
 }
 //----------------------------------
 
-float Disc::setRadius(int index, float size){
+void Disc::setRadius(int index, float size){
     
-    if ( index != -1) return radii[index] = size;
+    if ( index != -1) radii[index] = size;
 }
 //----------------------------------
 
 float Disc::getThickness(int index) const{
-    
+    if(index==0) {
+		return radii[index]-origin;
+	}
     return radii[index]-radii[index-1];
 }
 
 //----------------------------------
 void Disc::setThickness(int index, float size){
-    
-    float change = size - (radii[index]-radii[index-1]); // change in the difference of size between the inner circle
+	 float change = size - (radii[index]-origin);
+     if(index>0) {
+		change = size - (radii[index]-radii[index-1]); // change in the difference of size between the inner circle
+	}
     for (int i = index; i < getDiscIndex(); i++) {
         radii[i] = radii[i] + change;
     }
@@ -160,9 +166,9 @@ int Disc::getDensity(int index) const{
 }
 //----------------------------------
 
-int Disc::setDensity(int index, float newDensity) {
+void Disc::setDensity(int index, float newDensity) {
     
-    return density[index] = newDensity;
+    density[index] = newDensity;
 }
 //----------------------------------
 
@@ -172,12 +178,12 @@ float Disc::getRotation(int index) const{
 }
 //----------------------------------
 
-float Disc::setRotation(int index, float newRotation){
+void Disc::setRotation(int index, float newRotation){
     
     // we need to increase rotate values by an amount of rotationSpeed to draw properly in groove.draw()
     rotation[index] += newRotation;
     if (rotation[index] > 360.) rotation[index] -= 360;
-    return rotation[index];
+    rotation[index];
 }
 //----------------------------------
 
@@ -215,7 +221,9 @@ void Disc::setNetRotationSpeed(int index, float newSpeed){
             allBelow += rotationSpeed[i];
         }
         rotationSpeed[index] = newSpeed - allBelow;
-        rotationSpeed[index+1] -= newSpeed - allBelow; //outer disc rotates relative to the inner disc
+		if(index<discIndex-1) {
+			rotationSpeed[index+1] -= newSpeed - allBelow; //outer disc rotates relative to the inner disc
+		}
     }
     else rotationSpeed[0] = newSpeed;
 }
@@ -227,9 +235,9 @@ float Disc::getPosition(int index) const{
 }
 //----------------------------------
 
-float Disc::setPosition(int index, float newPosition){
+void Disc::setPosition(int index, float newPosition){
     
-    return zPosition[index] = newPosition;
+    zPosition[index] = newPosition;
 }
 //----------------------------------
 
@@ -239,9 +247,9 @@ float Disc::getPosOffset(int index) const{
 }
 //----------------------------------
 
-float Disc::setPosOffset (int index, float newOffset){
+void Disc::setPosOffset (int index, float newOffset){
     
-    return posOffset[index] = newOffset;
+    posOffset[index] = newOffset;
 }
 //----------------------------------
 
@@ -251,9 +259,9 @@ float Disc::getLife() const{
 }
 
 //----------------------------------
-float Disc::setLife(float cost){
+void Disc::setLife(float cost){
     
-    return life -= cost;
+    life -= cost;
 }
 
 //----------------------------------
@@ -263,7 +271,7 @@ float Disc::getEnvelope(int index, int section) const{
 }
 
 //----------------------------------
-float Disc::setEnvelope(int index, int type) {
+void Disc::setEnvelope(int index, int type) {
 
     vector <float> adsr;
     float attack, decay, sustain, release;

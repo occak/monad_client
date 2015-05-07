@@ -42,7 +42,7 @@ private:
     ofColor color;
     
     float life;
-    bool connected = false;
+    bool connected;
     
     int discIndex;
     
