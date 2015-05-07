@@ -10,6 +10,7 @@
 
 void Player::setup(){
     
+	connected = false;
     life = 100;
     
     

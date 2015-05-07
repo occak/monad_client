@@ -33,7 +33,7 @@ public:
     
     vector<ofRectangle> lifeBar;
     
-    bool turn = true;
+    bool turn;
     Disc* disc;
     Player* me;
     vector<Player *> otherPlayers;

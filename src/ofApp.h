@@ -12,6 +12,7 @@
 class ofApp : public ofBaseApp{
 
 	public:
+		ofApp();
 		void setup();
 		void update();
 		void draw();
@@ -55,7 +56,7 @@ class ofApp : public ofBaseApp{
     moveChanged,
     moveReset,
     moveAllChanged,
-    muteChanged = false;
+    muteChanged;
     
     void refreshUpdateButtons();
 		
@@ -72,7 +73,7 @@ private:
     
     bool fullScreen;
     bool mReleased;
-    bool TCPsetup = false;
+    bool TCPsetup;
     string IP;
     int port;
     

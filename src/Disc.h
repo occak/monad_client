@@ -26,19 +26,19 @@ class Disc{
     //getter&setter functions
     
     int getDiscIndex() const;
-    int setDiscIndex(int value);
+    void setDiscIndex(int value);
     
     float getRadius(int index) const;
-    float setRadius(int index, float size);
+    void setRadius(int index, float size);
     
     float getThickness(int index) const;
     void setThickness(int index, float size);
     
     int getDensity(int index) const;
-    int setDensity(int index, float newDensity);
+    void setDensity(int index, float newDensity);
     
     float getRotation(int index) const;
-    float setRotation(int index, float newRotation);
+    void setRotation(int index, float newRotation);
     //for the groove object to draw
     float getRotationSpeed(int index) const;
     void setRotationSpeed(int index, float addSpeed);
@@ -47,19 +47,19 @@ class Disc{
     void setNetRotationSpeed(int index, float addSpeed);
     
     int getTexture(int index) const;
-    int setTexture(int index, int type);
+    void setTexture(int index, int type);
     
     float getPosition(int index) const;
-    float setPosition(int index, float newPosition);
+    void setPosition(int index, float newPosition);
     
     float getPosOffset(int index) const;
-    float setPosOffset(int index, float newOffset);
+    void setPosOffset(int index, float newOffset);
     
     float getLife() const;
-    float setLife(float cost);
+    void setLife(float cost);
     
     float getEnvelope(int index, int section) const;
-    float setEnvelope(int index, int type);
+    void setEnvelope(int index, int type);
     
     int isMute(int index) const;
     void setMute(int index, int onOff);
@@ -75,8 +75,8 @@ class Disc{
     
     void zMotionSetup(int index, int seed);
 //
-    float origin = 10;
-    int selected = -1;
+    float origin;
+    int selected;
     vector<int> resetPerlin;
     
 private:

@@ -10,6 +10,7 @@
 
 void Groove::setup(Disc* disc, Player* player, vector<Player *> otherPlayers){
     
+	turn = true;
     //groove should not operate without getting disc
     this->disc = disc;
     this->me = player;
@@ -116,8 +117,8 @@ void Groove::draw(){
         
         
         //rotate
-        
-        if(turn) ofRotate(disc->setRotation(i, disc->getRotationSpeed(i)), 0, 0, 1);
+        disc->setRotation(i, disc->getRotationSpeed(i));
+        if(turn) ofRotate(disc->getRotation(i), 0, 0, 1);
         else ofRotate(disc->getRotation(i), 0, 0, 1);
         
         
