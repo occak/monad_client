@@ -52,7 +52,7 @@ void ofApp::setup(){
     noDisc->addSpacer();
     noDisc->addLabelToggle("chat", true);
     noDisc->autoSizeToFitWidgets();
-    if (me == NULL) noDisc->setVisible(false);
+    if (me == NULL || me->getDiscIndex() != -1) noDisc->setVisible(false);
     if (me != NULL) noDisc->setColorBack(me->getColor());
     ofAddListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
     
@@ -104,7 +104,8 @@ void ofApp::setup(){
         _ui->addLabelToggle("chat", true);
         
         _ui->autoSizeToFitWidgets();
-        _ui->setVisible(false);
+        if(me != NULL && i == me->getDiscIndex()) _ui->setVisible(true);
+        else _ui->setVisible(false);
         ofAddListener(_ui->newGUIEvent, this, &ofApp::guiEvent);
         
         ui.push_back(_ui);
@@ -229,7 +230,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     float envelopeCoeff = ofMap(disc.getDensity(i), 1, 30, 1, 5);
                     float pulseRatio = ofMap(disc.getDensity(i), 1, 30, 0.005, 1);
                     soundChange("envelopeWidth", i, envelopeCoeff);
-                    soundChange("pulseLength", i, pulseRatio);
+//                    soundChange("pulseLength", i, pulseRatio);
                     
                     //change metronome
                     float netSpeed = abs(disc.getNetRotationSpeed(i));
@@ -688,7 +689,7 @@ void ofApp::update(){
                             float envelopeCoeff = ofMap(disc.getDensity(i), 1, 30, 1, 5);
                             float pulseRatio = ofMap(disc.getDensity(i), 1, 30, 0.001, 1);
                             soundChange("envelopeWidth", i, envelopeCoeff);
-                            soundChange("pulseLength", i, pulseRatio);
+//                            soundChange("pulseLength", i, pulseRatio);
                             
                             float netSpeed = abs(disc.getNetRotationSpeed(i));
                             float frequency = ofMap(netSpeed, 0, 10, 50, 1500);
@@ -936,7 +937,7 @@ void ofApp::update(){
                 float envelopeCoeff = ofMap(disc.getDensity(index), 1, 30, 1, 5);
                 float pulseRatio = ofMap(disc.getDensity(index), 1, 30, 0.001, 1);
                 soundChange("envelopeWidth", index, envelopeCoeff);
-                soundChange("pulseLength", index, pulseRatio);
+//                soundChange("pulseLength", index, pulseRatio);
                 
                 //update ui
                 ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
@@ -1638,7 +1639,7 @@ void ofApp::soundChange(string name, int index, float value) {
         if(disc.getTexture(index) == 1) volCoeff = 1.1;
         else if(disc.getTexture(index) == 2) volCoeff = .25;
         else if(disc.getTexture(index) == 3) volCoeff = .25;
-        else if(disc.getTexture(index) == 4) volCoeff = 1;
+        else if(disc.getTexture(index) == 4) volCoeff = .20;
         
         sound.synth.setParameter("volBalance"+ofToString(index), volCoeff);
     }
