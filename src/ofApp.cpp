@@ -143,14 +143,15 @@ void ofApp::setup(){
 
 	chat = new ofxUICanvas();
 	chat->setDrawBack(false);
-	int chatWidth = 600;
-	chat->setPosition(ofGetWidth()/2-chatWidth/2, 0);
+	int chatWidth = 800;
+	chat->setPosition(noDisc->getGlobalCanvasWidth()+10, 0);
 	chat->setDimensions(chatWidth, ofGetHeight());
-	chat->setColorFill(ofxUIColor(133,150,133));
+	chat->setColorFill(ofxUIColor(33,200,33,180));
 	conversation = "";
-	chat->addTextInput("chatInput", "(type something...)", OFX_UI_FONT_LARGE)->setAutoUnfocus(false);
+	chat->addTextInput("chatInput", "", OFX_UI_FONT_LARGE)->setAutoUnfocus(false);
 	chat->addTextArea("chat", "", OFX_UI_FONT_LARGE);
 	if (me == NULL) chat->setVisible(false);
+    chat->autoSizeToFitWidgets();
 
 	ofAddListener(chat->newGUIEvent, this, &ofApp::guiEvent);
 
@@ -362,7 +363,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 
 			ofxUITextInput *text = (ofxUITextInput *) e.widget;
 			string input;
-			if(text->getTextString() != "" && text->getTextString() != "(type something...)"){
+			if(text->getTextString() != ""){
 				input = me->getIP() + "::" + text->getTextString()+"\n\n";
 			}
 			conversation = input + conversation;
