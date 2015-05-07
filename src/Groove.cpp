@@ -134,7 +134,7 @@ void Groove::draw(){
                 if( i == otherPlayers[j]->getDiscIndex() && disc->isMute(otherPlayers[j]->getDiscIndex()) == 0) ofSetColor(otherPlayers[j]->getColor());
                 else if( i == otherPlayers[j]->getDiscIndex() && disc->isMute(otherPlayers[j]->getDiscIndex()) == 1){
                     ofColor pale = otherPlayers[j]->getColor();
-                    pale.setSaturation(pale.getSaturation()-40);
+                    pale.setSaturation(pale.getSaturation() - 110);
                     ofSetColor(pale);
                 }
             }
@@ -143,7 +143,6 @@ void Groove::draw(){
         if( i == me->getDiscIndex() && disc->isMute(me->getDiscIndex()) == 1) {
             ofColor pale = me->getColor();
             pale.setSaturation(pale.getSaturation() - 110);
-//            pale.setHue(pale.getHue() - 10);
             ofSetColor(pale);
         }
         
