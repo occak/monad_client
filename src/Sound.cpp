@@ -28,7 +28,7 @@ void Sound::setup(Disc* disc){
         
 //        float pulseRatio = ofMap(disc->getDensity(i), 1, 30, 0.05, .9);
 //        ControlGenerator pulseLength = synth.addParameter("pulseLength"+ofToString(i), pulseRatio);
-        ControlGenerator halfPulse = 30 / bpm;
+        ControlGenerator halfPulse = 30 / (bpm+0.001);
         ControlGenerator pulse = ControlPulse().length(halfPulse).input(metronome);
         
         float envelopeCoeff = ofMap(disc->getDensity(i), 1, 30, .1, 10);
@@ -71,11 +71,11 @@ void Sound::setup(Disc* disc){
         master = master + delay;
     }
     
-    ControlGenerator wet = synth.addParameter("wet", 0.01).max(1).min(0.01);
+    ControlGenerator wet = synth.addParameter("wet", 0.).max(.5).min(0.);
     Generator limiter = Limiter().input(master).threshold(0.8);
     Generator reverb = Reverb().input(limiter).stereoWidth(.5).roomSize(.4).wetLevel(wet);
-    ControlGenerator masterLevel = synth.addParameter("master", 1).max(1).min(0.1);
-    synth.setOutputGen(masterLevel*limiter);
+    ControlGenerator masterLevel = synth.addParameter("master", 1.).max(1.).min(0.);
+    synth.setOutputGen(masterLevel*reverb);
     
 }
 

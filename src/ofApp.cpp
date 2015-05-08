@@ -666,8 +666,8 @@ void ofApp::update(){
 
 	disc.update();
 	for(int i = 0; i< disc.getDiscIndex(); i++){
-		float amountFreq = ofMap(abs(disc.getNetRotationSpeed(i)), 0, 10, 0, 10000);
-		float amountMod = ofMap(abs(disc.getPosition(i)), 0, 20, 0, 10000);
+		float amountFreq = ofMap(abs(disc.getNetRotationSpeed(i)), 0, 10, 0, 5000);
+		float amountMod = ofMap(abs(disc.getPosition(i)), 0, 100, 0, 10000);
 		soundChange("amountFreq", i, amountFreq);
 		soundChange("amountMod", i, amountMod);
 	}
@@ -1262,12 +1262,12 @@ void ofApp::draw(){
 		cam.begin();
 		groove.draw();
 
-		if(cam.getDistance() > 1000){
+		if(cam.getDistance() > 100){
 			cout<< cam.getDistance() <<endl;
-			float wetLevel = ofMap(cam.getDistance(), 1000, 5000, .01, .5);
-			float masterLevel = ofMap(cam.getDistance(), 1000, 5000, .99, .1);
-			ofClamp(wetLevel, 0.01, .5);
-			ofClamp(masterLevel, .1, .99);
+			float wetLevel = ofMap(cam.getDistance(), 500, 8000, 0., .4);
+			float masterLevel = ofMap(cam.getDistance(), 100, 7000, .999, 0.);
+			ofClamp(wetLevel, 0., .4);
+			ofClamp(masterLevel, 0., .999);
 
 			sound.synth.setParameter("wet", wetLevel);
 			sound.synth.setParameter("master", masterLevel);

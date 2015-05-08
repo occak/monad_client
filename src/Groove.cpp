@@ -147,8 +147,12 @@ void Groove::draw(){
         }
         
         ofSetCircleResolution(70);
+        //front
         ofCircle(0,0,disc->getPosition(i), disc->getRadius(i-1));
         ofCircle(0,0,disc->getPosition(i), disc->getRadius(i));
+        //back
+        ofCircle(0,0,disc->getPosition(i)-.2, disc->getRadius(i-1));
+        ofCircle(0,0,disc->getPosition(i)-.2, disc->getRadius(i));
         
         //        if( i != me->getDiscIndex() && disc->isMute(i) == 1) ofSetColor(ofColor::lightGrey);
         //        else if( i == me->getDiscIndex() && disc->isMute(me->getDiscIndex()) == 1) ofSetColor(ofColor::lightPink);
@@ -184,6 +188,13 @@ void Groove::draw(){
                                disc->getRadius(i)*sin(a*PI/180),      //y2
                                disc->getPosition(i));                 //z2
                         
+                        ofLine( disc->getRadius(i-1)*cos(a*PI/180) ,  //x1
+                               disc->getRadius(i-1)*sin(a*PI/180),    //y1
+                               disc->getPosition(i)-.2,                  //z1
+                               disc->getRadius(i)*cos(a*PI/180),      //x2
+                               disc->getRadius(i)*sin(a*PI/180),      //y2
+                               disc->getPosition(i)-.2);                 //z2
+                        
                     }
                 }
                 
@@ -211,6 +222,21 @@ void Groove::draw(){
                                  disc->getPosition(i));
                         ofEndShape();
                         
+                        ofBeginShape();
+                        ofVertex(disc->getRadius(i-1)*cos((a - disc->getDensity(i))*PI/180),
+                                 disc->getRadius(i-1)*sin((a - disc->getDensity(i))*PI/180),
+                                 disc->getPosition(i)-.2);
+                        ofVertex(disc->getRadius(i)*cos((a - disc->getDensity(i)/2)*PI/180),
+                                 disc->getRadius(i)*sin((a - disc->getDensity(i)/2)*PI/180),
+                                 disc->getPosition(i)-.2);
+                        ofVertex(disc->getRadius(i-1)*cos(a*PI/180),
+                                 disc->getRadius(i-1)*sin(a*PI/180),
+                                 disc->getPosition(i)-.2);
+                        ofVertex(disc->getRadius(i-1)*cos((a - disc->getDensity(i)/2)*PI/180),
+                                 disc->getRadius(i-1)*sin((a - disc->getDensity(i)/2)*PI/180),
+                                 disc->getPosition(i)-.2);
+                        ofEndShape();
+                        
                     }
                 }
                 
@@ -235,6 +261,21 @@ void Groove::draw(){
                         ofVertex(disc->getRadius(i)*cos((a - disc->getDensity(i)/2)*PI/180),
                                  disc->getRadius(i)*sin((a - disc->getDensity(i)/2)*PI/180),
                                  disc->getPosition(i));
+                        ofEndShape();
+                        
+                        ofBeginShape();
+                        ofVertex(disc->getRadius(i)*cos((a - disc->getDensity(i))*PI/180),        //x1
+                                 disc->getRadius(i)*sin((a - disc->getDensity(i))*PI/180),        //y1
+                                 disc->getPosition(i)-.2);
+                        ofVertex(disc->getRadius(i-1)*cos((a - disc->getDensity(i))*PI/180),    //x2
+                                 disc->getRadius(i-1)*sin((a - disc->getDensity(i))*PI/180),    //y2
+                                 disc->getPosition(i)-.2);
+                        ofVertex(disc->getRadius(i)*cos(a*PI/180),                                //x3
+                                 disc->getRadius(i)*sin(a*PI/180),                                //y3
+                                 disc->getPosition(i)-.2);
+                        ofVertex(disc->getRadius(i)*cos((a - disc->getDensity(i)/2)*PI/180),
+                                 disc->getRadius(i)*sin((a - disc->getDensity(i)/2)*PI/180),
+                                 disc->getPosition(i)-.2);
                         ofEndShape();
                         
                     }
@@ -271,8 +312,27 @@ void Groove::draw(){
                         ofVertex(disc->getRadius(i)*cos((a - disc->getDensity(i))*PI/180),
                                  disc->getRadius(i)*sin((a - disc->getDensity(i))*PI/180),
                                  disc->getPosition(i));
+                        ofEndShape();
                         
-                        
+                        ofBeginShape();
+                        ofVertex(disc->getRadius(i-1)*cos((a - disc->getDensity(i))*PI/180),
+                                 disc->getRadius(i-1)*sin((a - disc->getDensity(i))*PI/180),
+                                 disc->getPosition(i)-.2);
+                        ofVertex(disc->getRadius(i-1)*cos((a - disc->getDensity(i)/2)*PI/180),
+                                 disc->getRadius(i-1)*sin((a - disc->getDensity(i)/2)*PI/180),
+                                 disc->getPosition(i)-.2);
+                        ofVertex(disc->getRadius(i-1)*cos(a*PI/180),
+                                 disc->getRadius(i-1)*sin(a*PI/180),
+                                 disc->getPosition(i)-.2);
+                        ofVertex(disc->getRadius(i)*cos(a*PI/180),
+                                 disc->getRadius(i)*sin(a*PI/180),
+                                 disc->getPosition(i)-.2);
+                        ofVertex(disc->getRadius(i)*cos((a - disc->getDensity(i)/2)*PI/180),
+                                 disc->getRadius(i)*sin((a - disc->getDensity(i)/2)*PI/180),
+                                 disc->getPosition(i)-.2);
+                        ofVertex(disc->getRadius(i)*cos((a - disc->getDensity(i))*PI/180),
+                                 disc->getRadius(i)*sin((a - disc->getDensity(i))*PI/180),
+                                 disc->getPosition(i)-.2);
                         ofEndShape();
                         
                         space = true;
