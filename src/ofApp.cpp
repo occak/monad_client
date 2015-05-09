@@ -65,7 +65,7 @@ void ofApp::setup(){
 	ofAddListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
 
 
-	if(me==NULL) {
+	if(me == NULL) {
 		// set up values of objects
 		disc.setup();
 
@@ -101,21 +101,20 @@ void ofApp::setup(){
 			if(disc.getTexture(i)==4) _ui->addMultiImageButton("rect", "butonlar/buton-05.png", true, 35,35);
 			else _ui->addMultiImageButton("rect", "butonlar/buton-05.png", false, 35,35);
 			_ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-			_ui->addSpacer();
 
-			_ui->addLabel("rotation speed",2);
-			_ui->addBiLabelSlider("rotation" + ofToString(i+1), "CCW", "CW", 10, -10, disc.getNetRotationSpeed(i));
-			_ui->addLabel("density",2);
-			_ui->addBiLabelSlider("density" + ofToString(i+1), "sparse", "dense", 30, 1, disc.getDensity(i));
-			_ui->addLabel("size",2);
-			_ui->addBiLabelSlider("radius" + ofToString(i+1), "small", "large", 15, 100, disc.getRadius(i)-disc.getRadius(i-1));
+            _ui->addLabel("rotation speed",2);
+            _ui->addBiLabelSlider("rotation" + ofToString(i+1), "CCW", "CW", 10, -10, disc.getNetRotationSpeed(i));
+            _ui->addLabel("density",2);
+            _ui->addBiLabelSlider("density" + ofToString(i+1), "sparse", "dense", 30, 1, disc.getDensity(i));
+            _ui->addLabel("size",2);
+            _ui->addBiLabelSlider("radius" + ofToString(i+1), "small", "large", 15, 100, disc.getRadius(i)-disc.getRadius(i-1));
 
-			_ui->addLabel("z-motion",1);
-			_ui->addToggle("move", disc.isMoving(i));
-			_ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-			_ui->addButton("reset", disc.resetPerlin[i]);
+            _ui->addLabelToggle("mute", disc.isMute(i));
+            _ui->addLabel("z-motion",1);
+            _ui->addToggle("move", disc.isMoving(i));
+            _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+            _ui->addButton("reset", disc.resetPerlin[i]);
 			_ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-			_ui->addLabelToggle("mute", disc.isMute(i));
 			_ui->addSpacer();
 			_ui->addLabelToggle("chat", true);
 
@@ -130,7 +129,7 @@ void ofApp::setup(){
 
 	}
 
-	if( me!= NULL){
+	if( me != NULL){
 		for(int i = 0; i < disc.getDiscIndex(); i++){
 			ui[i]->setColorBack(me->getColor());
 		}
@@ -1263,9 +1262,9 @@ void ofApp::draw(){
 		groove.draw();
 
 		if(cam.getDistance() > 100){
-			cout<< cam.getDistance() <<endl;
-			float wetLevel = ofMap(cam.getDistance(), 500, 8000, 0., .4);
-			float masterLevel = ofMap(cam.getDistance(), 100, 7000, .999, 0.);
+//			cout<< cam.getDistance() <<endl;
+			float wetLevel = ofMap(cam.getDistance(), 500, 9000, 0., .4);
+			float masterLevel = ofMap(cam.getDistance(), 100, 9000, .999, 0.);
 			ofClamp(wetLevel, 0., .4);
 			ofClamp(masterLevel, 0., .999);
 
@@ -1642,28 +1641,41 @@ void ofApp::audioOut( float * output, int bufferSize, int nChannels ) {
 void ofApp::soundChange(string name, int index, float value) {
 
 	if(name == "envelope"){
-		if(disc.isMute(index) == 0){
-			disc.setEnvelope(index, value);
-			sound.synth.setParameter("attack"+ofToString(index),disc.getEnvelope(index, 0));
-			sound.synth.setParameter("decay"+ofToString(index),disc.getEnvelope(index, 1));
-			sound.synth.setParameter("sustain"+ofToString(index),disc.getEnvelope(index, 2));
-			sound.synth.setParameter("release"+ofToString(index),disc.getEnvelope(index, 3));
-		}
-		else{
-			disc.setEnvelope(index, 0);
-			sound.synth.setParameter("attack"+ofToString(index),disc.getEnvelope(index, 0));
-			sound.synth.setParameter("decay"+ofToString(index),disc.getEnvelope(index, 1));
-			sound.synth.setParameter("sustain"+ofToString(index),disc.getEnvelope(index, 2));
-			sound.synth.setParameter("release"+ofToString(index),disc.getEnvelope(index, 3));
-		}
+        
+        if(disc.isMute(index) == 0) disc.setEnvelope(index, value);
+        else disc.setEnvelope(index, 0);
+        
+        sound.synth.setParameter("attack"+ofToString(index),disc.getEnvelope(index, 0));
+        sound.synth.setParameter("decay"+ofToString(index),disc.getEnvelope(index, 1));
+        sound.synth.setParameter("sustain"+ofToString(index),disc.getEnvelope(index, 2));
+        sound.synth.setParameter("release"+ofToString(index),disc.getEnvelope(index, 3));
+        
 
 		float volCoeff = 1;
-		if(disc.getTexture(index) == 1) volCoeff = 1.1;
-		else if(disc.getTexture(index) == 2) volCoeff = .25;
+		if(disc.getTexture(index) == 1) volCoeff = 1.2;
+		else if(disc.getTexture(index) == 2) volCoeff = .5;
 		else if(disc.getTexture(index) == 3) volCoeff = .25;
-		else if(disc.getTexture(index) == 4) volCoeff = .20;
+		else if(disc.getTexture(index) == 4) volCoeff = .15;
 
 		sound.synth.setParameter("volBalance"+ofToString(index), volCoeff);
+        
+        //ui
+        ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
+        ofxUISlider *slider1 = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(index+1)));
+        ofxUISlider *slider2 = static_cast <ofxUISlider*> (canvas->getWidget("density"+ofToString(index+1)));
+        ofxUISlider *slider3 = static_cast <ofxUISlider*> (canvas->getWidget("radius"+ofToString(index+1)));
+        
+        if(disc.getTexture(index) == 0){
+            slider1->setVisible(false);
+            slider2->setVisible(false);
+            slider3->setVisible(false);
+        }
+        else {
+            slider1->setVisible(true);
+            slider2->setVisible(true);
+            slider3->setVisible(true);
+        }
+        
 	}
 
 	else sound.synth.setParameter(name+ofToString(index), value);
