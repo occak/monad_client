@@ -102,19 +102,20 @@ void ofApp::setup(){
 			else _ui->addMultiImageButton("rect", "butonlar/buton-05.png", false, 35,35);
 			_ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
 
-            _ui->addLabel("rotation speed",2);
+            _ui->addLabel("rotation speed",1);
             _ui->addBiLabelSlider("rotation" + ofToString(i+1), "CCW", "CW", 10, -10, disc.getNetRotationSpeed(i));
-            _ui->addLabel("density",2);
+            _ui->addLabel("density",1);
             _ui->addBiLabelSlider("density" + ofToString(i+1), "sparse", "dense", 30, 1, disc.getDensity(i));
-            _ui->addLabel("size",2);
+            _ui->addLabel("size",1);
             _ui->addBiLabelSlider("radius" + ofToString(i+1), "small", "large", 15, 100, disc.getRadius(i)-disc.getRadius(i-1));
 
-            _ui->addLabelToggle("mute", disc.isMute(i));
+            
             _ui->addLabel("z-motion",1);
             _ui->addToggle("move", disc.isMoving(i));
             _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
             _ui->addButton("reset", disc.resetPerlin[i]);
 			_ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+            _ui->addLabelToggle("mute", disc.isMute(i));
 			_ui->addSpacer();
 			_ui->addLabelToggle("chat", true);
 
