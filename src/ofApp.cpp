@@ -392,16 +392,16 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 
 			}
 			else toggle->setValue(true);
-
-			//when texture is set to blank, rotation stops
-			disc.setRotationSpeed(me->getDiscIndex(), -disc.getNetRotationSpeed(me->getDiscIndex()));
-
-			//set rotation slider to 0 - not working
-			//        ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
-			//        ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"));
-			//        slider->setValue(0.);
-
-			//sound
+            
+            //when texture is set to blank, rotation stops
+            disc.setRotationSpeed(me->getDiscIndex(), -disc.getNetRotationSpeed(me->getDiscIndex()));
+            
+            //set rotation slider to 0
+            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
+            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
+            slider->setValue(slider->getScaledValue()-slider->getScaledValue());
+            
+            //sound
 			soundChange("bpm", me->getDiscIndex(), 0);
 			soundChange("envelope", me->getDiscIndex(), 0);
 
@@ -748,7 +748,12 @@ void ofApp::update(){
 							ofxUIToggle *toggle2 = static_cast <ofxUIToggle*> (canvas->getWidget("tri"));
 							ofxUIToggle *toggle3 = static_cast <ofxUIToggle*> (canvas->getWidget("saw"));
 							ofxUIToggle *toggle4 = static_cast <ofxUIToggle*> (canvas->getWidget("rect"));
-							if(disc.getTexture(i) == 0) toggle0->setValue(true);
+                            if(disc.getTexture(i) == 0) {
+                                toggle0->setValue(true);
+                                //set rotation slider to 0
+                                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
+                                ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(i+1)));
+                                slider->setValue(slider->getScaledValue()-slider->getScaledValue());}
 							else toggle0->setValue(false);
 							if(disc.getTexture(i) == 1) toggle1->setValue(true);
 							else toggle1->setValue(false);
@@ -1011,7 +1016,17 @@ void ofApp::update(){
 				ofxUIToggle *toggle2 = static_cast <ofxUIToggle*> (canvas->getWidget("tri"));
 				ofxUIToggle *toggle3 = static_cast <ofxUIToggle*> (canvas->getWidget("saw"));
 				ofxUIToggle *toggle4 = static_cast <ofxUIToggle*> (canvas->getWidget("rect"));
-				if(disc.getTexture(index) == 0) toggle0->setValue(true);
+                if(disc.getTexture(index) == 0) {
+                    toggle0->setValue(true);
+                    
+                    //when texture is set to blank, rotation stops
+                    disc.setRotationSpeed(index, -disc.getNetRotationSpeed(index));
+                    
+                    //set rotation slider to 0
+                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[index]);
+                    ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(index+1)));
+                    slider->setValue(slider->getScaledValue()-slider->getScaledValue());
+                }
 				else toggle0->setValue(false);
 				if(disc.getTexture(index) == 1) toggle1->setValue(true);
 				else toggle1->setValue(false);
@@ -1654,17 +1669,17 @@ void ofApp::soundChange(string name, int index, float value) {
 
 		float volCoeff = 1;
 		if(disc.getTexture(index) == 1) volCoeff = 1.2;
-		else if(disc.getTexture(index) == 2) volCoeff = .5;
-		else if(disc.getTexture(index) == 3) volCoeff = .25;
-		else if(disc.getTexture(index) == 4) volCoeff = .15;
+		else if(disc.getTexture(index) == 2) volCoeff = 1.;
+		else if(disc.getTexture(index) == 3) volCoeff = .5;
+		else if(disc.getTexture(index) == 4) volCoeff = .10;
 
 		sound.synth.setParameter("volBalance"+ofToString(index), volCoeff);
         
         //ui
-        ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
-        ofxUISlider *slider1 = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(index+1)));
-        ofxUISlider *slider2 = static_cast <ofxUISlider*> (canvas->getWidget("density"+ofToString(index+1)));
-        ofxUISlider *slider3 = static_cast <ofxUISlider*> (canvas->getWidget("radius"+ofToString(index+1)));
+        ofxUICanvas *canvas1 = static_cast<ofxUICanvas*>(ui[index]);
+        ofxUISlider *slider1 = static_cast <ofxUISlider*> (canvas1->getWidget("rotation"+ofToString(index+1)));
+        ofxUISlider *slider2 = static_cast <ofxUISlider*> (canvas1->getWidget("density"+ofToString(index+1)));
+        ofxUISlider *slider3 = static_cast <ofxUISlider*> (canvas1->getWidget("radius"+ofToString(index+1)));
         
         if(disc.getTexture(index) == 0){
             slider1->setVisible(false);
@@ -1676,6 +1691,7 @@ void ofApp::soundChange(string name, int index, float value) {
             slider2->setVisible(true);
             slider3->setVisible(true);
         }
+        
         
 	}
 
