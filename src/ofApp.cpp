@@ -216,7 +216,11 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 
 					//change sound
 					float netSpeed = abs(disc.getNetRotationSpeed(i));
-					float frequency = ofMap(netSpeed, 0, 10, 50, 1500);
+                    float frequency;
+                    if(netSpeed <= 5){
+                        frequency = ofMap(netSpeed, 0, 5, 50, 500);
+                    }
+					else frequency = ofMap(netSpeed, 5, 10, 500, 2500);
 					float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
 					float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 2);
 					soundChange("freq", i, frequency);
@@ -705,7 +709,11 @@ void ofApp::update(){
 							disc.setNetRotationSpeed (i, ofToFloat(nameValue[1]));
 							//sound
 							float netSpeed = abs(disc.getNetRotationSpeed(i));
-							float frequency = ofMap(netSpeed, 0, 10, 50, 1500);
+                            float frequency;
+                            if(netSpeed <= 5){
+                                frequency = ofMap(netSpeed, 0, 5, 50, 500);
+                            }
+                            else frequency = ofMap(netSpeed, 5, 10, 500, 2500);
 							float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
 							float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 2);
 							soundChange("freq", i, frequency);
@@ -725,7 +733,11 @@ void ofApp::update(){
 							//                            soundChange("pulseLength", i, pulseRatio);
 
 							float netSpeed = abs(disc.getNetRotationSpeed(i));
-							float frequency = ofMap(netSpeed, 0, 10, 50, 1500);
+                            float frequency;
+                            if(netSpeed <= 5){
+                                frequency = ofMap(netSpeed, 0, 5, 50, 500);
+                            }
+                            else frequency = ofMap(netSpeed, 5, 10, 500, 2500);
 							float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
 							float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 2);
 							soundChange("freq", i, frequency);
@@ -906,7 +918,11 @@ void ofApp::update(){
 
 				//sound
 				float netSpeed = abs(disc.getNetRotationSpeed(index));
-				float frequency = ofMap(netSpeed, 0, 10, 50, 1500);
+                float frequency;
+                if(netSpeed <= 5){
+                    frequency = ofMap(netSpeed, 0, 5, 50, 500);
+                }
+                else frequency = ofMap(netSpeed, 5, 10, 500, 2500);
 				float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
 				float beatDensity = ofMap(disc.getDensity(index), 1, 30, 30, 2);
 				soundChange("freq", index, frequency);
@@ -1669,7 +1685,7 @@ void ofApp::soundChange(string name, int index, float value) {
 
 		float volCoeff = 1;
 		if(disc.getTexture(index) == 1) volCoeff = 1.2;
-		else if(disc.getTexture(index) == 2) volCoeff = 1.;
+		else if(disc.getTexture(index) == 2) volCoeff = .5;
 		else if(disc.getTexture(index) == 3) volCoeff = .5;
 		else if(disc.getTexture(index) == 4) volCoeff = .10;
 
