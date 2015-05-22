@@ -146,7 +146,7 @@ void ofApp::setup(){
 	int chatWidth = 800;
 	chat->setPosition(noDisc->getGlobalCanvasWidth()+10, 0);
 	chat->setDimensions(chatWidth, ofGetHeight());
-	chat->setColorFill(ofxUIColor(23,200,23,180));
+	chat->setColorFill(ofxUIColor(50,50,50,150));
 	conversation = "";
 	chat->addTextInput("chatInput", "", OFX_UI_FONT_LARGE)->setAutoUnfocus(false);
 	chat->addTextArea("chat", "", OFX_UI_FONT_LARGE);
