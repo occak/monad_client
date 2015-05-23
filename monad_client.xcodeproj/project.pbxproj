@@ -46,7 +46,6 @@
 		5349EE00251AB23987DF1544 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 03693C02607CE87EB54A1526 /* ofxXmlSettings.cpp */; };
 		598AB36BD1D7DC17917A8451 /* ControlFloor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EB706F0A69AB6D6654CB7F2C /* ControlFloor.cpp */; };
 		6049CB8074ACD01A3669C73D /* ofxUIWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A94EAF3DD9CD1180114EA62 /* ofxUIWidget.cpp */; };
-		6808D1CF2284AD5CC02D148E /* barPerlin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A12BEDC55479D80017ECF0B4 /* barPerlin.cpp */; };
 		68257918E35D12D8829D3BA2 /* ControlTrigger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6E40CE28BF1A33182FD17F54 /* ControlTrigger.cpp */; };
 		68656E80D5E5CEA532BBA93F /* ControlCounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 06E6EAE01B72BBC11952C82B /* ControlCounter.cpp */; };
 		6C8551DB2C641E610EA107BE /* Sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADBBA9C0BFE51E5257D4E881 /* Sound.cpp */; };
@@ -309,7 +308,6 @@
 		9FDC2BFA4F1395F8A9FFF968 /* Tonic.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Tonic.h; path = "../../openFrameworks/of_v0.8.4_osx_release/addons/ofxTonic-master/src/Tonic.h"; sourceTree = SOURCE_ROOT; };
 		9FEF6806EEEF0639CFBE1059 /* ofxUIRangeSlider.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxUIRangeSlider.h; path = "../../openFrameworks/of_v0.8.4_osx_release/addons/ofxUI-master/src/ofxUIRangeSlider.h"; sourceTree = SOURCE_ROOT; };
 		A0796C6C607FC9AD4C09609D /* ofxMSAPerlin.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxMSAPerlin.h; path = "../../openFrameworks/of_v0.8.4_osx_release/addons/ofxMSAPerlin-master/src/ofxMSAPerlin.h"; sourceTree = SOURCE_ROOT; };
-		A12BEDC55479D80017ECF0B4 /* barPerlin.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = barPerlin.cpp; path = src/barPerlin.cpp; sourceTree = SOURCE_ROOT; };
 		A1CA4882D17268964A9A494D /* CombFilter.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = CombFilter.h; path = "../../openFrameworks/of_v0.8.4_osx_release/addons/ofxTonic-master/src/Tonic/CombFilter.h"; sourceTree = SOURCE_ROOT; };
 		A315969276C7BA86C41DD44F /* ControlStepper.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ControlStepper.cpp; path = "../../openFrameworks/of_v0.8.4_osx_release/addons/ofxTonic-master/src/Tonic/ControlStepper.cpp"; sourceTree = SOURCE_ROOT; };
 		A4D7CC7E4AA61233EBF323C1 /* ofxUICircleSlider.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxUICircleSlider.cpp; path = "../../openFrameworks/of_v0.8.4_osx_release/addons/ofxUI-master/src/ofxUICircleSlider.cpp"; sourceTree = SOURCE_ROOT; };
@@ -348,7 +346,6 @@
 		BE7C2E091AFBDC040098737C /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = monad_client/Images.xcassets; sourceTree = "<group>"; };
 		BF525F0887A63B5E6FC5578E /* Noise.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = Noise.cpp; path = "../../openFrameworks/of_v0.8.4_osx_release/addons/ofxTonic-master/src/Tonic/Noise.cpp"; sourceTree = SOURCE_ROOT; };
 		BFFBEE0796BE9DCF4DB9F0DA /* RampedValue.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = RampedValue.cpp; path = "../../openFrameworks/of_v0.8.4_osx_release/addons/ofxTonic-master/src/Tonic/RampedValue.cpp"; sourceTree = SOURCE_ROOT; };
-		C1910DD3D4BF040CF1C667D8 /* barPerlin.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = barPerlin.h; path = src/barPerlin.h; sourceTree = SOURCE_ROOT; };
 		C4FFA9A0771A49EDCD706154 /* Generator.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = Generator.cpp; path = "../../openFrameworks/of_v0.8.4_osx_release/addons/ofxTonic-master/src/Tonic/Generator.cpp"; sourceTree = SOURCE_ROOT; };
 		C5F0D6307BD0C9CD2EE71918 /* tinyxmlparser.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = tinyxmlparser.cpp; path = ../../openFrameworks/of_v0.8.4_osx_release/addons/ofxXmlSettings/libs/tinyxmlparser.cpp; sourceTree = SOURCE_ROOT; };
 		C6EF59F10865C0362B18A08F /* SawtoothWave.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = SawtoothWave.h; path = "../../openFrameworks/of_v0.8.4_osx_release/addons/ofxTonic-master/src/Tonic/SawtoothWave.h"; sourceTree = SOURCE_ROOT; };
@@ -720,8 +717,6 @@
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
 				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
-				A12BEDC55479D80017ECF0B4 /* barPerlin.cpp */,
-				C1910DD3D4BF040CF1C667D8 /* barPerlin.h */,
 				079339E7E75AFFAE9F5E0D91 /* Disc.cpp */,
 				DB118A0446917314330D200B /* Disc.h */,
 				D543831D749C3874C40E9ABB /* Groove.cpp */,
@@ -950,7 +945,6 @@
 			files = (
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
-				6808D1CF2284AD5CC02D148E /* barPerlin.cpp in Sources */,
 				E9A4665A16BA14C06DDD9816 /* Disc.cpp in Sources */,
 				0E8ECE05915237170AE09449 /* Groove.cpp in Sources */,
 				CB70B178311B16CC26AC0B3E /* Player.cpp in Sources */,

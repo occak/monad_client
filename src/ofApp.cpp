@@ -1331,10 +1331,6 @@ void ofApp::draw(){
 			ofRect(groove.lifeBar[i+1]);
 		}
 	}
-    else{
-//        ofSetColor(0, 0, 0);
-//        ofDrawBitmapString("Welcome to Monad.", 0, 0, -1000);
-    }
 
 	ofPopMatrix();
 
