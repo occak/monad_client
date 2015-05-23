@@ -30,12 +30,14 @@ void ofApp::setup(){
 	ofSetFrameRate(30);
 	if( me == NULL){
 		initialize = new ofxUICanvas();
-		initialize->setPosition(ofGetWidth()/2-100, ofGetHeight()/2-10);
-		initialize->addLabel("SERVER IP :");
+		initialize->setPosition(ofGetWidth()/2-150, ofGetHeight()/2-50);
+        initialize->setFont(OF_TTF_MONO);
+        initialize->addTextArea("welcome", "       Welcome to Monad.");
+		initialize->addLabel("Server IP :");
 		initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
 		initialize->addTextInput("IP", "");
 		initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-        initialize->addLabel("NICKNAME :");
+        initialize->addLabel("Nickname  :");
         initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
         initialize->addTextInput("nick", "");
 		initialize->autoSizeToFitWidgets();
@@ -44,9 +46,10 @@ void ofApp::setup(){
 
 	//set up gui
 	noDisc = new ofxUICanvas();
+    noDisc->setFont(OF_TTF_MONO);
 	noDisc->addMultiImageToggle("inner","butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
 	noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-	noDisc->addLabel("None Selected",0);
+	noDisc->addLabel("None Selected",1);
 	ofxUILabel *label = (ofxUILabel*) noDisc->getWidget("None Selected");
 	noDisc->addWidgetPosition(label,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_CENTER);
 	noDisc->addMultiImageToggle("outer", "butonlar/buton-07.png",false, 20, 20);
@@ -78,6 +81,7 @@ void ofApp::setup(){
 			ofxUICanvas *_ui;
 
 			_ui = new ofxUICanvas();
+            _ui->setFont(OF_TTF_MONO);
 			_ui->addMultiImageToggle("inner","butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
 			_ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
 			_ui->addLabel("Groove " + ofToString(i+1),0);
@@ -143,6 +147,7 @@ void ofApp::setup(){
 	ofAddListener(updateButtons->newGUIEvent, this, &ofApp::guiEvent);
 
 	chat = new ofxUICanvas();
+    chat->setFont(OF_TTF_MONO);
 	chat->setDrawBack(false);
 	int chatWidth = 800;
 	chat->setPosition(noDisc->getGlobalCanvasWidth()+10, 0);
@@ -1326,8 +1331,8 @@ void ofApp::draw(){
 		}
 	}
     else{
-        ofSetColor(0, 0, 0);
-        ofDrawBitmapString("Welcome to Monad.", -50, -100);
+//        ofSetColor(0, 0, 0);
+//        ofDrawBitmapString("Welcome to Monad.", 0, 0, -1000);
     }
 
 	ofPopMatrix();
@@ -1484,31 +1489,6 @@ void ofApp::keyPressed(int key){
 		fullScreen = !fullScreen;
 		ofSetFullscreen(fullScreen);
 	}
-
-	//    if(key == 'i' && me->getDiscIndex() != -1 ) {
-	//        disc.setPosition(me->getDiscIndex(), disc.getPosition(me->getDiscIndex())+1);
-	//    }
-	//    if(key == 'k' && me->getDiscIndex() != -1 ) {
-	//        disc.setPosition(me->getDiscIndex(), disc.getPosition(me->getDiscIndex())-1);
-	//    }
-	//    if(key == 'm' && me->getDiscIndex() != -1 ) {
-	//        if(me->getLife() > 0){
-	//            disc.setLife(costMute);
-	//            if(disc.isMute(me->getDiscIndex()) == 0) {
-	//                disc.setMute(me->getDiscIndex(),1); //mute on
-	//                soundChange("envelope", me->getDiscIndex(), 0);
-	//            }
-	//            else{
-	//                disc.setMute(me->getDiscIndex(),0); //mute off
-	//                disc.setEnvelope(me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
-	//                soundChange("envelope", me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
-	//            }
-	//            string change = "mute//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMute(me->getDiscIndex()));
-	//            client.send(change);
-	//        }
-	//    }
-
-
 
 }
 

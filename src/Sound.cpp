@@ -55,9 +55,9 @@ void Sound::setup(Disc* disc){
         
         float volCoeff = 1;
         if(disc->getTexture(i) == 1) volCoeff = 1.1;
-        else if(disc->getTexture(i) == 2) volCoeff = .25;
-        else if(disc->getTexture(i) == 3) volCoeff = .25;
-        else if(disc->getTexture(i) == 4) volCoeff = .20;
+        else if(disc->getTexture(i) == 2) volCoeff = .65;
+        else if(disc->getTexture(i) == 3) volCoeff = .65;
+        else if(disc->getTexture(i) == 4) volCoeff = .45;
         
         ControlGenerator volumeBalance = synth.addParameter("volBalance"+ofToString(i), volCoeff);
         groove = snd * amplitude * volumeBalance;
