@@ -35,10 +35,13 @@ public:
     int getDiscIndex() const;
     void setDiscIndex(int index);
     
+    string getNick() const;
+    void setNick(string nickname);
     
 private:
     
     string IP;
+    string nick;
     ofColor color;
     
     float life;

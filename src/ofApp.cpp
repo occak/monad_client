@@ -31,15 +31,16 @@ void ofApp::setup(){
 	if( me == NULL){
 		initialize = new ofxUICanvas();
 		initialize->setPosition(ofGetWidth()/2-100, ofGetHeight()/2-10);
-		initialize->addLabel("IP :");
+		initialize->addLabel("SERVER IP :");
 		initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
 		initialize->addTextInput("IP", "");
 		initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+        initialize->addLabel("NICKNAME :");
+        initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+        initialize->addTextInput("nick", "");
 		initialize->autoSizeToFitWidgets();
 		ofAddListener(initialize->newGUIEvent, this, &ofApp::guiEvent);
 	}
-
-
 
 	//set up gui
 	noDisc = new ofxUICanvas();
@@ -164,10 +165,10 @@ void ofApp::setup(){
 	costRadius = 1;
 	costDensity = 1;
 	costRotation = 1;
-	costTexture = 2;
+	costTexture = 1;
 	costMute = 1;
 	costMove = 1;
-	reward = 3;
+	reward = 1.5;
 
 }
 //--------------------------------------------------------------
@@ -197,7 +198,13 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 				IP = text->getTextString();
 			}
 		}
-		if (IP != "") {
+        if(e.getName() == "nick"){
+            ofxUITextInput *text = (ofxUITextInput *) e.widget;
+            if(text->getTextString() != ""){
+                nick = text->getTextString();
+            }
+        }
+		if (IP != "" && nick != "") {
 			client.setup(IP, 10002);
 			client.setMessageDelimiter("varianet");
 
@@ -205,6 +212,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 			client.send("hello//");
 		}
 	}
+    
 	else{
 		for(int i = 0; i < disc.getDiscIndex(); i++){
 			if(e.getName() == "rotation" + ofToString(i+1)){
@@ -368,7 +376,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 			ofxUITextInput *text = (ofxUITextInput *) e.widget;
 			string input;
 			if(text->getTextString() != ""){
-				input = me->getIP() + "::" + text->getTextString()+"\n\n";
+				input = me->getNick() + "::" + text->getTextString()+"\n\n";
 			}
 			conversation = input + conversation;
 			ofxUITextArea *history = (ofxUITextArea *) chat->getWidget("chat");
@@ -836,6 +844,7 @@ void ofApp::update(){
 					if (playerData[0] == "life") _player->setLife(ofToFloat(playerData[1]));
 					if (playerData[0] == "index") _player->setDiscIndex(ofToInt(playerData[1]));
 				}
+                _player->setNick(nick);
 				_player->setConnection(true);
 				me = _player;
 				groove.setup(&disc, me, otherPlayers);
@@ -1316,6 +1325,10 @@ void ofApp::draw(){
 			ofRect(groove.lifeBar[i+1]);
 		}
 	}
+    else{
+        ofSetColor(0, 0, 0);
+        ofDrawBitmapString("Welcome to Monad.", -50, -100);
+    }
 
 	ofPopMatrix();
 

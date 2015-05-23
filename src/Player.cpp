@@ -102,3 +102,13 @@ void Player::setDiscIndex(int index){
     discIndex = index;
     
 }
+
+string Player::getNick() const{
+    
+    return nick;
+}
+
+void Player::setNick(string nickname){
+    
+    nick = nickname;
+}

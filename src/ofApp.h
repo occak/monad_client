@@ -75,6 +75,7 @@ private:
     bool mReleased;
     bool TCPsetup;
     string IP;
+    string nick;
     int port;
     
 //    float newRotation;
