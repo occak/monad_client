@@ -292,15 +292,15 @@ void Disc::setEnvelope(int index, int type) {
             break;
             
         case 2:         // texture 2 - triangle
-            attack = 0.03;
-            decay = 0.05;
+            attack = 0.02;
+            decay = 0.03;
             sustain = 0;
             release = 0;
             break;
             
         case 3:         // texture 3 - note
             attack = 0.001;
-            decay = 0.1;
+            decay = 0.05;
             sustain = 0;
             release = 0;
             break;

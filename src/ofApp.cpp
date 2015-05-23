@@ -1675,9 +1675,9 @@ void ofApp::soundChange(string name, int index, float value) {
 
 		float volCoeff = 1;
 		if(disc.getTexture(index) == 1) volCoeff = 1.2;
-		else if(disc.getTexture(index) == 2) volCoeff = .5;
-		else if(disc.getTexture(index) == 3) volCoeff = .5;
-		else if(disc.getTexture(index) == 4) volCoeff = .10;
+		else if(disc.getTexture(index) == 2) volCoeff = .8;
+		else if(disc.getTexture(index) == 3) volCoeff = .6;
+		else if(disc.getTexture(index) == 4) volCoeff = .15;
 
 		sound.synth.setParameter("volBalance"+ofToString(index), volCoeff);
         

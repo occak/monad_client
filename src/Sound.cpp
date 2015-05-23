@@ -55,7 +55,7 @@ void Sound::setup(Disc* disc){
         
         float volCoeff = 1;
         if(disc->getTexture(i) == 1) volCoeff = 1.1;
-        else if(disc->getTexture(i) == 2) volCoeff = .60;
+        else if(disc->getTexture(i) == 2) volCoeff = .8;
         else if(disc->getTexture(i) == 3) volCoeff = .60;
         else if(disc->getTexture(i) == 4) volCoeff = .40;
         
