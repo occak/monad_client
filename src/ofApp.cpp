@@ -30,9 +30,10 @@ void ofApp::setup(){
 	ofSetFrameRate(30);
 	if( me == NULL){
 		initialize = new ofxUICanvas();
-		initialize->setPosition(ofGetWidth()/2-150, ofGetHeight()/2-50);
+		initialize->setPosition(ofGetWidth()/2-125, ofGetHeight()/2-50);
         initialize->setFont(OF_TTF_MONO);
-        initialize->addTextArea("welcome", "       Welcome to Monad.");
+        initialize->setDimensions(250, 200);
+        initialize->addTextArea("welcome", "     Welcome to Monad.", 0);
 		initialize->addLabel("Server IP :");
 		initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
 		initialize->addTextInput("IP", "");
