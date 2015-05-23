@@ -1,0 +1,1 @@
+/Users/cem cakmak/Library/Developer/Xcode/DerivedData/monad_client-ebulglemcqrntddhhdwbpwypdszf/Build/Intermediates/ArchiveIntermediates/monad_client Release/InstallationBuildProductsLocation/Users/cem cakmak/Applications/monad_client.app
