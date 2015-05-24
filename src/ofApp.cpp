@@ -1674,10 +1674,10 @@ void ofApp::soundChange(string name, int index, float value) {
         
 
 		float volCoeff = 1;
-		if(disc.getTexture(index) == 1) volCoeff = 1.2;
-		else if(disc.getTexture(index) == 2) volCoeff = .8;
-		else if(disc.getTexture(index) == 3) volCoeff = .6;
-		else if(disc.getTexture(index) == 4) volCoeff = .15;
+		if(disc.getTexture(index) == 1) volCoeff = 1.1;
+		else if(disc.getTexture(index) == 2) volCoeff = .7;
+		else if(disc.getTexture(index) == 3) volCoeff = .5;
+		else if(disc.getTexture(index) == 4) volCoeff = .1;
 
 		sound.synth.setParameter("volBalance"+ofToString(index), volCoeff);
         
