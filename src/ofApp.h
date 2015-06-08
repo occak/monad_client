@@ -74,9 +74,12 @@ private:
     bool fullScreen;
     bool mReleased;
     bool TCPsetup;
+    bool timer;
     string IP;
     string nick;
     int port;
+    int loginMinute;
+    float loginSecond;
     
 //    float newRotation;
     float thisRotation;

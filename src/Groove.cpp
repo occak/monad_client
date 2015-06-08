@@ -125,7 +125,7 @@ void Groove::draw(){
         mesh[i].draw();
         
         //draw circles
-        ofSetLineWidth(2);
+        ofSetLineWidth(3);
         ofNoFill();
         ofSetColor(50);
         if( i != me->getDiscIndex() && disc->isMute(i) == 1) ofSetColor(ofColor::lightGrey);

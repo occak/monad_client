@@ -8,6 +8,7 @@
 ofApp::ofApp() {
 	moveChanged = false;
 	TCPsetup = false;
+    timer = false;
 	radiusChanged = false;
 	textureChanged = false;
 	densityChanged = false;
@@ -111,7 +112,7 @@ void ofApp::setup(){
             _ui->addLabel("rotation speed",1);
             _ui->addBiLabelSlider("rotation" + ofToString(i+1), "CCW", "CW", 10, -10, disc.getNetRotationSpeed(i));
             _ui->addLabel("density",1);
-            _ui->addBiLabelSlider("density" + ofToString(i+1), "sparse", "dense", 30, 1, disc.getDensity(i));
+            _ui->addBiLabelSlider("density" + ofToString(i+1), "sparse", "dense", 30, 3, disc.getDensity(i));
             _ui->addLabel("size",1);
             _ui->addBiLabelSlider("radius" + ofToString(i+1), "small", "large", 15, 100, disc.getRadius(i)-disc.getRadius(i-1));
 
@@ -174,7 +175,7 @@ void ofApp::setup(){
 	costTexture = 1;
 	costMute = 1;
 	costMove = 1;
-	reward = 1.5;
+	reward = 1;
 
 }
 //--------------------------------------------------------------
@@ -747,14 +748,14 @@ void ofApp::update(){
 							//                            soundChange("pulseLength", i, pulseRatio);
 
 							float netSpeed = abs(disc.getNetRotationSpeed(i));
-                            float frequency;
-                            if(netSpeed <= 5){
-                                frequency = ofMap(netSpeed, 0, 5, 50, 500);
-                            }
-                            else frequency = ofMap(netSpeed, 5, 10, 500, 2500);
+//                            float frequency;
+//                            if(netSpeed <= 5){
+//                                frequency = ofMap(netSpeed, 0, 5, 50, 500);
+//                            }
+//                            else frequency = ofMap(netSpeed, 5, 10, 500, 2500);
 							float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
 							float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 2);
-							soundChange("freq", i, frequency);
+//							soundChange("freq", i, frequency);
 							soundChange("bpm", i, beatSpeed*beatDensity);
 
 							//ui
@@ -834,6 +835,9 @@ void ofApp::update(){
 				me->setConnection(true);
 				TCPsetup = true;
 				initialize->setVisible(false);
+                
+                loginMinute = ofGetMinutes();
+                loginSecond = ofGetElapsedTimef();
 
 				setup();
 				//                sound.setup(&disc);
@@ -1008,6 +1012,12 @@ void ofApp::update(){
 				float pulseRatio = ofMap(disc.getDensity(index), 1, 30, 0.001, 1);
 				soundChange("envelopeWidth", index, envelopeCoeff);
 				//                soundChange("pulseLength", index, pulseRatio);
+                
+                //change metronome
+                float netSpeed = abs(disc.getNetRotationSpeed(index));
+                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
+                float beatDensity = ofMap(disc.getDensity(index), 1, 30, 30, 2);
+                soundChange("bpm", index, beatSpeed*beatDensity);
 
 				//update ui
 				ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
@@ -1330,6 +1340,7 @@ void ofApp::draw(){
 			ofFill();
 			ofRect(groove.lifeBar[i+1]);
 		}
+        if(timer) ofDrawBitmapString(ofToString(abs(ofGetElapsedTimef()-loginSecond)), ofGetWidth()/2 - 120, ofGetHeight()/2 - 10);
 	}
 
 	ofPopMatrix();
@@ -1486,6 +1497,10 @@ void ofApp::keyPressed(int key){
 		fullScreen = !fullScreen;
 		ofSetFullscreen(fullScreen);
 	}
+    
+    if(key == 't') {
+        timer = !timer;
+    }
 
 }
 
@@ -1675,8 +1690,8 @@ void ofApp::soundChange(string name, int index, float value) {
 
 		float volCoeff = 1;
 		if(disc.getTexture(index) == 1) volCoeff = 1.1;
-		else if(disc.getTexture(index) == 2) volCoeff = .7;
-		else if(disc.getTexture(index) == 3) volCoeff = .5;
+		else if(disc.getTexture(index) == 2) volCoeff = .6;
+		else if(disc.getTexture(index) == 3) volCoeff = .45;
 		else if(disc.getTexture(index) == 4) volCoeff = .1;
 
 		sound.synth.setParameter("volBalance"+ofToString(index), volCoeff);
