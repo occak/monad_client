@@ -151,13 +151,13 @@ void ofApp::setup(){
 	chat = new ofxUICanvas();
     chat->setFont(OF_TTF_MONO);
 	chat->setDrawBack(false);
-	int chatWidth = 800;
+	int chatWidth = 900;
 	chat->setPosition(noDisc->getGlobalCanvasWidth()+10, 0);
 	chat->setDimensions(chatWidth, ofGetHeight());
 	chat->setColorFill(ofxUIColor(50,50,50,150));
 	conversation = "";
-	chat->addTextInput("chatInput", "", OFX_UI_FONT_LARGE)->setAutoUnfocus(false);
-	chat->addTextArea("chat", "", OFX_UI_FONT_LARGE);
+	chat->addTextInput("chatInput", "", OFX_UI_FONT_MEDIUM)->setAutoUnfocus(false);
+	chat->addTextArea("chat", "", OFX_UI_FONT_MEDIUM);
 	if (me == NULL) chat->setVisible(false);
     chat->autoSizeToFitWidgets();
 
@@ -183,7 +183,7 @@ void ofApp::exit(){
 
 	me->setConnection(false);
 	string playerOut;
-	playerOut = "goodbye//"+me->getIP();
+	playerOut = "goodbye//"+me->getNick();
 	client.send(playerOut);
 
 
@@ -216,7 +216,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 			client.setMessageDelimiter("varianet");
 
 			// ask for server state
-			client.send("hello//");
+			client.send("hello//"+me->getNick());
 		}
 	}
     
@@ -881,14 +881,17 @@ void ofApp::update(){
 							_player->setIP(playerData[1]);
 						}
 						_player->setConnection(true);
-
-						conversation = "***"+_player->getIP()+" is online***"+"\n\n" + conversation;
-						ofxUITextArea *history = (ofxUITextArea *) chat->getWidget("chat");
-						history->setTextString(conversation);
 					}
 					if (playerData[0] == "color") _player->setColor(ofFromString<ofColor>(playerData[1]));
 					if (playerData[0] == "life") _player->setLife(ofToFloat(playerData[1]));
 					if (playerData[0] == "index") _player->setDiscIndex(ofToInt(playerData[1]));
+                    if (playerData[0] == "nick") {
+                        _player->setNick(playerData[1]);
+                    
+                        conversation = "***"+_player->getNick()+" is online***"+"\n\n" + conversation;
+                        ofxUITextArea *history = (ofxUITextArea *) chat->getWidget("chat");
+                        history->setTextString(conversation);
+                    }
 				}
 				groove.setup(&disc, me, otherPlayers);
 
@@ -1288,7 +1291,7 @@ void ofApp::update(){
 
 			else if (title == "goodbye"){
 				for (int i = 0; i < otherPlayers.size(); i++) {
-					if(received[1] == otherPlayers[i]->getIP()) {
+					if(received[1] == otherPlayers[i]->getNick()) {
 						otherPlayers[i]->setConnection(false);
 						otherPlayers[i]->setDiscIndex(-1);
 					}
@@ -1331,16 +1334,21 @@ void ofApp::draw(){
 
 		cam.end();
 
-		ofSetColor(me->getColor());
-		ofFill();
-		ofRect(groove.lifeBar[0]);
-
-		for(int i = 0; i < otherPlayers.size(); i++){
-			ofSetColor(otherPlayers[i]->getColor());
-			ofFill();
-			ofRect(groove.lifeBar[i+1]);
-		}
-        if(timer) ofDrawBitmapString(ofToString(abs(ofGetElapsedTimef()-loginSecond)), ofGetWidth()/2 - 120, ofGetHeight()/2 - 10);
+        ofSetColor(me->getColor());
+        ofFill();
+        ofRect(groove.lifeBar[0]);
+        
+        for(int i = 0; i < otherPlayers.size(); i++){
+            if(otherPlayers[i]->isConnected() == true){
+                ofSetColor(otherPlayers[i]->getColor());
+                ofFill();
+                ofRect(groove.lifeBar[i+1]);
+            }
+        }
+        if(timer) {
+            ofSetColor(0);
+            ofDrawBitmapString(ofToString(abs(ofGetElapsedTimef()-loginSecond)), ofGetWidth()/2 - 120, ofGetHeight()/2 - 10);
+        }
 	}
 
 	ofPopMatrix();
