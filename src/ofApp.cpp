@@ -848,18 +848,17 @@ void ofApp::update(){
 
 
 			else if (title == "playerInfo" ){
-				Player* _player = new Player();
 				for(int i = 1; i < received.size(); i++ ){
 					vector<string> playerData;
 					playerData = ofSplitString(received[i], ": ");
-					if (playerData[0] == "IP") _player->setIP(playerData[1]);
-					if (playerData[0] == "color") _player->setColor(ofFromString<ofColor>(playerData[1]));
-					if (playerData[0] == "life") _player->setLife(ofToFloat(playerData[1]));
-					if (playerData[0] == "index") _player->setDiscIndex(ofToInt(playerData[1]));
+					if (playerData[0] == "IP") me->setIP(playerData[1]);
+					if (playerData[0] == "color") me->setColor(ofFromString<ofColor>(playerData[1]));
+					if (playerData[0] == "life") me->setLife(ofToFloat(playerData[1]));
+					if (playerData[0] == "index") me->setDiscIndex(ofToInt(playerData[1]));
+                    if (playerData[0] == "nick") me->setNick(playerData[1]);
 				}
-                _player->setNick(me->getNick());
-				_player->setConnection(true);
-				me = _player;
+                
+				me->setConnection(true);
 				groove.setup(&disc, me, otherPlayers);
 			}
 
