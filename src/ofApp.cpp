@@ -215,6 +215,9 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 			client.setup(IP, 10002);
 			client.setMessageDelimiter("varianet");
 
+            Player* _player = new Player();
+            _player->setNick(nick);
+            me = _player;
 			// ask for server state
 			client.send("hello//"+me->getNick());
 		}
@@ -854,7 +857,7 @@ void ofApp::update(){
 					if (playerData[0] == "life") _player->setLife(ofToFloat(playerData[1]));
 					if (playerData[0] == "index") _player->setDiscIndex(ofToInt(playerData[1]));
 				}
-                _player->setNick(nick);
+                _player->setNick(me->getNick());
 				_player->setConnection(true);
 				me = _player;
 				groove.setup(&disc, me, otherPlayers);
