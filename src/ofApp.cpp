@@ -1514,7 +1514,87 @@ void ofApp::keyPressed(int key){
 
 }
 
+//--------------------------------------------------------------
+void ofApp::audioOut( float * output, int bufferSize, int nChannels ) {
+    
+    sound.synth.fillBufferOfFloats(output, bufferSize, nChannels);
+    
+    
+    //    for(int i = 0; i < bufferSize; i++){
+    //        float value = 0.1 *sawWave(220);
+    //        output[2*i] = value;
+    //        output[2*i+1] = value;
+    //    }
+    
+}
 
+//--------------------------------------------------------------
+void ofApp::soundChange(string name, int index, float value) {
+    
+    if(name == "envelope"){
+        
+        if(disc.isMute(index) == 0) disc.setEnvelope(index, value);
+        else disc.setEnvelope(index, 0);
+        
+        sound.synth.setParameter("attack"+ofToString(index),disc.getEnvelope(index, 0));
+        sound.synth.setParameter("decay"+ofToString(index),disc.getEnvelope(index, 1));
+        sound.synth.setParameter("sustain"+ofToString(index),disc.getEnvelope(index, 2));
+        sound.synth.setParameter("release"+ofToString(index),disc.getEnvelope(index, 3));
+        
+        
+        float volCoeff = 1;
+        if(disc.getTexture(index) == 1) volCoeff = 1.1;
+        else if(disc.getTexture(index) == 2) volCoeff = .6;
+        else if(disc.getTexture(index) == 3) volCoeff = .45;
+        else if(disc.getTexture(index) == 4) volCoeff = .1;
+        
+        sound.synth.setParameter("volBalance"+ofToString(index), volCoeff);
+        
+        //ui
+        ofxUICanvas *canvas1 = static_cast<ofxUICanvas*>(ui[index]);
+        ofxUISlider *slider1 = static_cast <ofxUISlider*> (canvas1->getWidget("rotation"+ofToString(index+1)));
+        ofxUISlider *slider2 = static_cast <ofxUISlider*> (canvas1->getWidget("density"+ofToString(index+1)));
+        ofxUISlider *slider3 = static_cast <ofxUISlider*> (canvas1->getWidget("radius"+ofToString(index+1)));
+        
+        if(disc.getTexture(index) == 0){
+            slider1->setVisible(false);
+            slider2->setVisible(false);
+            slider3->setVisible(false);
+        }
+        else {
+            slider1->setVisible(true);
+            slider2->setVisible(true);
+            slider3->setVisible(true);
+        }
+        
+        
+    }
+    
+    else sound.synth.setParameter(name+ofToString(index), value);
+    
+}
+
+//--------------------------------------------------------------
+void ofApp::refreshUpdateButtons(){
+    
+    if(updateButtonsArray.size() > 8){
+        ofxUILabelToggle *toggle0 = updateButtonsArray.front();
+        updateButtons->removeWidget(toggle0);
+        updateButtonsArray.erase(updateButtonsArray.begin());
+    }
+    updateButtons->clearWidgets();
+    for(int i = updateButtonsArray.size()-1; i >= 0; i--){
+        ofxUILabelToggle *thisToggle = updateButtonsArray[i];
+        
+        thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
+        if( thisToggle->getValue() == false){
+            thisToggle->setColorBack(updateButtonsArray[i]->getColorBack());
+        }
+        updateButtonsArray[i] = thisToggle;
+    }
+    updateButtons->autoSizeToFitWidgets();
+    
+}
 
 
 //--------------------------------------------------------------
@@ -1670,84 +1750,4 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 //
 //}
 
-//--------------------------------------------------------------
-void ofApp::audioOut( float * output, int bufferSize, int nChannels ) {
 
-	sound.synth.fillBufferOfFloats(output, bufferSize, nChannels);
-
-
-	//    for(int i = 0; i < bufferSize; i++){
-	//        float value = 0.1 *sawWave(220);
-	//        output[2*i] = value;
-	//        output[2*i+1] = value;
-	//    }
-
-}
-
-//--------------------------------------------------------------
-void ofApp::soundChange(string name, int index, float value) {
-
-	if(name == "envelope"){
-        
-        if(disc.isMute(index) == 0) disc.setEnvelope(index, value);
-        else disc.setEnvelope(index, 0);
-        
-        sound.synth.setParameter("attack"+ofToString(index),disc.getEnvelope(index, 0));
-        sound.synth.setParameter("decay"+ofToString(index),disc.getEnvelope(index, 1));
-        sound.synth.setParameter("sustain"+ofToString(index),disc.getEnvelope(index, 2));
-        sound.synth.setParameter("release"+ofToString(index),disc.getEnvelope(index, 3));
-        
-
-		float volCoeff = 1;
-		if(disc.getTexture(index) == 1) volCoeff = 1.1;
-		else if(disc.getTexture(index) == 2) volCoeff = .6;
-		else if(disc.getTexture(index) == 3) volCoeff = .45;
-		else if(disc.getTexture(index) == 4) volCoeff = .1;
-
-		sound.synth.setParameter("volBalance"+ofToString(index), volCoeff);
-        
-        //ui
-        ofxUICanvas *canvas1 = static_cast<ofxUICanvas*>(ui[index]);
-        ofxUISlider *slider1 = static_cast <ofxUISlider*> (canvas1->getWidget("rotation"+ofToString(index+1)));
-        ofxUISlider *slider2 = static_cast <ofxUISlider*> (canvas1->getWidget("density"+ofToString(index+1)));
-        ofxUISlider *slider3 = static_cast <ofxUISlider*> (canvas1->getWidget("radius"+ofToString(index+1)));
-        
-        if(disc.getTexture(index) == 0){
-            slider1->setVisible(false);
-            slider2->setVisible(false);
-            slider3->setVisible(false);
-        }
-        else {
-            slider1->setVisible(true);
-            slider2->setVisible(true);
-            slider3->setVisible(true);
-        }
-        
-        
-	}
-
-	else sound.synth.setParameter(name+ofToString(index), value);
-
-}
-
-//--------------------------------------------------------------
-void ofApp::refreshUpdateButtons(){
-
-	if(updateButtonsArray.size() > 8){
-		ofxUILabelToggle *toggle0 = updateButtonsArray.front();
-		updateButtons->removeWidget(toggle0);
-		updateButtonsArray.erase(updateButtonsArray.begin());
-	}
-	updateButtons->clearWidgets();
-	for(int i = updateButtonsArray.size()-1; i >= 0; i--){
-		ofxUILabelToggle *thisToggle = updateButtonsArray[i];
-
-		thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
-		if( thisToggle->getValue() == false){
-			thisToggle->setColorBack(updateButtonsArray[i]->getColorBack());
-		}
-		updateButtonsArray[i] = thisToggle;
-	}
-	updateButtons->autoSizeToFitWidgets();
-
-}

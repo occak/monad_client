@@ -49,9 +49,10 @@ void Sound::setup(Disc* disc){
         ControlGenerator freq = synth.addParameter("freq"+ofToString(i), pitch);
         ControlGenerator amountFreq = synth.addParameter("amountFreq"+ofToString(i));
         ControlGenerator amountMod = synth.addParameter("amountMod"+ofToString(i),0);
-        
+
         Generator modulation = SineWave().freq(amountFreq) * amountMod;
         Generator snd = SawtoothWave().freq(freq+modulation);
+        
         
         float volCoeff = 1;
         if(disc->getTexture(i) == 1) volCoeff = 1.1;
@@ -74,7 +75,7 @@ void Sound::setup(Disc* disc){
     ControlGenerator wet = synth.addParameter("wet", 0.).max(.5).min(0.);
     Generator limiter = Limiter().input(master).threshold(0.8);
     Generator reverb = Reverb().input(limiter).stereoWidth(.5).roomSize(.4).wetLevel(wet);
-    ControlGenerator masterLevel = synth.addParameter("master", 1.).max(1.).min(0.);
+    ControlGenerator masterLevel = synth.addParameter("master", .99).max(.99).min(0.);
     synth.setOutputGen(masterLevel*reverb);
     
 }
