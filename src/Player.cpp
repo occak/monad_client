@@ -91,6 +91,12 @@ void Player::setLife(float newLife){
     
 }
 
+void Player::changeLife(float amount){
+    
+    life += amount;
+    
+}
+
 int Player::getDiscIndex() const{
     
     return discIndex;

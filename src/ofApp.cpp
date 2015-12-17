@@ -168,14 +168,14 @@ void ofApp::setup(){
 
 	//        sound.setup(&disc);
 
-	// set up game costs
-	costRadius = 1;
-	costDensity = 1;
-	costRotation = 1;
-	costTexture = 1;
-	costMute = 1;
-	costMove = 1;
-	reward = 1;
+//	// set up game costs
+//	costRadius = 1;
+//	costDensity = 1;
+//	costRotation = 1;
+//	costTexture = 1;
+//	costMute = 1;
+//	costMove = 1;
+//	reward = 1;
 
 }
 //--------------------------------------------------------------
@@ -302,7 +302,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 				//send update
 				string lifeUpdate = "life//";
 				lifeUpdate += "IP: "+ofToString(_player->getIP()) + "//";
-				lifeUpdate += "life: "+ofToString(_player->getLife()) + "//";
+				lifeUpdate += "lifeChange: "+ofToString(_player->getLife()) + "//";
 				client.send(lifeUpdate);
 
 			}
@@ -558,7 +558,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 					//update server
 					string lifeUpdate = "life//";
 					lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-					lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
+					lifeUpdate += "lifeChange: "+ofToString(costMove*costFactor) + "//";
 					client.send(lifeUpdate);
 				}
 				if(toggle->getValue() == false){
@@ -584,7 +584,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 					//update server
 					string lifeUpdate = "life//";
 					lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-					lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
+					lifeUpdate += "lifeChange: "+ofToString(costMove*costFactor) + "//";
 					client.send(lifeUpdate);
 				}
 			}
@@ -614,7 +614,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 					//update server
 					string lifeUpdate = "life//";
 					lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-					lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
+					lifeUpdate += "lifeChange: "+ofToString(costMove*costFactor) + "//";
 					client.send(lifeUpdate);
 				}
 			}
@@ -659,7 +659,7 @@ void ofApp::update(){
 		//update server
 		string lifeUpdate = "life//";
 		lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-		lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
+		lifeUpdate += "lifeChange: "+ofToString(costMove) + "//";
 		client.send(lifeUpdate);
 
 		string movement = "move//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMoving(me->getDiscIndex()))+"//"+me->getIP();
@@ -679,7 +679,7 @@ void ofApp::update(){
 		//update server
 		string lifeUpdate = "life//";
 		lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-		lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
+		lifeUpdate += "lifeChange: "+ofToString(costMute) + "//";
 		client.send(lifeUpdate);
 
 		string change = "mute//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.isMute(me->getDiscIndex()))+"//"+me->getIP();
@@ -846,6 +846,21 @@ void ofApp::update(){
 				//                sound.setup(&disc);
 			}
 
+            else if (title == "costs"){
+                
+                for(int i = 1; i < received.size(); i++ ){
+                    vector<string> playerData;
+                    playerData = ofSplitString(received[i], ": ");
+                    if (playerData[0] == "costRadius") costRadius = ofToFloat(playerData[1]);
+                    if (playerData[0] == "costDensity") costDensity = ofToFloat(playerData[1]);
+                    if (playerData[0] == "costRotation") costRotation = ofToFloat(playerData[1]);
+                    if (playerData[0] == "costTexture") costTexture = ofToFloat(playerData[1]);
+                    if (playerData[0] == "costMute") costMute = ofToFloat(playerData[1]);
+                    if (playerData[0] == "costMove") costMove = ofToFloat(playerData[1]);
+                    if (playerData[0] == "reward") reward = ofToFloat(playerData[1]);
+                }
+                
+            }
 
 			else if (title == "playerInfo" ){
 				for(int i = 1; i < received.size(); i++ ){
@@ -931,7 +946,7 @@ void ofApp::update(){
 					}
 					else if (playerData[0] == "IP" && playerData[1] == me->getIP()) _player = me;
 
-					if (playerData[0] == "life" && _player != NULL) _player->setLife(ofToFloat(playerData[1]));
+					if (playerData[0] == "lifeChange" && _player != NULL) _player->changeLife(ofToFloat(playerData[1]));
 				}
 			}
 
@@ -1632,7 +1647,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 		//update server
 		string lifeUpdate = "life//";
 		lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-		lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
+		lifeUpdate += "lifeChange: "+ofToString(costRadius) + "//";
 		client.send(lifeUpdate);
 
 		string change = "radius//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getThickness(me->getDiscIndex()))+"//"+me->getIP();
@@ -1646,7 +1661,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 		//update server
 		string lifeUpdate = "life//";
 		lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-		lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
+		lifeUpdate += "lifeChange: "+ofToString(costDensity) + "//";
 		client.send(lifeUpdate);
 
 		string change = "density//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getDensity(me->getDiscIndex()))+"//"+me->getIP();
@@ -1659,7 +1674,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 		//update server
 		string lifeUpdate = "life//";
 		lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-		lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
+		lifeUpdate += "lifeChange: "+ofToString(costTexture) + "//";
 		client.send(lifeUpdate);
 
 		string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()))+"//"+me->getIP();
@@ -1677,7 +1692,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 		//update server
 		string lifeUpdate = "life//";
 		lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-		lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
+		lifeUpdate += "lifeChange: "+ofToString(costRotation) + "//";
 		client.send(lifeUpdate);
 
 		//send to server
@@ -1694,7 +1709,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 		//update server
 		string lifeUpdate = "life//";
 		lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-		lifeUpdate += "life: "+ofToString(me->getLife()) + "//";
+		lifeUpdate += "lifeChange: "+ofToString(costMove) + "//";
 		client.send(lifeUpdate);
 
 		string movementReset = "moveReset//"+ofToString(me->getDiscIndex())+"//"+me->getIP();

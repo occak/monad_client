@@ -26,9 +26,6 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
     
-    float triangleWave(float frequency);
-    float squareWave(float frequency);
-    float sawWave(float frequency);
     
     //audio
     void audioOut( float * output, int bufferSize, int nChannels );
@@ -93,9 +90,11 @@ private:
     
     vector<ofxUICanvas *> ui;
     ofxUICanvas *noDisc;
-    //update buttons not working
+    
+    //update buttons will be removed
     vector<ofxUILabelToggle *> updateButtonsArray;
     ofxUICanvas *updateButtons;
+    
     ofxUICanvas *initialize;
     
     ofxUICanvas *chat;
