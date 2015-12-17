@@ -238,9 +238,9 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     if(netSpeed <= 5){
                         frequency = ofMap(netSpeed, 0, 5, 50, 500);
                     }
-					else frequency = ofMap(netSpeed, 5, 10, 500, 2500);
-					float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
-					float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 2);
+					else frequency = ofMap(netSpeed, 5, 10, 500, 1500);
+					float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
+					float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
 					soundChange("freq", i, frequency);
 					soundChange("bpm", i, beatSpeed*beatDensity);
 
@@ -276,8 +276,8 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 
 					//change metronome
 					float netSpeed = abs(disc.getNetRotationSpeed(i));
-					float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
-					float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 2);
+					float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
+					float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
 					soundChange("bpm", i, beatSpeed*beatDensity);
 
 					//send to server
@@ -732,9 +732,9 @@ void ofApp::update(){
                             if(netSpeed <= 5){
                                 frequency = ofMap(netSpeed, 0, 5, 50, 500);
                             }
-                            else frequency = ofMap(netSpeed, 5, 10, 500, 2500);
-							float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
-							float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 2);
+                            else frequency = ofMap(netSpeed, 5, 10, 500, 1500);
+							float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
+							float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
 							soundChange("freq", i, frequency);
 							soundChange("bpm", i, beatSpeed*beatDensity);
 							//ui
@@ -757,8 +757,8 @@ void ofApp::update(){
 //                                frequency = ofMap(netSpeed, 0, 5, 50, 500);
 //                            }
 //                            else frequency = ofMap(netSpeed, 5, 10, 500, 2500);
-							float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
-							float beatDensity = ofMap(disc.getDensity(i), 1, 30, 30, 2);
+							float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
+							float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
 //							soundChange("freq", i, frequency);
 							soundChange("bpm", i, beatSpeed*beatDensity);
 
@@ -962,9 +962,9 @@ void ofApp::update(){
                 if(netSpeed <= 5){
                     frequency = ofMap(netSpeed, 0, 5, 50, 500);
                 }
-                else frequency = ofMap(netSpeed, 5, 10, 500, 2500);
-				float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
-				float beatDensity = ofMap(disc.getDensity(index), 1, 30, 30, 2);
+                else frequency = ofMap(netSpeed, 5, 10, 500, 1500);
+				float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
+				float beatDensity = ofMap(disc.getDensity(index), 1, 30, 15, 2);
 				soundChange("freq", index, frequency);
 				soundChange("bpm", index, beatSpeed*beatDensity);
 
@@ -1036,8 +1036,8 @@ void ofApp::update(){
                 
                 //change metronome
                 float netSpeed = abs(disc.getNetRotationSpeed(index));
-                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 250);
-                float beatDensity = ofMap(disc.getDensity(index), 1, 30, 30, 2);
+                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
+                float beatDensity = ofMap(disc.getDensity(index), 1, 30, 15, 2);
                 soundChange("bpm", index, beatSpeed*beatDensity);
 
 				//update ui
