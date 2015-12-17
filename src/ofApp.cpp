@@ -289,27 +289,28 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 		}
 
 		//update buttons
-		if(e.getKind() == OFX_UI_WIDGET_LABELTOGGLE && e.getName() != "mute" && e.getName() != "chat"){
-
-			ofxUILabelToggle *updateButton = static_cast <ofxUILabelToggle*> (e.getToggle());
-			if(updateButton->getValue() == true){
-
-				Player* _player = new Player();
-				for(int i = 0; i < otherPlayers.size(); i++){
-					if(otherPlayers[i]->getColor() == updateButton->getColorBack()) _player = otherPlayers[i];
-				}
-				_player->setLife(_player->getLife()+reward);
-				//send update
-				string lifeUpdate = "life//";
-				lifeUpdate += "IP: "+ofToString(_player->getIP()) + "//";
-				lifeUpdate += "lifeChange: "+ofToString(_player->getLife()) + "//";
-				client.send(lifeUpdate);
-
-			}
-			else updateButton->setValue(true);
-
-		}
-		else if(e.getName() == "inner"){
+//		if(e.getKind() == OFX_UI_WIDGET_LABELTOGGLE && e.getName() != "mute" && e.getName() != "chat"){
+//
+//			ofxUILabelToggle *updateButton = static_cast <ofxUILabelToggle*> (e.getToggle());
+//			if(updateButton->getValue() == true){
+//
+//				Player* _player = new Player();
+//				for(int i = 0; i < otherPlayers.size(); i++){
+//					if(otherPlayers[i]->getColor() == updateButton->getColorBack()) _player = otherPlayers[i];
+//				}
+//				_player->setLife(_player->getLife()+reward);
+//				//send update
+//				string lifeUpdate = "life//";
+//				lifeUpdate += "IP: "+ofToString(_player->getIP()) + "//";
+//				lifeUpdate += "lifeChange: "+ofToString(_player->getLife()) + "//";
+//				client.send(lifeUpdate);
+//
+//			}
+//			else updateButton->setValue(true);
+//
+//		}
+        
+		if(e.getName() == "inner"){
 			ofxUIButton *button = e.getButton();
 
 			int jump = 1;
@@ -551,7 +552,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 							costFactor++;
 						}
 					}
-					me->setLife(me->getLife()-(costMove*costFactor));
+					me->changeLife(costMove*costFactor);
 					string moveAll = "moveAll//"+me->getIP();
 					client.send(moveAll);
 
@@ -576,7 +577,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 						}
 						zPositionAll += ofToString(i)+": "+ofToString(disc.getPosition(i))+"//";
 					}
-					me->setLife(me->getLife()-(costMove*costFactor));
+					me->changeLife(costMove*costFactor);
 					string stopAll = "stopAll//"+me->getIP();
 					client.send(stopAll);
 					client.send(zPositionAll);
@@ -607,7 +608,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 					ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (canvas->getWidget("move all"));
 					toggleMoveAll->setValue(false);
 
-					me->setLife(me->getLife()-(costMove*costFactor));
+					me->changeLife(costMove*costFactor);
 					string resetAll = "resetAll//"+me->getIP();
 					client.send(resetAll);
 
@@ -654,7 +655,7 @@ void ofApp::update(){
 
 	if(moveChanged){
 		moveChanged = false;
-		me->setLife(me->getLife()-costMove);
+		me->changeLife(costMove);
 
 		//update server
 		string lifeUpdate = "life//";
@@ -674,7 +675,7 @@ void ofApp::update(){
 	}
 	if(muteChanged){
 		muteChanged = false;
-		me->setLife(me->getLife()-costMute);
+		me->changeLife(costMute);
 
 		//update server
 		string lifeUpdate = "life//";
@@ -1642,7 +1643,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 
 	if(radiusChanged) {
 		radiusChanged = false;
-		me->setLife(me->getLife()-costRadius);
+		me->changeLife(costRadius);
 
 		//update server
 		string lifeUpdate = "life//";
@@ -1656,7 +1657,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 	}
 	else if(densityChanged){
 		densityChanged = false;
-		me->setLife(me->getLife()-costDensity);
+		me->changeLife(costDensity);
 
 		//update server
 		string lifeUpdate = "life//";
@@ -1669,7 +1670,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 	}
 	else if(textureChanged){
 		textureChanged = false;
-		me->setLife(me->getLife()-costTexture);
+		me->changeLife(costTexture);
 
 		//update server
 		string lifeUpdate = "life//";
@@ -1682,7 +1683,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 	}
 	else if(rotationChanged){
 		rotationChanged = false;
-		me->setLife(me->getLife()-costRotation);
+		me->changeLife(costRotation);
 
 		//update ui
 		ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
@@ -1704,7 +1705,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 
 	else if(moveReset){
 		moveReset = false;
-		me->setLife(me->getLife()-costMove);
+		me->changeLife(costMove);
 
 		//update server
 		string lifeUpdate = "life//";
