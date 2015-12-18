@@ -244,7 +244,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 				ofxUISlider *slider = e.getSlider();
                 float newRotation = slider->getScaledValue()-disc.getNetRotationSpeed(i);
                 
-				if(me->getLife() > 0 && mReleased == false && disc.getTexture(i) != 0 && newRotation != disc.getRotationSpeed(<#int index#>)) {
+				if(me->getLife() > 0 && mReleased == false && disc.getTexture(i) != 0 && newRotation != disc.getRotationSpeed(i)) {
 					rotationChanged = true;
 					disc.setRotationSpeed(i, newRotation);
 
@@ -1558,14 +1558,25 @@ void ofApp::draw(){
 
 		if(cam.getDistance() > 100){
 //			cout<< cam.getDistance() <<endl;
-			float wetLevel = ofMap(cam.getDistance(), 500, 9000, 0., .4);
-			float masterLevel = ofMap(cam.getDistance(), 100, 9000, .999, 0.);
-			ofClamp(wetLevel, 0., .4);
-			ofClamp(masterLevel, 0., .999);
-
-			sound.synth.setParameter("wet", wetLevel);
-			sound.synth.setParameter("master", masterLevel);
-		}
+			float wetLevel = ofMap(cam.getDistance(), 100, 9000, 0., .8);
+            float masterLevel = ofMap(cam.getDistance(), 100, 9000, .999, 0.);
+            ofClamp(wetLevel, 0., 0.9);
+            ofClamp(masterLevel, 0., .999);
+            
+            sound.synth.setParameter("wet", wetLevel);
+            sound.synth.setParameter("master", masterLevel);
+        }
+        
+        if(abs(cam.getPosition().x > 5000 ||
+               cam.getPosition().y > 5000 ||
+               cam.getPosition().z > 5000))
+        {
+            
+            cam.setPosition(ofClamp(cam.getPosition().x, -5000, 5000),
+                            ofClamp(cam.getPosition().y, -5000, 5000),
+                            ofClamp(cam.getPosition().z, -5000, 5000));
+            
+        }
 
 		cam.end();
 
