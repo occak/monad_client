@@ -62,19 +62,19 @@ void Groove::setup(Disc* disc, Player* player, vector<Player *> otherPlayers){
 void Groove::update(){
     
     ofRectangle myBar;
-    float myHeight = ofMap(me->getLife(), 0, 100, 0, ofGetHeight());
-    myBar.x = ofGetWidth()/2-10;
+    float myHeight = ofMap(me->getLife(), 0, 100, 0, ofGetHeight()-50);
+    myBar.x = ofGetWidth()/2-20;
     myBar.y = -ofGetHeight()/2+(ofGetHeight()-myHeight);
-    myBar.width = 10;
+    myBar.width = 20;
     myBar.height = myHeight;
     lifeBar[0] = myBar;
     
     for(int i = 0; i < otherPlayers.size(); i++){
         ofRectangle thisBar;
-        float thisHeight = ofMap(otherPlayers[i]->getLife(), 0, 100, 0, ofGetHeight());
-        thisBar.x = (ofGetWidth()/2)-(10*(i+2));
+        float thisHeight = ofMap(otherPlayers[i]->getLife(), 0, 100, 0, ofGetHeight()-50);
+        thisBar.x = (ofGetWidth()/2)-(20*(i+2));
         thisBar.y = -ofGetHeight()/2+(ofGetHeight()-thisHeight);
-        thisBar.width = 10;
+        thisBar.width = 20;
         thisBar.height = thisHeight;
         lifeBar[i+1] = thisBar;
     }
