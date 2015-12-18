@@ -240,10 +240,12 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 	else{
 		for(int i = 0; i < disc.getDiscIndex(); i++){
 			if(e.getName() == "rotation" + ofToString(i+1)){
+                
 				ofxUISlider *slider = e.getSlider();
-				if(me->getLife() > 0 && mReleased == false && disc.getTexture(i) != 0) {
+                float newRotation = slider->getScaledValue()-disc.getNetRotationSpeed(i);
+                
+				if(me->getLife() > 0 && mReleased == false && disc.getTexture(i) != 0 && newRotation != disc.getRotationSpeed(<#int index#>)) {
 					rotationChanged = true;
-					float newRotation = slider->getScaledValue()-disc.getNetRotationSpeed(i);
 					disc.setRotationSpeed(i, newRotation);
 
 					//change sound
@@ -535,7 +537,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 		}
 		else if(e.getName() == "move"){
 			ofxUIToggle *toggle = e.getToggle();
-			if(me->getLife()>0){
+			if(me->getLife() > 0){
 				moveChanged = true;
 				if (toggle->getValue() == true) disc.setMoving(me->getDiscIndex(), 1);
 				else disc.setMoving(me->getDiscIndex(), 0);
@@ -543,7 +545,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 		}
 		else if(e.getName() == "reset"){
 			ofxUIButton *button = e.getButton();
-			if(me->getLife()>0){
+			if(me->getLife() > 0 && disc.getPosition(me->getDiscIndex()) != 0){
 				moveReset = true;
 				disc.resetPerlin[me->getDiscIndex()] = 1;
 				ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
@@ -654,11 +656,17 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 		}
 		else if(e.getName() == "chat"){
 			ofxUIToggle *toggle = e.getToggle();
+            
+            //toggle all chat buttons
 			for(int j = 0; j<disc.getDiscIndex(); j++){
 				ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
-				ofxUIToggle *toggleChat = static_cast <ofxUIToggle*> (canvas->getWidget("chat"));
-				toggleChat->setValue(toggle->getValue());
+				ofxUIToggle *uiChatToggle = static_cast <ofxUIToggle*> (canvas->getWidget("chat"));
+				uiChatToggle->setValue(toggle->getValue());
 			}
+            
+            ofxUIToggle *noDiscChatToggle = static_cast <ofxUIToggle*> (noDisc->getWidget("chat"));
+            noDiscChatToggle->setValue(toggle->getValue());
+            
 			chat->setVisible(toggle->getValue());
 		}
 
@@ -970,6 +978,26 @@ void ofApp::update(){
 					if (playerData[0] == "lifeChange" && _player != NULL) _player->changeLife(ofToFloat(playerData[1]));
 				}
 			}
+            
+            else if (title == "reward"){
+                Player *_player = NULL;
+                for(int i = 1; i < received.size(); i++ ){
+                    vector<string> playerData = ofSplitString(received[i], ": ");;
+                    if (playerData[0] == "IP" && playerData[1] != me->getIP()){
+                        for (int j = 0; j < otherPlayers.size(); j++) {
+                            if(playerData[1] == otherPlayers[j]->getIP()) {
+                                _player = otherPlayers[j];
+                                break;
+                            }
+                        }
+                    }
+                    else if (playerData[0] == "IP" && playerData[1] == me->getIP()) _player = me;
+                    
+                    if (playerData[0] == "lifeChange" && _player != NULL) _player->changeLife(ofToFloat(playerData[1]));
+                }
+                
+                historyText = _player->getNick() + " earned"+ ofToString(reward) + "points!\n\n"+ historyText;
+            }
 
 			else if (title == "rotationSpeed"){
 				vector<string> nameValue = ofSplitString(received[1], ": ");;
@@ -1574,8 +1602,21 @@ void ofApp::keyPressed(int key){
 	}
 
 
-	if(key == 'c') chat->toggleVisible();
-
+    if(key == 'c') {
+        
+        chat->toggleVisible();
+        
+        for (int i = 0 ; i < disc.getDiscIndex(); i++) {
+            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
+            ofxUIToggle *toggleChat = static_cast <ofxUIToggle*> (canvas->getWidget("chat"));
+            toggleChat->setValue(!toggleChat->getValue());
+        }
+        
+        ofxUICanvas *canvas = static_cast <ofxUICanvas*> (noDisc);
+        ofxUIToggle *toggleChat = static_cast <ofxUIToggle*> (canvas->getWidget("chat"));
+        toggleChat->setValue(!toggleChat->getValue());
+        
+    }
 
 	if(key == 'w'){
 		int jump = 1;
@@ -1729,26 +1770,26 @@ void ofApp::soundChange(string name, int index, float value) {
 }
 
 //--------------------------------------------------------------
-void ofApp::refreshUpdateButtons(){
-    
-    if(updateButtonsArray.size() > 8){
-        ofxUILabelToggle *toggle0 = updateButtonsArray.front();
-        updateButtons->removeWidget(toggle0);
-        updateButtonsArray.erase(updateButtonsArray.begin());
-    }
-    updateButtons->clearWidgets();
-    for(int i = updateButtonsArray.size()-1; i >= 0; i--){
-        ofxUILabelToggle *thisToggle = updateButtonsArray[i];
-        
-        thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
-        if( thisToggle->getValue() == false){
-            thisToggle->setColorBack(updateButtonsArray[i]->getColorBack());
-        }
-        updateButtonsArray[i] = thisToggle;
-    }
-    updateButtons->autoSizeToFitWidgets();
-    
-}
+//void ofApp::refreshUpdateButtons(){
+//    
+//    if(updateButtonsArray.size() > 8){
+//        ofxUILabelToggle *toggle0 = updateButtonsArray.front();
+//        updateButtons->removeWidget(toggle0);
+//        updateButtonsArray.erase(updateButtonsArray.begin());
+//    }
+//    updateButtons->clearWidgets();
+//    for(int i = updateButtonsArray.size()-1; i >= 0; i--){
+//        ofxUILabelToggle *thisToggle = updateButtonsArray[i];
+//        
+//        thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
+//        if( thisToggle->getValue() == false){
+//            thisToggle->setColorBack(updateButtonsArray[i]->getColorBack());
+//        }
+//        updateButtonsArray[i] = thisToggle;
+//    }
+//    updateButtons->autoSizeToFitWidgets();
+//    
+//}
 
 
 //--------------------------------------------------------------
@@ -1854,7 +1895,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 		string movementReset = "moveReset//"+ofToString(me->getDiscIndex())+"//"+me->getIP();
 		client.send(movementReset);
 	}
-	// cost calculation and server notifications of move/stop/resetAll button are handled in guiEvent
+	// cost calculation and server notifications of move/stop/resetAll buttons are handled in guiEvent()
 }
 
 //--------------------------------------------------------------
