@@ -99,5 +99,9 @@ private:
     
     ofxUICanvas *chat;
     string conversation;
+    
+    ofxUICanvas *history;
+    string historyText;
+    
 };
 

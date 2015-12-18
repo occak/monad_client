@@ -142,17 +142,19 @@ void ofApp::setup(){
 			ui[i]->setColorBack(me->getColor());
 		}
 	}
-	updateButtons = new ofxUICanvas();
-	updateButtons->setPosition(0, ofGetHeight()/2-70);
-	updateButtons->setDrawBack(false);
-	updateButtons->setFontSize(OFX_UI_FONT_SMALL, 7);
-	ofAddListener(updateButtons->newGUIEvent, this, &ofApp::guiEvent);
+    
+    
+//	updateButtons = new ofxUICanvas();
+//	updateButtons->setPosition(0, ofGetHeight()/2-70);
+//	updateButtons->setDrawBack(false);
+//	updateButtons->setFontSize(OFX_UI_FONT_SMALL, 7);
+//	ofAddListener(updateButtons->newGUIEvent, this, &ofApp::guiEvent);
 
 	chat = new ofxUICanvas();
     chat->setFont(OF_TTF_MONO);
 	chat->setDrawBack(false);
 	int chatWidth = 900;
-	chat->setPosition(noDisc->getGlobalCanvasWidth()+10, 0);
+	chat->setPosition(noDisc->getGlobalCanvasWidth()+50, 0);
 	chat->setDimensions(chatWidth, ofGetHeight());
 	chat->setColorFill(ofxUIColor(50,50,50,150));
 	conversation = "";
@@ -160,6 +162,17 @@ void ofApp::setup(){
 	chat->addTextArea("chat", "", OFX_UI_FONT_MEDIUM);
 	if (me == NULL) chat->setVisible(false);
     chat->autoSizeToFitWidgets();
+    
+    history = new ofxUICanvas();
+    history->setDrawBack(false);
+    history->setFont(OF_TTF_MONO);
+    history->setColorFill(ofxUIColor(0));
+    history->setPosition(0, ofGetHeight()/2 - 70);
+    history->setDimensions(noDisc->getGlobalCanvasWidth()+50, ofGetHeight()/2 + 70);
+    historyText = "";
+    history->addTextArea("history", historyText, OFX_UI_FONT_SMALL);
+    if (me == NULL) history->setVisible(false);
+    history->autoSizeToFitWidgets();
 
 	ofAddListener(chat->newGUIEvent, this, &ofApp::guiEvent);
 
@@ -193,6 +206,7 @@ void ofApp::exit(){
 	delete noDisc;
 	delete chat;
 	delete initialize;
+    delete history;
 
 }
 //--------------------------------------------------------------
@@ -398,6 +412,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 
 		}
 		else if(e.getName() == "blank"){
+        
 			ofxUIToggle *toggle = e.getToggle();
 			int texture = disc.getTexture(me->getDiscIndex());
 			if(me->getLife()> 0 && texture != 0 && toggle->getValue() == true) {
@@ -839,6 +854,7 @@ void ofApp::update(){
 				me->setConnection(true);
 				TCPsetup = true;
 				initialize->setVisible(false);
+                noDisc->setVisible(true);
                 
                 loginMinute = ofGetMinutes();
                 loginSecond = ofGetElapsedTimef();
@@ -907,8 +923,12 @@ void ofApp::update(){
                         _player->setNick(playerData[1]);
                     
                         conversation = "***"+_player->getNick()+" is online***"+"\n\n" + conversation;
-                        ofxUITextArea *history = (ofxUITextArea *) chat->getWidget("chat");
-                        history->setTextString(conversation);
+                        ofxUITextArea *chatHistory = (ofxUITextArea *) chat->getWidget("chat");
+                        chatHistory->setTextString(conversation);
+                        
+                        historyText = "***"+_player->getNick()+" is online***"+"\n\n" + historyText;
+                        ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                        _history->setTextString(historyText);
                     }
 				}
 				groove.setup(&disc, me, otherPlayers);
@@ -972,20 +992,37 @@ void ofApp::update(){
 				ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[index]);
 				ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(index+1)));
 				slider->setValue(disc.getNetRotationSpeed(index));
+                
+                
+                //update history//
 
+                string eventHistory;
+                
+                Player* _player = NULL;
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                }
+                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "rotation:" + ofToString( roundf(disc.getNetRotationSpeed(index)*10)/10) +"\n\n";
+                historyText = eventHistory + historyText;
+                
+                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                _history->setTextString(historyText);
+
+                
 				///////////update buttons/////////////
 
-				ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" rotation\nset to "+ofToString(disc.getNetRotationSpeed(index)), false, 200, 50);
-				updateButtonsArray.push_back(toggle);
-
-				Player* _player = NULL;
-				for(int i = 0; i < otherPlayers.size(); i++){
-					if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-				}
-				if(_player == NULL) cout<< "_player is not matched" <<endl;
-				toggle->setColorBack(_player->getColor());
-
-				refreshUpdateButtons();
+//				ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" rotation\nset to "+ofToString(disc.getNetRotationSpeed(index)), false, 200, 50);
+//				updateButtonsArray.push_back(toggle);
+//
+//				Player* _player = NULL;
+//				for(int i = 0; i < otherPlayers.size(); i++){
+//					if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+//				}
+//				if(_player == NULL) cout<< "_player is not matched" <<endl;
+//				toggle->setColorBack(_player->getColor());
+//
+//				refreshUpdateButtons();
 
 				///////////////////////////////////////////
 			}
@@ -1004,20 +1041,35 @@ void ofApp::update(){
 				ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
 				ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("radius"+ofToString(index+1)));
 				slider->setValue(disc.getRadius(index)-disc.getRadius(index-1));
+                
+                //update history//
+                
+                string eventHistory;
+                
+                Player* _player = NULL;
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                }
+                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "size:" + ofToString(roundf(disc.getThickness(index)*10)/10) +"\n\n";
+                historyText = eventHistory + historyText;
+                
+                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                _history->setTextString(historyText);
 
 				///////////update buttons/////////////
 
-				ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" size\nset to "+ofToString(disc.getThickness(index)), false, 200, 50);
-				updateButtonsArray.push_back(toggle);
-
-				Player* _player = NULL;
-				for(int i = 0; i < otherPlayers.size(); i++){
-					if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-				}
-				if(_player == NULL) cout<< "_player is not matched" <<endl;
-				toggle->setColorBack(_player->getColor());
-
-				refreshUpdateButtons();
+//				ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" size\nset to "+ofToString(disc.getThickness(index)), false, 200, 50);
+//				updateButtonsArray.push_back(toggle);
+//
+//				Player* _player = NULL;
+//				for(int i = 0; i < otherPlayers.size(); i++){
+//					if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+//				}
+//				if(_player == NULL) cout<< "_player is not matched" <<endl;
+//				toggle->setColorBack(_player->getColor());
+//
+//				refreshUpdateButtons();
 
 				///////////////////////////////////////////
 			}
@@ -1044,20 +1096,36 @@ void ofApp::update(){
 				ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
 				ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("density"+ofToString(index+1)));
 				slider->setValue(disc.getDensity(index));
+                
+                //update history//
+                
+                string eventHistory;
+                
+                Player* _player = NULL;
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                }
+                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "density:" + ofToString(disc.getDensity(index)) +"\n\n";
+                historyText = eventHistory + historyText;
+                
+                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                _history->setTextString(historyText);
+                
 
 				///////////update buttons/////////////
 
-				ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" density\nset to "+ofToString(disc.getDensity(index)), false, 200, 50);
-				updateButtonsArray.push_back(toggle);
-
-				Player* _player = NULL;
-				for(int i = 0; i < otherPlayers.size(); i++){
-					if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-				}
-				if(_player == NULL) cout<< "_player is not matched" <<endl;
-				toggle->setColorBack(_player->getColor());
-
-				refreshUpdateButtons();
+//				ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" density\nset to "+ofToString(disc.getDensity(index)), false, 200, 50);
+//				updateButtonsArray.push_back(toggle);
+//
+//				Player* _player = NULL;
+//				for(int i = 0; i < otherPlayers.size(); i++){
+//					if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+//				}
+//				if(_player == NULL) cout<< "_player is not matched" <<endl;
+//				toggle->setColorBack(_player->getColor());
+//
+//				refreshUpdateButtons();
 
 				///////////////////////////////////////////
 			}
@@ -1098,27 +1166,48 @@ void ofApp::update(){
 				else toggle3->setValue(false);
 				if(disc.getTexture(index) == 4) toggle4->setValue(true);
 				else toggle4->setValue(false);
+                
+                //update history//
+                
+                string eventHistory;
+                string texture;
+                if(disc.getTexture(index) == 0) texture = "blank";
+                if(disc.getTexture(index) == 1) texture = "line";
+                if(disc.getTexture(index) == 2) texture = "tri";
+                if(disc.getTexture(index) == 3) texture = "saw";
+                if(disc.getTexture(index) == 4) texture = "rect";
+                
+                Player* _player = NULL;
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                }
+                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "texture:" + texture +"\n\n";
+                historyText = eventHistory + historyText;
+                
+                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                _history->setTextString(historyText);
 
 				///////////update buttons/////////////
 
-				string texture;
-				if(disc.getTexture(index) == 0) texture = "blank";
-				if(disc.getTexture(index) == 1) texture = "line";
-				if(disc.getTexture(index) == 2) texture = "tri";
-				if(disc.getTexture(index) == 3) texture = "saw";
-				if(disc.getTexture(index) == 4) texture = "rect";
-
-				ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" texture\nset to "+texture, false, 200, 50);
-				updateButtonsArray.push_back(toggle);
-
-				Player* _player = NULL;
-				for(int i = 0; i < otherPlayers.size(); i++){
-					if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-				}
-				if(_player == NULL) cout<< "_player is not matched" <<endl;
-				toggle->setColorBack(_player->getColor());
-
-				refreshUpdateButtons();
+//				string texture;
+//				if(disc.getTexture(index) == 0) texture = "blank";
+//				if(disc.getTexture(index) == 1) texture = "line";
+//				if(disc.getTexture(index) == 2) texture = "tri";
+//				if(disc.getTexture(index) == 3) texture = "saw";
+//				if(disc.getTexture(index) == 4) texture = "rect";
+//
+//				ofxUILabelToggle *toggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" texture\nset to "+texture, false, 200, 50);
+//				updateButtonsArray.push_back(toggle);
+//
+//				Player* _player = NULL;
+//				for(int i = 0; i < otherPlayers.size(); i++){
+//					if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+//				}
+//				if(_player == NULL) cout<< "_player is not matched" <<endl;
+//				toggle->setColorBack(_player->getColor());
+//
+//				refreshUpdateButtons();
 
 				///////////////////////////////////////////
 			}
@@ -1134,22 +1223,40 @@ void ofApp::update(){
 				ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
 				ofxUILabelToggle *toggle = static_cast<ofxUILabelToggle*>(canvas->getWidget("mute"));
 				toggle->setValue((bool)disc.isMute(index));
+                
+                //update history//
+                
+                string eventHistory;
+                string change;
+                if(ofToInt(nameValue[1]) == 0) change = "off";
+                if(ofToInt(nameValue[1]) == 1) change = "on";
+                
+                Player* _player = NULL;
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                }
+                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "mute:" + change +"\n\n";
+                historyText = eventHistory + historyText;
+                
+                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                _history->setTextString(historyText);
 
 				///////////update buttons/////////////
-				string change;
-				if(ofToInt(nameValue[1]) == 0) change = "off";
-				if(ofToInt(nameValue[1]) == 1) change = "on";
-				ofxUILabelToggle *newToggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" mute\ntoggled "+ change, false, 200, 50);
-				updateButtonsArray.push_back(newToggle);
-
-				Player* _player = NULL;
-				for(int i = 0; i < otherPlayers.size(); i++){
-					if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-				}
-				if(_player == NULL) cout<< "_player is not matched" <<endl;
-				newToggle->setColorBack(_player->getColor());
-
-				refreshUpdateButtons();
+//				string change;
+//				if(ofToInt(nameValue[1]) == 0) change = "off";
+//				if(ofToInt(nameValue[1]) == 1) change = "on";
+//				ofxUILabelToggle *newToggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" mute\ntoggled "+ change, false, 200, 50);
+//				updateButtonsArray.push_back(newToggle);
+//
+//				Player* _player = NULL;
+//				for(int i = 0; i < otherPlayers.size(); i++){
+//					if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+//				}
+//				if(_player == NULL) cout<< "_player is not matched" <<endl;
+//				newToggle->setColorBack(_player->getColor());
+//
+//				refreshUpdateButtons();
 				///////////////////////////////////////////
 			}
 
@@ -1162,22 +1269,40 @@ void ofApp::update(){
 				ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
 				ofxUIToggle *toggle = static_cast<ofxUIToggle*>(canvas->getWidget("move"));
 				toggle->setValue((bool)disc.isMoving(index));
+                
+                //update history//
+                
+                string eventHistory;
+                string change;
+                if(ofToInt(nameValue[1]) == 0) change = "off";
+                if(ofToInt(nameValue[1]) == 1) change = "on";
+                
+                Player* _player = NULL;
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                }
+                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "move:" + change +"\n\n";
+                historyText = eventHistory + historyText;
+                
+                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                _history->setTextString(historyText);
 
 				///////////update buttons/////////////
-				string change;
-				if(ofToInt(nameValue[1]) == 0) change = "off";
-				if(ofToInt(nameValue[1]) == 1) change = "on";
-				ofxUILabelToggle *newToggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" z-motion\ntoggled "+ change, false, 200, 50);
-				updateButtonsArray.push_back(newToggle);
-
-				Player* _player = NULL;
-				for(int i = 0; i < otherPlayers.size(); i++){
-					if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-				}
-				if(_player == NULL) cout<< "_player is not matched" <<endl;
-				newToggle->setColorBack(_player->getColor());
-
-				refreshUpdateButtons();
+//				string change;
+//				if(ofToInt(nameValue[1]) == 0) change = "off";
+//				if(ofToInt(nameValue[1]) == 1) change = "on";
+//				ofxUILabelToggle *newToggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" z-motion\ntoggled "+ change, false, 200, 50);
+//				updateButtonsArray.push_back(newToggle);
+//
+//				Player* _player = NULL;
+//				for(int i = 0; i < otherPlayers.size(); i++){
+//					if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+//				}
+//				if(_player == NULL) cout<< "_player is not matched" <<endl;
+//				newToggle->setColorBack(_player->getColor());
+//
+//				refreshUpdateButtons();
 				///////////////////////////////////////////
 			}
 
@@ -1188,19 +1313,34 @@ void ofApp::update(){
 				ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[index]);
 				ofxUIToggle *toggle = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
 				toggle->setValue(false);
+                
+                //update history//
+                
+                string eventHistory;
+                
+                Player* _player = NULL;
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                }
+                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "z-reset\n\n";
+                historyText = eventHistory + historyText;
+                
+                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                _history->setTextString(historyText);
 
 				///////////update buttons/////////////
-				ofxUILabelToggle *newToggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" z-motion\nreset", false, 200, 50);
-				updateButtonsArray.push_back(newToggle);
-
-				Player* _player = NULL;
-				for(int i = 0; i < otherPlayers.size(); i++){
-					if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-				}
-				if(_player == NULL) cout<< "_player is not matched" <<endl;
-				newToggle->setColorBack(_player->getColor());
-
-				refreshUpdateButtons();
+//				ofxUILabelToggle *newToggle = new ofxUILabelToggle("Groove "+ofToString(index+1)+" z-motion\nreset", false, 200, 50);
+//				updateButtonsArray.push_back(newToggle);
+//
+//				Player* _player = NULL;
+//				for(int i = 0; i < otherPlayers.size(); i++){
+//					if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+//				}
+//				if(_player == NULL) cout<< "_player is not matched" <<endl;
+//				newToggle->setColorBack(_player->getColor());
+//
+//				refreshUpdateButtons();
 				///////////////////////////////////////////
 
 			}
@@ -1214,19 +1354,34 @@ void ofApp::update(){
 					toggleMove->setValue(true);
 					disc.setMoving(i, 1);
 				}
+                
+                //update history//
+                
+                string eventHistory;
+                
+                Player* _player = NULL;
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                }
+                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                else eventHistory = _player->getNick() + "//" + "move all\n\n";
+                historyText = eventHistory + historyText;
+                
+                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                _history->setTextString(historyText);
 
 				///////////update buttons/////////////
-				ofxUILabelToggle *newToggle = new ofxUILabelToggle("Moving all grooves", false, 200, 50);
-				updateButtonsArray.push_back(newToggle);
-
-				Player* _player = NULL;
-				for(int i = 0; i < otherPlayers.size(); i++){
-					if(received[1] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-				}
-				if(_player == NULL) cout<< "_player is not matched" <<endl;
-				newToggle->setColorBack(_player->getColor());
-
-				refreshUpdateButtons();
+//				ofxUILabelToggle *newToggle = new ofxUILabelToggle("Moving all grooves", false, 200, 50);
+//				updateButtonsArray.push_back(newToggle);
+//
+//				Player* _player = NULL;
+//				for(int i = 0; i < otherPlayers.size(); i++){
+//					if(received[1] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+//				}
+//				if(_player == NULL) cout<< "_player is not matched" <<endl;
+//				newToggle->setColorBack(_player->getColor());
+//
+//				refreshUpdateButtons();
 				///////////////////////////////////////////
 			}
 
@@ -1239,19 +1394,34 @@ void ofApp::update(){
 					toggleMove->setValue(false);
 					disc.setMoving(i, 0);
 				}
+                
+                //update history//
+                
+                string eventHistory;
+                
+                Player* _player = NULL;
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                }
+                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                else eventHistory = _player->getNick() + "//" + "halt all\n\n";
+                historyText = eventHistory + historyText;
+                
+                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                _history->setTextString(historyText);
 
 				///////////update buttons/////////////
-				ofxUILabelToggle *newToggle = new ofxUILabelToggle("Stopping all grooves", false, 200, 50);
-				updateButtonsArray.push_back(newToggle);
-
-				Player* _player = NULL;
-				for(int i = 0; i < otherPlayers.size(); i++){
-					if(received[1] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-				}
-				if(_player == NULL) cout<< "_player is not matched" <<endl;
-				newToggle->setColorBack(_player->getColor());
-
-				refreshUpdateButtons();
+//				ofxUILabelToggle *newToggle = new ofxUILabelToggle("Stopping all grooves", false, 200, 50);
+//				updateButtonsArray.push_back(newToggle);
+//
+//				Player* _player = NULL;
+//				for(int i = 0; i < otherPlayers.size(); i++){
+//					if(received[1] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+//				}
+//				if(_player == NULL) cout<< "_player is not matched" <<endl;
+//				newToggle->setColorBack(_player->getColor());
+//
+//				refreshUpdateButtons();
 				///////////////////////////////////////////
 			}
 
@@ -1264,19 +1434,34 @@ void ofApp::update(){
 					ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
 					toggleMove->setValue(false);
 				}
+                
+                //update history//
+                
+                string eventHistory;
+                
+                Player* _player = NULL;
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                }
+                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                else eventHistory = _player->getNick() + "//" + "reset all\n\n";
+                historyText = eventHistory + historyText;
+                
+                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                _history->setTextString(historyText);
 
 				///////////update buttons/////////////
-				ofxUILabelToggle *newToggle = new ofxUILabelToggle("Reset all groove depths", false, 200, 50);
-				updateButtonsArray.push_back(newToggle);
-
-				Player* _player = NULL;
-				for(int i = 0; i < otherPlayers.size(); i++){
-					if(received[1] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-				}
-				if(_player == NULL) cout<< "_player is not matched" <<endl;
-				newToggle->setColorBack(_player->getColor());
-
-				refreshUpdateButtons();
+//				ofxUILabelToggle *newToggle = new ofxUILabelToggle("Reset all groove depths", false, 200, 50);
+//				updateButtonsArray.push_back(newToggle);
+//
+//				Player* _player = NULL;
+//				for(int i = 0; i < otherPlayers.size(); i++){
+//					if(received[1] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+//				}
+//				if(_player == NULL) cout<< "_player is not matched" <<endl;
+//				newToggle->setColorBack(_player->getColor());
+//
+//				refreshUpdateButtons();
 				///////////////////////////////////////////
 			}
 
@@ -1302,8 +1487,8 @@ void ofApp::update(){
 
 			else if (title == "chat"){
 				conversation = received[1] + conversation;
-				ofxUITextArea *history = (ofxUITextArea *) chat->getWidget("chat");
-				history->setTextString(conversation);
+				ofxUITextArea *chatHistory = (ofxUITextArea *) chat->getWidget("chat");
+				chatHistory->setTextString(conversation);
 
 			}
 
@@ -1316,8 +1501,12 @@ void ofApp::update(){
 					else continue;
 				}
 				conversation = "***"+received[1]+" is offline***"+"\n\n" + conversation;
-				ofxUITextArea *history = (ofxUITextArea *) chat->getWidget("chat");
-				history->setTextString(conversation);
+				ofxUITextArea *chatHistory = (ofxUITextArea *) chat->getWidget("chat");
+				chatHistory->setTextString(conversation);
+                
+                historyText = "***"+received[1]+" is offline***"+"\n\n" + historyText;
+                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                _history->setTextString(historyText);
 			}
 
 		}
@@ -1384,60 +1573,9 @@ void ofApp::keyPressed(int key){
 		return;
 	}
 
-	//    if(key == ' ') groove.turn = !groove.turn;
-	//    if(key == 'p'){
-	//        if (disc.isMoving(me->getDiscIndex()) == 0) disc.setMoving(me->getDiscIndex(), 1);
-	//        else disc.setMoving(me->getDiscIndex(), 0);
-	//    }
-	//    if(key == 'o') disc.resetPerlin[me->getDiscIndex()] = 1;
 
 	if(key == 'c') chat->toggleVisible();
 
-	//    if(key == 'a' && me->getDiscIndex() != -1) {
-
-	//        if(disc.getLife() > 0) {
-	//            disc.setLife(costRotation);     // reduce life
-	//            disc.setRotationSpeed(me->getDiscIndex(), +.05);
-	//
-	//            //update ui
-	//            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
-	//            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
-	//            slider->setValue(disc.getNetRotationSpeed(me->getDiscIndex()));
-	//
-	//            //change sound
-	//            float netSpeed = abs(disc.getNetRotationSpeed(me->getDiscIndex()));
-	//            float beat = ofMap(netSpeed, 0, 10, 0, 1000);
-	//            sound.synth.setParameter("bpm"+ofToString(me->getDiscIndex()), beat);
-	//
-	//            //send to server
-	//            float newRotation = slider->getScaledValue()-disc.getNetRotationSpeed(me->getDiscIndex());
-	//            string change = "rotationSpeed//"+ ofToString(me->getDiscIndex())+": "+ ofToString(+0.05);
-	//            client.send(change);
-	//        }
-	//    }
-
-	//    if(key == 'd' && me->getDiscIndex() != -1 ) {
-
-	//        if(disc.getLife() > 0) {
-	//            disc.setLife(costRotation);     // reduce life
-	//            disc.setRotationSpeed(me->getDiscIndex(), -.05);
-	//
-	//            //update ui
-	//            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
-	//            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
-	//            slider->setValue(disc.getNetRotationSpeed(me->getDiscIndex()));
-	//
-	//            //change sound
-	//            float netSpeed = abs(disc.getNetRotationSpeed(me->getDiscIndex()));
-	//            float beat = ofMap(netSpeed, 0, 10, 0, 1000);
-	//            sound.synth.setParameter("bpm"+ofToString(me->getDiscIndex()), beat);
-	//
-	//            //send to server
-	//            float newRotation = slider->getScaledValue()-disc.getNetRotationSpeed(me->getDiscIndex());
-	//            string change = "rotationSpeed//"+ ofToString(me->getDiscIndex())+": "+ ofToString(-0.05);
-	//            client.send(change);
-	//        }
-	//    }
 
 	if(key == 'w'){
 		int jump = 1;
@@ -1733,37 +1871,3 @@ void ofApp::gotMessage(ofMessage msg){
 void ofApp::dragEvent(ofDragInfo dragInfo){
 
 }
-
-//--------------------------------------------------------------
-//float ofApp::triangleWave(float frequency){
-//
-//    float phaseStep = frequency/44100;
-//    phase += phaseStep;
-//    return asin(sin(TWO_PI*phase))/PI;
-//
-//}
-//
-////--------------------------------------------------------------
-//float ofApp::squareWave(float frequency){
-//
-//    float phaseStep = frequency/44100.;
-//    phase += phaseStep;
-//    if(phase > (1)) phase = phase - (1);
-//    float y;
-//    if(phase < .5) y = 1;
-//    else y = -1;
-//    return y;
-//
-//}
-//
-////--------------------------------------------------------------
-//float ofApp::sawWave(float frequency){
-//
-//    float phaseStep = frequency/44100;
-//    phase += phaseStep;
-//    if(phase > (1)) phase = phase - (1);
-//    return 1 - ( phase/.5 );
-//
-//}
-
-

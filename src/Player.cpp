@@ -95,6 +95,8 @@ void Player::changeLife(float amount){
     
     life += amount;
     
+    ofClamp(life, 0, 100);
+    
 }
 
 int Player::getDiscIndex() const{
