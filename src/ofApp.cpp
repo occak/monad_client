@@ -48,24 +48,18 @@ void ofApp::setup(){
     //set up gui
     noDisc = new ofxUICanvas();
     noDisc->setFont(OF_TTF_MONO);
-    noDisc->addMultiImageToggle("inner","butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
+    noDisc->setPosition(ofGetWidth()/2-125, ofGetHeight()-25);
+    noDisc->addMultiImageToggle("inner", "butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
     noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    noDisc->addLabel("None Selected",1);
-    ofxUILabel *label = (ofxUILabel*) noDisc->getWidget("None Selected");
-    noDisc->addWidgetPosition(label,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_CENTER);
     noDisc->addMultiImageToggle("outer", "butonlar/buton-07.png",false, 20, 20);
-    ofxUIMultiImageToggle *toggle = (ofxUIMultiImageToggle*) noDisc->getWidget("outer");
-    noDisc->addWidgetPosition(toggle,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_RIGHT);
-    noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-    noDisc->addSpacer();
+    noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
     noDisc->addToggle("move all", false);
     noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
     noDisc->addButton("reset all", false);
-    noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-    noDisc->addSpacer();
+    noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
     noDisc->addLabelToggle("chat", true);
     noDisc->autoSizeToFitWidgets();
-    if (me == NULL || me->getDiscIndex() != -1) noDisc->setVisible(false);
+    if (me == NULL) noDisc->setVisible(false);
     if (me != NULL) noDisc->setColorBack(me->getColor());
     ofAddListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
     
@@ -126,8 +120,10 @@ void ofApp::setup(){
             _ui->addLabelToggle("chat", true);
             
             _ui->autoSizeToFitWidgets();
+            
             if(me != NULL && i == me->getDiscIndex()) _ui->setVisible(true);
             else _ui->setVisible(false);
+            
             ofAddListener(_ui->newGUIEvent, this, &ofApp::guiEvent);
             
             ui.push_back(_ui);
@@ -339,8 +335,6 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             button->setValue(false);
             
             //change ui
-            noDisc->setVisible(false);
-            ofRemoveListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
             for(int i = 0; i < disc.getDiscIndex(); i++){
                 ui[i]->setVisible(false);
             }
@@ -376,8 +370,6 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             button->setValue(false);
             
             //change ui
-            noDisc->setVisible(false);
-            ofRemoveListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
             for(int i = 0; i < disc.getDiscIndex(); i++){
                 ui[i]->setVisible(false);
             }
@@ -958,7 +950,6 @@ void ofApp::update(){
                 TCPsetup = true;
                 initialize->setVisible(false);
                 noDisc->setVisible(true);
-                ofAddListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
                 
                 loginMinute = ofGetMinutes();
                 loginSecond = ofGetElapsedTimef();
@@ -1093,6 +1084,9 @@ void ofApp::update(){
                         
                         _player->changeLife(ofToFloat(playerData[1]));
                         historyText = "*" + _player->getNick() + " +"+ ofToString(reward) + " points!*\n\n"+ historyText;
+                        
+                        ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                        _history->setTextString(historyText);
                     }
                 }
                 
@@ -1541,7 +1535,7 @@ void ofApp::draw(){
         }
         if(timer) {
             ofSetColor(0);
-            ofDrawBitmapString(ofToString(roundf((ofGetElapsedTimef()-loginSecond)*100)/100), ofGetWidth()/2 - 120, ofGetHeight()/2 - 10);
+            ofDrawBitmapString(ofToString(roundf((ofGetElapsedTimef()-loginSecond)*100)/100)+" seconds elapsed", ofGetWidth()/2 - 120, ofGetHeight()/2 - 10);
         }
     }
     
@@ -1597,8 +1591,6 @@ void ofApp::keyPressed(int key){
         else me->setDiscIndex(me->getDiscIndex() + jump - disc.getDiscIndex());
         
         //change ui
-        noDisc->setVisible(false);
-        ofRemoveListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
         for(int i = 0; i < disc.getDiscIndex(); i++){
             ui[i]->setVisible(false);
         }
@@ -1635,8 +1627,6 @@ void ofApp::keyPressed(int key){
             ui[i]->setVisible(false);
         }
         ui[me->getDiscIndex()]->toggleVisible();
-        noDisc->setVisible(false);
-        ofRemoveListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
         
         //send change to server
         string changeDisc = "otherPlayersIndex//";
@@ -1646,12 +1636,10 @@ void ofApp::keyPressed(int key){
     }
     
     if(key == OF_KEY_BACKSPACE && TCPsetup == true) {
+        
         if(me->getDiscIndex() != -1){
             ui[me->getDiscIndex()]->setVisible(false);
             me->setDiscIndex(-1);
-            noDisc->setVisible(true);
-            ofAddListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
-            
             //send change to server
             string changeDisc = "otherPlayersIndex//";
             changeDisc += "IP: "+ofToString(me->getIP()) + "//";
