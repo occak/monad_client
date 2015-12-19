@@ -194,9 +194,9 @@ float Disc::getRotationSpeed(int index) const{
 //----------------------------------
 
 void Disc::setRotationSpeed(int index, float addSpeed){
-    if(index<discIndex-1){
-    rotationSpeed[index+1] -= addSpeed; //outer disc rotates relative to the inner disc
-    }
+    
+    if(index<discIndex-1) rotationSpeed[index+1] -= addSpeed; //outer disc rotates relative to the inner disc
+    
     rotationSpeed[index] += addSpeed;
 }
 //----------------------------------

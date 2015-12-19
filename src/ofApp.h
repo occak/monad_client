@@ -37,13 +37,13 @@ class ofApp : public ofBaseApp{
     void guiEvent(ofxUIEventArgs &e);
     
     //game
-    float   costRadius,
-            costTexture,
-            costDensity,
-            costRotation,
-            costMute,
-            costMove,
-            reward;
+    float   costRadius = 0,
+            costTexture  = 0,
+            costDensity = 0,
+            costRotation = 0,
+            costMute = 0,
+            costMove = 0,
+            reward = 0;
     
     bool radiusChanged,
     textureChanged,
