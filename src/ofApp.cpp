@@ -340,7 +340,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             
             //change ui
             noDisc->setVisible(false);
-            noDisc->disable();
+            ofRemoveListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
             for(int i = 0; i < disc.getDiscIndex(); i++){
                 ui[i]->setVisible(false);
             }
@@ -377,7 +377,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             
             //change ui
             noDisc->setVisible(false);
-            noDisc->disable();
+            ofRemoveListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
             for(int i = 0; i < disc.getDiscIndex(); i++){
                 ui[i]->setVisible(false);
             }
@@ -958,6 +958,7 @@ void ofApp::update(){
                 TCPsetup = true;
                 initialize->setVisible(false);
                 noDisc->setVisible(true);
+                ofAddListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
                 
                 loginMinute = ofGetMinutes();
                 loginSecond = ofGetElapsedTimef();
@@ -1597,7 +1598,7 @@ void ofApp::keyPressed(int key){
         
         //change ui
         noDisc->setVisible(false);
-        noDisc->disable();
+        ofRemoveListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
         for(int i = 0; i < disc.getDiscIndex(); i++){
             ui[i]->setVisible(false);
         }
@@ -1635,7 +1636,7 @@ void ofApp::keyPressed(int key){
         }
         ui[me->getDiscIndex()]->toggleVisible();
         noDisc->setVisible(false);
-        noDisc->disable();
+        ofRemoveListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
         
         //send change to server
         string changeDisc = "otherPlayersIndex//";
@@ -1649,7 +1650,7 @@ void ofApp::keyPressed(int key){
             ui[me->getDiscIndex()]->setVisible(false);
             me->setDiscIndex(-1);
             noDisc->setVisible(true);
-            noDisc->enable();
+            ofAddListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
             
             //send change to server
             string changeDisc = "otherPlayersIndex//";
