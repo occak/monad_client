@@ -148,13 +148,13 @@ void ofApp::setup(){
     chat = new ofxUICanvas();
     chat->setFont(OF_TTF_MONO);
     chat->setDrawBack(false);
-    int chatWidth = 1500;
-    chat->setPosition(noDisc->getGlobalCanvasWidth()+50, 0);
+    int chatWidth = 700;
+    chat->setPosition(noDisc->getGlobalCanvasWidth()+10, 0);
     chat->setDimensions(chatWidth, ofGetHeight());
     chat->setColorFill(ofxUIColor(50,50,50,150));
     conversation = "";
-    chat->addTextInput("chatInput", "", OFX_UI_FONT_MEDIUM)->setAutoUnfocus(false);
-    chat->addTextArea("chat", "", OFX_UI_FONT_MEDIUM);
+    chat->addTextInput("chatInput", "", OFX_UI_FONT_SMALL)->setAutoUnfocus(false);
+    chat->addTextArea("chat", "", OFX_UI_FONT_SMALL);
     if (me == NULL) chat->setVisible(false);
     chat->autoSizeToFitWidgets();
     
@@ -1535,7 +1535,7 @@ void ofApp::draw(){
         }
         if(timer) {
             ofSetColor(0);
-            ofDrawBitmapString(ofToString(roundf((ofGetElapsedTimef()-loginSecond)*100)/100)+" seconds elapsed", ofGetWidth()/2 - 120, ofGetHeight()/2 - 10);
+            ofDrawBitmapString(ofToString(roundf((ofGetElapsedTimef()-loginSecond)*100)/100)+" seconds elapsed", ofGetWidth()/2 - 250, ofGetHeight()/2 - 10);
         }
     }
     
