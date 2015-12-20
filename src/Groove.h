@@ -33,6 +33,7 @@ public:
     
     vector<ofRectangle> lifeBar;
     
+    float flipsideDist = 0.2;;
     bool turn;
     Disc* disc;
     Player* me;

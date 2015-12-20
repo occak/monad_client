@@ -41,6 +41,9 @@ void Disc::setup(){
         // set depths, all zero by default
         zPosition.push_back(0.);
         
+        //set spike position, initialize 0.
+        spikeDistance.push_back(0.);
+        
         posOffset.push_back(180* (int)ofRandom(2));
         //sound
         vector<float> adsr;
@@ -376,6 +379,20 @@ void Disc::setSeed(int index, int value){
 void Disc::zMotionSetup(int index, int seed){
     
     zMotion[index] = new msa::Perlin(4,2,.5,seed);
+    
+}
+
+//----------------------------------
+float Disc::getSpikeDistance(int index) const{
+    
+    return spikeDistance[index];
+    
+}
+
+//----------------------------------
+void Disc::setSpikeDistance(int index, float value){
+    
+    spikeDistance[index] = value;
     
 }
 

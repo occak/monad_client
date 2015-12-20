@@ -72,9 +72,12 @@ class Disc{
     
     int getSeed(int index) const;
     void setSeed(int index, int value);
+
+    float getSpikeDistance(int index) const;
+    void setSpikeDistance(int index, float value);
     
     void zMotionSetup(int index, int seed);
-//
+    
     float origin;
     int selected;
     vector<int> resetPerlin;
@@ -95,6 +98,9 @@ private:
     
     vector<float> zPosition;
     vector<float> posOffset;
+    
+    vector<float> spikeDistance;;
+    
     
     //adsr
     vector< vector <float> > envelope;

@@ -181,20 +181,38 @@ void Groove::draw(){
                     
                     if(fmodf(a, disc->getDensity(i)) == 0){
                         
-                        ofLine( disc->getRadius(i-1)*cos(a*PI/180) ,  //x1
+                        ofSetPolyMode(OF_POLY_WINDING_ODD);
+                        ofBeginShape();
+                        ofVertex( disc->getRadius(i-1)*cos(a*PI/180) ,  //x1
                                disc->getRadius(i-1)*sin(a*PI/180),    //y1
-                               disc->getPosition(i),                  //z1
+                                 disc->getPosition(i));
+                        ofVertex(              //z1
                                disc->getRadius(i)*cos(a*PI/180),      //x2
                                disc->getRadius(i)*sin(a*PI/180),      //y2
                                disc->getPosition(i));                 //z2
                         
-                        ofLine( disc->getRadius(i-1)*cos(a*PI/180) ,  //x1
-                               disc->getRadius(i-1)*sin(a*PI/180),    //y1
-                               disc->getPosition(i)-.2,                  //z1
-                               disc->getRadius(i)*cos(a*PI/180),      //x2
-                               disc->getRadius(i)*sin(a*PI/180),      //y2
-                               disc->getPosition(i)-.2);                 //z2
+                        //spike
+                        double spikePoint = (disc->getRadius(i)+disc->getRadius(i-1))/2;
+                        ofVertex(spikePoint*cos(a*PI/180),      //x
+                                 spikePoint*sin(a*PI/180),      //y
+                                 disc->getPosition(i) + disc->getSpikeDistance(i)); //z
+                        ofEndShape();
                         
+                        ofBeginShape();
+                        
+                        //flipside
+                        ofVertex( disc->getRadius(i-1)*cos(a*PI/180) ,  //x1
+                                 disc->getRadius(i-1)*sin(a*PI/180),    //y1
+                                 disc->getPosition(i)-flipsideDist);
+                        ofVertex(              //z1
+                                 disc->getRadius(i)*cos(a*PI/180),      //x2
+                                 disc->getRadius(i)*sin(a*PI/180),      //y2
+                                 disc->getPosition(i)-flipsideDist);                 //z2
+                        ofVertex(spikePoint*cos(a*PI/180),      //x
+                                 spikePoint*sin(a*PI/180),      //y
+                                 disc->getPosition(i) - disc->getSpikeDistance(i)); //z
+                        
+                        ofEndShape();
                     }
                 }
                 
