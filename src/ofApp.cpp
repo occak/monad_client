@@ -1555,6 +1555,7 @@ void ofApp::keyPressed(int key){
     }
     
     
+    
     if(key == 'c') {
         
         chat->toggleVisible();
