@@ -53,7 +53,8 @@ class ofApp : public ofBaseApp{
     moveChanged,
     moveReset,
     moveAllChanged,
-    muteChanged;
+    muteChanged,
+    spikeChanged;
     
     void refreshUpdateButtons();
 		

@@ -224,35 +224,57 @@ void Groove::draw(){
                     
                     if(fmodf(a, disc->getDensity(i)) == 0){
                         
+                        //spike locted at center of gravity
+                        double spikePoint = (disc->getRadius(i-1)+(disc->getRadius(i)-disc->getRadius(i-1))/3);
+                        
                         ofSetPolyMode(OF_POLY_WINDING_ODD);
                         ofBeginShape();
-                        ofVertex(disc->getRadius(i-1)*cos((a - disc->getDensity(i))*PI/180),
-                                 disc->getRadius(i-1)*sin((a - disc->getDensity(i))*PI/180),
-                                 disc->getPosition(i));
-                        ofVertex(disc->getRadius(i)*cos((a - disc->getDensity(i)/2)*PI/180),
-                                 disc->getRadius(i)*sin((a - disc->getDensity(i)/2)*PI/180),
-                                 disc->getPosition(i));
-                        ofVertex(disc->getRadius(i-1)*cos(a*PI/180),
-                                 disc->getRadius(i-1)*sin(a*PI/180),
-                                 disc->getPosition(i));
-                        ofVertex(disc->getRadius(i-1)*cos((a - disc->getDensity(i)/2)*PI/180),
-                                 disc->getRadius(i-1)*sin((a - disc->getDensity(i)/2)*PI/180),
-                                 disc->getPosition(i));
+                        
+                        ofPoint p1, p2, p3, p4, p5;
+                        p1.set(disc->getRadius(i-1)*cos((a - disc->getDensity(i))*PI/180),
+                               disc->getRadius(i-1)*sin((a - disc->getDensity(i))*PI/180),
+                               disc->getPosition(i));
+                        p2.set(disc->getRadius(i)*cos((a - disc->getDensity(i)/2)*PI/180),
+                               disc->getRadius(i)*sin((a - disc->getDensity(i)/2)*PI/180),
+                               disc->getPosition(i));
+                        p3.set(disc->getRadius(i-1)*cos(a*PI/180),
+                               disc->getRadius(i-1)*sin(a*PI/180),
+                               disc->getPosition(i));
+                        p4.set(disc->getRadius(i-1)*cos((a - disc->getDensity(i)/2)*PI/180),
+                               disc->getRadius(i-1)*sin((a - disc->getDensity(i)/2)*PI/180),
+                               disc->getPosition(i));
+                        p5.set(spikePoint*cos((a - disc->getDensity(i)/2)*PI/180),
+                               spikePoint*sin((a - disc->getDensity(i)/2)*PI/180),
+                               disc->getPosition(i) + disc->getSpikeDistance(i));
+                        
+                        ofVertex(p1);
+                        ofVertex(p2);
+                        ofVertex(p3);
+                        ofVertex(p5);
+                        ofVertex(p4);
+                        ofVertex(p5);
+                       
+                        
                         ofEndShape();
                         
                         ofBeginShape();
+                        
                         ofVertex(disc->getRadius(i-1)*cos((a - disc->getDensity(i))*PI/180),
                                  disc->getRadius(i-1)*sin((a - disc->getDensity(i))*PI/180),
-                                 disc->getPosition(i)-.2);
+                                 disc->getPosition(i)-flipsideDist);
                         ofVertex(disc->getRadius(i)*cos((a - disc->getDensity(i)/2)*PI/180),
                                  disc->getRadius(i)*sin((a - disc->getDensity(i)/2)*PI/180),
-                                 disc->getPosition(i)-.2);
+                                 disc->getPosition(i)-flipsideDist);
                         ofVertex(disc->getRadius(i-1)*cos(a*PI/180),
                                  disc->getRadius(i-1)*sin(a*PI/180),
-                                 disc->getPosition(i)-.2);
+                                 disc->getPosition(i)-flipsideDist);
+                        ofVertex(spikePoint*cos((a - disc->getDensity(i)/2)*PI/180),
+                                 spikePoint*sin((a - disc->getDensity(i)/2)*PI/180),
+                                 disc->getPosition(i) - flipsideDist - disc->getSpikeDistance(i));
                         ofVertex(disc->getRadius(i-1)*cos((a - disc->getDensity(i)/2)*PI/180),
                                  disc->getRadius(i-1)*sin((a - disc->getDensity(i)/2)*PI/180),
-                                 disc->getPosition(i)-.2);
+                                 disc->getPosition(i)-flipsideDist);
+                        
                         ofEndShape();
                         
                     }

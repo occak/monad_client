@@ -42,7 +42,7 @@ void Disc::setup(){
         zPosition.push_back(0.);
         
         //set spike position, initialize 0.
-        spikeDistance.push_back(0.);
+        spikeDistance.push_back(100.);
         
         posOffset.push_back(180* (int)ofRandom(2));
         //sound

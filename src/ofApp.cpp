@@ -17,6 +17,7 @@ ofApp::ofApp() {
     moveChanged = false;
     moveReset = false;
     muteChanged = false;
+    spikeChanged = false;
     me = NULL;
 }
 
@@ -103,11 +104,13 @@ void ofApp::setup(){
             _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
             
             _ui->addLabel("rotation speed",1);
-            _ui->addBiLabelSlider("rotation" + ofToString(i+1), "CCW", "CW", 10, -10, disc.getNetRotationSpeed(i));
+            _ui->addBiLabelSlider("rotation" + ofToString(i+1), "<", ">", 10, -10, disc.getNetRotationSpeed(i));
             _ui->addLabel("density",1);
-            _ui->addBiLabelSlider("density" + ofToString(i+1), "sparse", "dense", 30, 3, disc.getDensity(i));
+            _ui->addBiLabelSlider("density" + ofToString(i+1), "| | |", "|||||", 30, 3, disc.getDensity(i));
             _ui->addLabel("size",1);
-            _ui->addBiLabelSlider("radius" + ofToString(i+1), "small", "large", 15, 100, disc.getRadius(i)-disc.getRadius(i-1));
+            _ui->addBiLabelSlider("radius" + ofToString(i+1), "o", "O", 15, 100, disc.getRadius(i)-disc.getRadius(i-1));
+            _ui->addLabel("spike",1);
+            _ui->addBiLabelSlider("spike" + ofToString(i+1), ".", "^", 0, 100, disc.getSpikeDistance(i));
             
             
             _ui->addLabel("z-motion",1);
@@ -116,8 +119,6 @@ void ofApp::setup(){
             _ui->addButton("reset", disc.resetPerlin[i]);
             _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
             _ui->addLabelToggle("mute", disc.isMute(i));
-            _ui->addSpacer();
-            _ui->addLabelToggle("chat", true);
             
             _ui->autoSizeToFitWidgets();
             
@@ -162,7 +163,7 @@ void ofApp::setup(){
     history->setDrawBack(false);
     history->setFont(OF_TTF_MONO);
     history->setColorFill(ofxUIColor(25));
-    history->setPosition(0, ofGetHeight()/2 - 70);
+    history->setPosition(0, ofGetHeight()/2 - 50);
     history->setDimensions(noDisc->getGlobalCanvasWidth()+50, ofGetHeight()/2 + 70);
     historyText = "";
     history->addTextArea("history", historyText, OFX_UI_FONT_SMALL);
@@ -307,6 +308,27 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
                     float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
                     soundChange("bpm", i, beatSpeed*beatDensity);
+                }
+            }
+            else if(e.getName() == "spike" + ofToString(i+1)){
+                ofxUISlider *slider = e.getSlider();
+                float spikeHeight = disc.getSpikeDistance(i);
+                
+                if(me->getLife()> 0 && mReleased == false && (int) slider->getScaledValue() != spikeHeight) {
+                    spikeChanged = true;
+                    disc.setSpikeDistance(i, slider->getScaledValue());
+                    
+                    //change envelope
+//                    float envelopeCoeff = ofMap(disc.getDensity(i), 1, 30, 1, 5);
+//                    float pulseRatio = ofMap(disc.getDensity(i), 1, 30, 0.005, 1);
+//                    soundChange("envelopeWidth", i, envelopeCoeff);
+//                    //                    soundChange("pulseLength", i, pulseRatio);
+//                    
+//                    //change metronome
+//                    float netSpeed = abs(disc.getNetRotationSpeed(i));
+//                    float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
+//                    float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
+//                    soundChange("bpm", i, beatSpeed*beatDensity);
                 }
             }
         }
@@ -743,13 +765,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         else if(e.getName() == "chat"){
             ofxUIToggle *toggle = e.getToggle();
             
-            //toggle all chat buttons
-            for(int j = 0; j<disc.getDiscIndex(); j++){
-                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
-                ofxUIToggle *uiChatToggle = static_cast <ofxUIToggle*> (canvas->getWidget("chat"));
-                uiChatToggle->setValue(toggle->getValue());
-            }
-            
+            //toggle chat button           
             
             ofxUIToggle *noDiscChatToggle = static_cast <ofxUIToggle*> (noDisc->getWidget("chat"));
             noDiscChatToggle->setValue(toggle->getValue());
@@ -1556,15 +1572,9 @@ void ofApp::keyPressed(int key){
     
     
     
-    if(key == 'c') {
+    if(key == 'c' && TCPsetup) {
         
         chat->toggleVisible();
-        
-        for (int i = 0 ; i < disc.getDiscIndex(); i++) {
-            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
-            ofxUIToggle *toggleChat = static_cast <ofxUIToggle*> (canvas->getWidget("chat"));
-            toggleChat->setValue(!toggleChat->getValue());
-        }
         
         ofxUICanvas *canvas = static_cast <ofxUICanvas*> (noDisc);
         ofxUIToggle *toggleChat = static_cast <ofxUIToggle*> (canvas->getWidget("chat"));
@@ -1572,7 +1582,7 @@ void ofApp::keyPressed(int key){
         
     }
     
-    if(key == 'w'){
+    if(key == 'w' && TCPsetup){
         int jump = 1;
         bool occupied = true;
         while(occupied == true){
@@ -1604,7 +1614,7 @@ void ofApp::keyPressed(int key){
         client.send(changeDisc);
     }
     
-    if(key == 's'){
+    if(key == 's' && TCPsetup){
         int jump = -1;
         bool occupied = true;
         while(occupied == true){
@@ -1636,7 +1646,7 @@ void ofApp::keyPressed(int key){
         client.send(changeDisc);
     }
     
-    if(key == OF_KEY_BACKSPACE && TCPsetup == true) {
+    if(key == OF_KEY_BACKSPACE && TCPsetup) {
         
         if(me->getDiscIndex() != -1){
             ui[me->getDiscIndex()]->setVisible(false);
@@ -1654,7 +1664,7 @@ void ofApp::keyPressed(int key){
         ofSetFullscreen(fullScreen);
     }
     
-    if(key == 't') {
+    if(key == 't' && TCPsetup) {
         timer = !timer;
     }
     
@@ -1807,6 +1817,26 @@ void ofApp::mouseReleased(int x, int y, int button){
         
         //update history//
         string eventHistory = me->getNick() + "//" + "Grv"+ofToString(me->getDiscIndex()+1)+ "//" + "density:" + ofToString(disc.getDensity(me->getDiscIndex())) +"\n\n";
+        historyText = eventHistory + historyText;
+        
+        ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+        _history->setTextString(historyText);
+    }
+    else if(spikeChanged){
+        spikeChanged = false;
+//        me->changeLife(costSpike);
+        
+        //update server
+//        string lifeUpdate = "life//";
+//        lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+//        lifeUpdate += "lifeChange: "+ofToString() + "//";
+//        client.send(lifeUpdate);
+        
+//        string change = "spike//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getSpikeDistance(me->getDiscIndex()))+"//"+me->getIP();
+//        client.send(change);
+        
+        //update history//
+        string eventHistory = me->getNick() + "//" + "Grv"+ofToString(me->getDiscIndex()+1)+ "//" + "spike:" + ofToString(disc.getSpikeDistance(me->getDiscIndex())) +"\n\n";
         historyText = eventHistory + historyText;
         
         ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
