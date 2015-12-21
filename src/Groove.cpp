@@ -10,7 +10,7 @@
 
 void Groove::setup(Disc* disc, Player* player, vector<Player *> otherPlayers){
     
-	turn = true;
+    turn = true;
     //groove should not operate without getting disc
     this->disc = disc;
     this->me = player;
@@ -201,20 +201,23 @@ void Groove::draw(){
                         
                         
                         ofLine(p1,p2);
-                        
-                        ofBeginShape();
-                        ofVertex(p1);
-                        ofVertex(p2);
-                        ofVertex(p3);
-                        ofEndShape();
-                        
                         //reverse
-                        ofLine(rp1,rp2);   
-                        ofBeginShape();
-                        ofVertex(rp1);
-                        ofVertex(rp2);
-                        ofVertex(rp3);
-                        ofEndShape();
+                        ofLine(rp1,rp2);
+                        
+                        if(disc->getSpikeDistance(i) != 0){
+                            ofBeginShape();
+                            ofVertex(p1);
+                            ofVertex(p2);
+                            ofVertex(p3);
+                            ofEndShape();
+                            
+                            
+                            ofBeginShape();
+                            ofVertex(rp1);
+                            ofVertex(rp2);
+                            ofVertex(rp3);
+                            ofEndShape();
+                        }
                         
                     }
                 }
@@ -266,18 +269,6 @@ void Groove::draw(){
                         ofVertex(p4);
                         ofEndShape();
                         
-                        ofBeginShape(); //spike
-                        ofVertex(p4);
-                        ofVertex(p5);
-                        ofVertex(p3);
-                        ofEndShape();
-                        
-                        ofBeginShape(); //spike
-                        ofVertex(p4);
-                        ofVertex(p5);
-                        ofVertex(p1);
-                        ofEndShape();
-                        
                         //reverse
                         ofBeginShape(); //base
                         ofVertex(rp1);
@@ -286,17 +277,33 @@ void Groove::draw(){
                         ofVertex(rp4);
                         ofEndShape();
                         
-                        ofBeginShape(); //spike
-                        ofVertex(rp4);
-                        ofVertex(rp5);
-                        ofVertex(rp3);
-                        ofEndShape();
-                        
-                        ofBeginShape(); //spike
-                        ofVertex(rp4);
-                        ofVertex(rp5);
-                        ofVertex(rp1);
-                        ofEndShape();
+                        if(disc->getSpikeDistance(i) != 0){
+                            
+                            ofBeginShape(); //spike
+                            ofVertex(p4);
+                            ofVertex(p5);
+                            ofVertex(p3);
+                            ofEndShape();
+                            
+                            ofBeginShape(); //spike
+                            ofVertex(p4);
+                            ofVertex(p5);
+                            ofVertex(p1);
+                            ofEndShape();
+                            
+                            
+                            ofBeginShape(); //spike
+                            ofVertex(rp4);
+                            ofVertex(rp5);
+                            ofVertex(rp3);
+                            ofEndShape();
+                            
+                            ofBeginShape(); //spike
+                            ofVertex(rp4);
+                            ofVertex(rp5);
+                            ofVertex(rp1);
+                            ofEndShape();
+                        }
                     }
                 }
                 
@@ -343,19 +350,7 @@ void Groove::draw(){
                         ofVertex(p4);
                         ofEndShape();
                         
-                        ofBeginShape(); //spike
-                        ofVertex(p4);
-                        ofVertex(p5);
-                        ofVertex(p3);
-                        ofEndShape();
-                        
-                        ofBeginShape(); //spike
-                        ofVertex(p4);
-                        ofVertex(p5);
-                        ofVertex(p1);
-                        ofEndShape();
-                        
-                        //reverse side
+                        //reverse
                         ofBeginShape(); //base
                         ofVertex(rp1);
                         ofVertex(rp2);
@@ -363,17 +358,34 @@ void Groove::draw(){
                         ofVertex(rp4);
                         ofEndShape();
                         
-                        ofBeginShape(); //spike
-                        ofVertex(rp4);
-                        ofVertex(rp5);
-                        ofVertex(rp3);
-                        ofEndShape();
+                        if(disc->getSpikeDistance(i) != 0){
+                            ofBeginShape(); //spike
+                            ofVertex(p4);
+                            ofVertex(p5);
+                            ofVertex(p3);
+                            ofEndShape();
+                            
+                            ofBeginShape(); //spike
+                            ofVertex(p4);
+                            ofVertex(p5);
+                            ofVertex(p1);
+                            ofEndShape();
+                            
+                            ofBeginShape(); //spike
+                            ofVertex(rp4);
+                            ofVertex(rp5);
+                            ofVertex(rp3);
+                            ofEndShape();
+                            
+                            ofBeginShape(); //spike
+                            ofVertex(rp4);
+                            ofVertex(rp5);
+                            ofVertex(rp1);
+                            ofEndShape();
+                        }
                         
-                        ofBeginShape(); //spike
-                        ofVertex(rp4);
-                        ofVertex(rp5);
-                        ofVertex(rp1);
-                        ofEndShape();
+                        
+                        
                         
                     }
                 }
@@ -437,24 +449,6 @@ void Groove::draw(){
                         ofVertex(p6);
                         ofEndShape();
                         
-                        ofBeginShape(); //spike
-                        ofVertex(p6);
-                        ofVertex(p7);
-                        ofVertex(p4);
-                        ofEndShape();
-                        
-                        ofBeginShape();
-                        ofVertex(p6);
-                        ofVertex(p7);
-                        ofVertex(p1);
-                        ofEndShape();
-                        
-                        ofBeginShape();
-                        ofVertex(p4);
-                        ofVertex(p7);
-                        ofVertex(p3);
-                        ofEndShape();
-                        
                         //reverse
                         ofBeginShape(); //base
                         ofVertex(rp1);
@@ -465,23 +459,47 @@ void Groove::draw(){
                         ofVertex(rp6);
                         ofEndShape();
                         
-                        ofBeginShape(); //spike
-                        ofVertex(rp6);
-                        ofVertex(rp7);
-                        ofVertex(rp4);
-                        ofEndShape();
                         
-                        ofBeginShape();
-                        ofVertex(rp6);
-                        ofVertex(rp7);
-                        ofVertex(rp1);
-                        ofEndShape();
-                        
-                        ofBeginShape();
-                        ofVertex(rp4);
-                        ofVertex(rp7);
-                        ofVertex(rp3);
-                        ofEndShape();
+                        if(disc->getSpikeDistance(i) != 0){
+                            
+                            
+                            ofBeginShape(); //spike
+                            ofVertex(p6);
+                            ofVertex(p7);
+                            ofVertex(p4);
+                            ofEndShape();
+                            
+                            ofBeginShape();
+                            ofVertex(p6);
+                            ofVertex(p7);
+                            ofVertex(p1);
+                            ofEndShape();
+                            
+                            ofBeginShape();
+                            ofVertex(p4);
+                            ofVertex(p7);
+                            ofVertex(p3);
+                            ofEndShape();
+                            
+                            
+                            ofBeginShape(); //spike
+                            ofVertex(rp6);
+                            ofVertex(rp7);
+                            ofVertex(rp4);
+                            ofEndShape();
+                            
+                            ofBeginShape();
+                            ofVertex(rp6);
+                            ofVertex(rp7);
+                            ofVertex(rp1);
+                            ofEndShape();
+                            
+                            ofBeginShape();
+                            ofVertex(rp4);
+                            ofVertex(rp7);
+                            ofVertex(rp3);
+                            ofEndShape();
+                        }
                         
                         space = true;
                     }
