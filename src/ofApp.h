@@ -93,8 +93,8 @@ private:
     ofxUICanvas *noDisc;
     
     //update buttons will be removed
-    vector<ofxUILabelToggle *> updateButtonsArray;
-    ofxUICanvas *updateButtons;
+//    vector<ofxUILabelToggle *> updateButtonsArray;
+//    ofxUICanvas *updateButtons;
     
     ofxUICanvas *initialize;
     

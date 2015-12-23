@@ -110,7 +110,7 @@ void ofApp::setup(){
             _ui->addLabel("size",1);
             _ui->addBiLabelSlider("radius" + ofToString(i+1), "o", "O", 15, 100, disc.getRadius(i)-disc.getRadius(i-1));
             _ui->addLabel("spike",1);
-            _ui->addBiLabelSlider("spike" + ofToString(i+1), ".", "^", 0, 100, disc.getSpikeDistance(i));
+            _ui->addBiLabelSlider("spike" + ofToString(i+1), ".", "^", 0, 50, disc.getSpikeDistance(i));
             
             
             _ui->addLabel("z-motion",1);
@@ -311,24 +311,17 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 }
             }
             else if(e.getName() == "spike" + ofToString(i+1)){
+                
                 ofxUISlider *slider = e.getSlider();
                 float spikeHeight = disc.getSpikeDistance(i);
                 
-                if(me->getLife()> 0 && mReleased == false && (int) slider->getScaledValue() != spikeHeight) {
+                if(me->getLife()> 0 && mReleased == false && slider->getScaledValue() != spikeHeight) {
                     spikeChanged = true;
                     disc.setSpikeDistance(i, slider->getScaledValue());
                     
-                    //change envelope
-//                    float envelopeCoeff = ofMap(disc.getDensity(i), 1, 30, 1, 5);
-//                    float pulseRatio = ofMap(disc.getDensity(i), 1, 30, 0.005, 1);
-//                    soundChange("envelopeWidth", i, envelopeCoeff);
-//                    //                    soundChange("pulseLength", i, pulseRatio);
-//                    
-//                    //change metronome
-//                    float netSpeed = abs(disc.getNetRotationSpeed(i));
-//                    float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
-//                    float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
-//                    soundChange("bpm", i, beatSpeed*beatDensity);
+                    //change gain
+                    float distAmount = ofMap(disc.getSpikeDistance(i), 0., 50., 1., 40.);
+                    soundChange("drive", i, distAmount);
                 }
             }
         }
