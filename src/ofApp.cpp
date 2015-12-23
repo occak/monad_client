@@ -110,7 +110,7 @@ void ofApp::setup(){
             _ui->addLabel("size",1);
             _ui->addBiLabelSlider("radius" + ofToString(i+1), "o", "O", 15, 100, disc.getThickness(i));
             _ui->addLabel("spike",1);
-            _ui->addBiLabelSlider("spike" + ofToString(i+1), ".", "^", 0, 50, disc.getSpikeDistance(i));
+            _ui->addBiLabelSlider("spike" + ofToString(i+1), ".", "^", 0, 100, disc.getSpikeDistance(i));
             
             
             _ui->addLabel("z-motion",1);
@@ -822,7 +822,6 @@ void ofApp::update(){
             received = ofSplitString(str, "//");
             title = received[0];
             if(title == "state"){
-                cout<< str <<endl;
                 vector<string> nameValue;
                 nameValue = ofSplitString(received[1], ": ");
                 if(nameValue[0] == "discIndex") disc.setDiscIndex(ofToInt(nameValue[1]));
@@ -884,7 +883,7 @@ void ofApp::update(){
                             disc.setSpikeDistance(i, ofToFloat(nameValue[1]));
                             
                             //sound
-                            float distAmount = ofMap(disc.getSpikeDistance(i), 0., 50., 1., 40.);
+                            float distAmount = ofMap(disc.getSpikeDistance(i), 0., 100., 1., 40.);
                             soundChange("drive", i, distAmount);
                             
                             //ui
@@ -1229,7 +1228,7 @@ void ofApp::update(){
                 disc.setSpikeDistance(index, ofToFloat(nameValue[1]));
                 
                 //change sound
-                float distAmount = ofMap(disc.getSpikeDistance(index), 0., 50., 1., 40.);
+                float distAmount = ofMap(disc.getSpikeDistance(index), 0., 100., 1., 40.);
                 soundChange("drive", index, distAmount);
                 
                 //update ui

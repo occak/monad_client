@@ -199,23 +199,24 @@ void Groove::draw(){
                         rp2.set(p2.x, p2.y, p2.z-flipsideDist);
                         rp3.set(p3.x, p3.y, p3.z-(flipsideDist+2*disc->getSpikeDistance(i)));
                         
-                        
                         ofLine(p1,p2);
                         //reverse
                         ofLine(rp1,rp2);
                         
                         if(disc->getSpikeDistance(i) != 0){
+                            
+                            ofNoFill();
                             ofBeginShape();
                             ofVertex(p1);
-                            ofVertex(p2);
                             ofVertex(p3);
+                            ofVertex(p2);
                             ofEndShape();
                             
                             
                             ofBeginShape();
                             ofVertex(rp1);
-                            ofVertex(rp2);
                             ofVertex(rp3);
+                            ofVertex(rp2);
                             ofEndShape();
                         }
                         
@@ -261,7 +262,7 @@ void Groove::draw(){
                         
                         ofSetPolyMode(OF_POLY_WINDING_ODD);
                         
-                        
+                        ofFill();
                         ofBeginShape(); //base
                         ofVertex(p1);
                         ofVertex(p2);
@@ -278,6 +279,8 @@ void Groove::draw(){
                         ofEndShape();
                         
                         if(disc->getSpikeDistance(i) != 0){
+                            
+                            ofNoFill();
                             
                             ofBeginShape(); //spike
                             ofVertex(p4);
@@ -343,6 +346,8 @@ void Groove::draw(){
                         
                         
                         ofSetPolyMode(OF_POLY_WINDING_ODD);
+                        ofFill();
+                        
                         ofBeginShape(); //base
                         ofVertex(p1);
                         ofVertex(p2);
@@ -359,6 +364,8 @@ void Groove::draw(){
                         ofEndShape();
                         
                         if(disc->getSpikeDistance(i) != 0){
+                            
+                            ofNoFill();
                             ofBeginShape(); //spike
                             ofVertex(p4);
                             ofVertex(p5);
@@ -439,6 +446,7 @@ void Groove::draw(){
                         
                         
                         ofSetPolyMode(OF_POLY_WINDING_ODD);
+                        ofFill();
                         
                         ofBeginShape(); //base
                         ofVertex(p1);
@@ -462,6 +470,7 @@ void Groove::draw(){
                         
                         if(disc->getSpikeDistance(i) != 0){
                             
+                            ofNoFill();
                             
                             ofBeginShape(); //spike
                             ofVertex(p6);

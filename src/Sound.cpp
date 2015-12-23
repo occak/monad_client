@@ -69,7 +69,7 @@ void Sound::setup(Disc* disc){
         
         Generator delay = StereoDelay(0, .0025*i).input(filter).feedback(.01).delayTimeLeft(0).delayTimeRight(.0025*i);
         
-        float distAmount = ofMap(disc->getSpikeDistance(i), 0., 50., 1., 40.);
+        float distAmount = ofMap(disc->getSpikeDistance(i), 0., 100., 1., 40.);
         ControlGenerator gainAmount = synth.addParameter("drive"+ofToString(i),distAmount).max(40.);
         Generator hardClip = Limiter().input(delay).makeupGain(gainAmount).threshold(.70);
         
