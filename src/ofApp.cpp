@@ -868,17 +868,10 @@ void ofApp::update(){
                             float envelopeCoeff = ofMap(disc.getDensity(i), 1, 30, 1, 5);
                             float pulseRatio = ofMap(disc.getDensity(i), 1, 30, 0.001, 1);
                             soundChange("envelopeWidth", i, envelopeCoeff);
-                            //                            soundChange("pulseLength", i, pulseRatio);
                             
                             float netSpeed = abs(disc.getNetRotationSpeed(i));
-                            //                            float frequency;
-                            //                            if(netSpeed <= 5){
-                            //                                frequency = ofMap(netSpeed, 0, 5, 50, 500);
-                            //                            }
-                            //                            else frequency = ofMap(netSpeed, 5, 10, 500, 2500);
                             float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
                             float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
-                            //							soundChange("freq", i, frequency);
                             soundChange("bpm", i, beatSpeed*beatDensity);
                             
                             //ui
@@ -886,6 +879,19 @@ void ofApp::update(){
                             ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("density"+ofToString(i+1)));
                             slider->setValue(disc.getDensity(i));
                         }
+                        if(nameValue[0] == "spike"+ofToString(i)) {
+                            disc.setSpikeDistance(i, ofToFloat(nameValue[1]));
+                            
+                            //sound
+                            float distAmount = ofMap(disc.getSpikeDistance(i), 0., 50., 1., 40.);
+                            soundChange("drive", i, distAmount);
+                            
+                            //ui
+                            ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
+                            ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("spike"+ofToString(i+1)));
+                            slider->setValue(disc.getDensity(i));
+                        }
+                            
                         if(nameValue[0] == "texture"+ofToString(i)) {
                             disc.setTexture (i, ofToFloat(nameValue[1]));
                             //sound
@@ -978,9 +984,9 @@ void ofApp::update(){
                     if (playerData[0] == "costTexture") costTexture = ofToFloat(playerData[1]);
                     if (playerData[0] == "costMute") costMute = ofToFloat(playerData[1]);
                     if (playerData[0] == "costMove") costMove = ofToFloat(playerData[1]);
+                    if (playerData[0] == "costSpike") costSpike = ofToFloat(playerData[1]);
                     if (playerData[0] == "reward") reward = ofToFloat(playerData[1]);
                 }
-                
             }
             
             else if (title == "playerInfo" ){
@@ -1208,6 +1214,38 @@ void ofApp::update(){
                 }
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
                 else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "density:" + ofToString(disc.getDensity(index)) +"\n\n";
+                historyText = eventHistory + historyText;
+                
+                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                _history->setTextString(historyText);
+                
+            }
+            
+            else if (title == "spike"){
+                vector<string> nameValue;
+                nameValue = ofSplitString(received[1], ": ");
+                int index = ofToInt(nameValue[0]);
+                disc.setSpikeDistance(index, ofToFloat(nameValue[1]));
+                
+                //change sound
+                float distAmount = ofMap(disc.getSpikeDistance(index), 0., 50., 1., 40.);
+                soundChange("drive", index, distAmount);
+                
+                //update ui
+                ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
+                ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("spike"+ofToString(index+1)));
+                slider->setValue(disc.getSpikeDistance(index));
+                
+                //update history//
+                
+                string eventHistory;
+                
+                Player* _player = NULL;
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                }
+                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "spike:" + ofToString(disc.getSpikeDistance(index)) +"\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -1815,18 +1853,20 @@ void ofApp::mouseReleased(int x, int y, int button){
         ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
         _history->setTextString(historyText);
     }
+    
     else if(spikeChanged){
         spikeChanged = false;
-//        me->changeLife(costSpike);
+        me->changeLife(costSpike);
         
         //update server
-//        string lifeUpdate = "life//";
-//        lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-//        lifeUpdate += "lifeChange: "+ofToString() + "//";
-//        client.send(lifeUpdate);
+        string lifeUpdate = "life//";
+        lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+        lifeUpdate += "lifeChange: "+ofToString(costSpike) + "//";
+        client.send(lifeUpdate);
         
-//        string change = "spike//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getSpikeDistance(me->getDiscIndex()))+"//"+me->getIP();
-//        client.send(change);
+        string change = "spike//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getSpikeDistance(me->getDiscIndex()))+"//"+me->getIP();
+        client.send(change);
+    
         
         //update history//
         string eventHistory = me->getNick() + "//" + "Grv"+ofToString(me->getDiscIndex()+1)+ "//" + "spike:" + ofToString(disc.getSpikeDistance(me->getDiscIndex())) +"\n\n";
@@ -1835,6 +1875,7 @@ void ofApp::mouseReleased(int x, int y, int button){
         ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
         _history->setTextString(historyText);
     }
+    
     else if(textureChanged){
         textureChanged = false;
         me->changeLife(costTexture);
