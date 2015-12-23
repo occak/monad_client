@@ -91,7 +91,7 @@ private:
     vector<Player*> otherPlayers;
     
     vector<ofxUICanvas *> ui;
-    ofxUICanvas *noDisc;
+    ofxUICanvas *dashboard;
     
     //update buttons will be removed
 //    vector<ofxUILabelToggle *> updateButtonsArray;

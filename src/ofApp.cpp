@@ -47,22 +47,22 @@ void ofApp::setup(){
     }
     
     //set up gui
-    noDisc = new ofxUICanvas();
-    noDisc->setFont(OF_TTF_MONO);
-    noDisc->setPosition(ofGetWidth()/2-125, ofGetHeight()-25);
-    noDisc->addMultiImageToggle("inner", "butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
-    noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    noDisc->addMultiImageToggle("outer", "butonlar/buton-07.png",false, 20, 20);
-    noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    noDisc->addToggle("move all", false);
-    noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    noDisc->addButton("reset all", false);
-    noDisc->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    noDisc->addLabelToggle("chat", true);
-    noDisc->autoSizeToFitWidgets();
-    if (me == NULL) noDisc->setVisible(false);
-    if (me != NULL) noDisc->setColorBack(me->getColor());
-    ofAddListener(noDisc->newGUIEvent, this, &ofApp::guiEvent);
+    dashboard = new ofxUICanvas();
+    dashboard->setFont(OF_TTF_MONO);
+    dashboard->setPosition(ofGetWidth()/2-125, ofGetHeight()-25);
+    dashboard->addMultiImageToggle("inner", "butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
+    dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+    dashboard->addMultiImageToggle("outer", "butonlar/buton-07.png",false, 20, 20);
+    dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+    dashboard->addToggle("move all", false);
+    dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+    dashboard->addButton("reset all", false);
+    dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+    dashboard->addLabelToggle("chat", true);
+    dashboard->autoSizeToFitWidgets();
+    if (me == NULL) dashboard->setVisible(false);
+    if (me != NULL) dashboard->setColorBack(me->getColor());
+    ofAddListener(dashboard->newGUIEvent, this, &ofApp::guiEvent);
     
     
     if(me == NULL) {
@@ -150,7 +150,7 @@ void ofApp::setup(){
     chat->setFont(OF_TTF_MONO);
     chat->setDrawBack(false);
     int chatWidth = 700;
-    chat->setPosition(noDisc->getGlobalCanvasWidth()+10, 0);
+    chat->setPosition(dashboard->getGlobalCanvasWidth()+10, 0);
     chat->setDimensions(chatWidth, ofGetHeight());
     chat->setColorFill(ofxUIColor(50,50,50,150));
     conversation = "";
@@ -164,7 +164,7 @@ void ofApp::setup(){
     history->setFont(OF_TTF_MONO);
     history->setColorFill(ofxUIColor(25));
     history->setPosition(0, ofGetHeight()/2 - 50);
-    history->setDimensions(noDisc->getGlobalCanvasWidth()+50, ofGetHeight()/2 + 70);
+    history->setDimensions(dashboard->getGlobalCanvasWidth()+250, ofGetHeight()/2 + 70);
     historyText = "";
     history->addTextArea("history", historyText, OFX_UI_FONT_SMALL);
     if (me == NULL) history->setVisible(false);
@@ -209,7 +209,7 @@ void ofApp::exit(){
         //        for(int i = 0; i < disc.getDiscIndex(); i++){
         //            delete ui[i]
         //        }
-        //        delete noDisc;
+        //        delete dashboard;
         //        delete chat;
         //        delete history;
     }
@@ -701,7 +701,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                             costFactor++;
                         }
                     }
-                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (noDisc);
+                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (dashboard);
                     ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (canvas->getWidget("move all"));
                     toggleMoveAll->setValue(false);
                     
@@ -760,8 +760,8 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             
             //toggle chat button           
             
-            ofxUIToggle *noDiscChatToggle = static_cast <ofxUIToggle*> (noDisc->getWidget("chat"));
-            noDiscChatToggle->setValue(toggle->getValue());
+            ofxUIToggle *dashboardChatToggle = static_cast <ofxUIToggle*> (dashboard->getWidget("chat"));
+            dashboardChatToggle->setValue(toggle->getValue());
             
             chat->setVisible(toggle->getValue());
         }
@@ -958,13 +958,13 @@ void ofApp::update(){
                         break;
                     }
                 }
-                ofxUIToggle *moveAll = (ofxUIToggle*) noDisc->getWidget("move all");
+                ofxUIToggle *moveAll = (ofxUIToggle*) dashboard->getWidget("move all");
                 moveAll->setValue(allMoving);
                 
                 me->setConnection(true);
                 TCPsetup = true;
                 initialize->setVisible(false);
-                noDisc->setVisible(true);
+                dashboard->setVisible(true);
                 
                 loginMinute = ofGetMinutes();
                 loginSecond = ofGetElapsedTimef();
@@ -1402,7 +1402,7 @@ void ofApp::update(){
             }
             
             else if (title == "moveAll"){
-                ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (noDisc->getWidget("move all"));
+                ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (dashboard->getWidget("move all"));
                 toggleMoveAll->setValue(true);
                 for(int i = 0; i<disc.getDiscIndex(); i++){
                     ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
@@ -1429,7 +1429,7 @@ void ofApp::update(){
             }
             
             else if (title == "stopAll"){
-                ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (noDisc->getWidget("move all"));
+                ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (dashboard->getWidget("move all"));
                 toggleMoveAll->setValue(false);
                 for(int i = 0; i<disc.getDiscIndex(); i++){
                     ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
@@ -1456,7 +1456,7 @@ void ofApp::update(){
             }
             
             else if (title == "resetAll"){
-                ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (noDisc->getWidget("move all"));
+                ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (dashboard->getWidget("move all"));
                 toggleMoveAll->setValue(false);
                 for(int i = 0; i<disc.getDiscIndex(); i++){
                     disc.resetPerlin[i] = 1;
@@ -1607,7 +1607,7 @@ void ofApp::keyPressed(int key){
         
         chat->toggleVisible();
         
-        ofxUICanvas *canvas = static_cast <ofxUICanvas*> (noDisc);
+        ofxUICanvas *canvas = static_cast <ofxUICanvas*> (dashboard);
         ofxUIToggle *toggleChat = static_cast <ofxUIToggle*> (canvas->getWidget("chat"));
         toggleChat->setValue(!toggleChat->getValue());
         
@@ -1738,23 +1738,34 @@ void ofApp::soundChange(string name, int index, float value) {
         sound.synth.setParameter("volBalance"+ofToString(index), volCoeff);
         
         //ui
-        ofxUICanvas *canvas1 = static_cast<ofxUICanvas*>(ui[index]);
-        ofxUISlider *slider1 = static_cast <ofxUISlider*> (canvas1->getWidget("rotation"+ofToString(index+1)));
-        ofxUISlider *slider2 = static_cast <ofxUISlider*> (canvas1->getWidget("density"+ofToString(index+1)));
-        ofxUISlider *slider3 = static_cast <ofxUISlider*> (canvas1->getWidget("radius"+ofToString(index+1)));
-        ofxUISlider *slider4 = static_cast <ofxUISlider*> (canvas1->getWidget("spike"+ofToString(index+1)));
+        ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
+        ofxUISlider *slider1 = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(index+1)));
+        ofxUISlider *slider2 = static_cast <ofxUISlider*> (canvas->getWidget("density"+ofToString(index+1)));
+        ofxUISlider *slider3 = static_cast <ofxUISlider*> (canvas->getWidget("radius"+ofToString(index+1)));
+        ofxUISlider *slider4 = static_cast <ofxUISlider*> (canvas->getWidget("spike"+ofToString(index+1)));
+        ofxUIButton *button1 = static_cast <ofxUIButton*> (canvas->getWidget("move"));
+        ofxUIButton *button2 = static_cast <ofxUIButton*> (canvas->getWidget("reset"));
+        ofxUIButton *button3 = static_cast <ofxUIButton*> (canvas->getWidget("mute"));
+
+
         
         if(disc.getTexture(index) == 0){
             slider1->setVisible(false);
             slider2->setVisible(false);
             slider3->setVisible(false);
             slider4->setVisible(false);
+            button1->setVisible(false);
+            button2->setVisible(false);
+            button3->setVisible(false);
         }
         else {
             slider1->setVisible(true);
             slider2->setVisible(true);
             slider3->setVisible(true);
             slider4->setVisible(true);
+            button1->setVisible(true);
+            button2->setVisible(true);
+            button3->setVisible(true);
         }
         
         

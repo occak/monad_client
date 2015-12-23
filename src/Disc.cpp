@@ -119,6 +119,63 @@ void Disc::setDiscIndex(int value){
 
 //----------------------------------
 
+void Disc::addDisc(){
+    
+    //maximum 9 discs
+    if(discIndex <= 9) {
+        
+        discIndex++;
+        
+        int newIndex = discIndex - 1;
+        
+        // generate radius information of discs
+        if (newIndex == 0) radii.push_back(ofRandom(50) + 15.);
+        else radii.push_back(radii[newIndex-1] + ofRandom(50) + 15.);
+        
+        // generate texture densities, rule out non-symmetrics
+        float thisDensity = ofRandom(30) + 1;
+        //        while ((int) thisDensity % 360 != 0) {
+        //            thisDensity = ofRandom(30) + 1;
+        ////            cout << "recalculating" << endl;
+        //        }
+        density.push_back(thisDensity);
+        //        cout << (int) thisDensity << endl;
+        
+        // determine their initial rotation angle and speed
+        rotation.push_back(0);
+        rotationSpeed.push_back(0);
+        
+        // determine texture type
+        texture.push_back((int) ofRandom(5));
+        
+        // set depths, all zero by default
+        zPosition.push_back(0.);
+        
+        //set spike position, initialize 0.
+        spikeDistance.push_back(0.);
+        
+        posOffset.push_back(180* (int)ofRandom(2));
+        //sound
+        vector<float> adsr;
+        envelope.push_back(adsr);
+        setEnvelope(newIndex, getTexture(newIndex));
+        
+        //muting, all initially false
+        mute.push_back(0);
+        
+        //z-motion is off
+        perlin.push_back(0);
+        resetPerlin.push_back(0);
+        counter.push_back(0);
+        
+        seed.push_back(0);
+        msa::Perlin* _zMotion = new msa::Perlin(4,2,1.,1);
+        zMotion.push_back(_zMotion);
+    }
+    
+}
+
+//---------------------------------
 int Disc::getTexture(int index) const{
   
     return texture[index];
