@@ -108,7 +108,7 @@ void ofApp::setup(){
             _ui->addLabel("density",1);
             _ui->addBiLabelSlider("density" + ofToString(i+1), "| | |", "|||||", 30, 3, disc.getDensity(i));
             _ui->addLabel("size",1);
-            _ui->addBiLabelSlider("radius" + ofToString(i+1), "o", "O", 15, 100, disc.getRadius(i)-disc.getRadius(i-1));
+            _ui->addBiLabelSlider("radius" + ofToString(i+1), "o", "O", 15, 100, disc.getThickness(i));
             _ui->addLabel("spike",1);
             _ui->addBiLabelSlider("spike" + ofToString(i+1), ".", "^", 0, 50, disc.getSpikeDistance(i));
             
@@ -822,14 +822,15 @@ void ofApp::update(){
             received = ofSplitString(str, "//");
             title = received[0];
             if(title == "state"){
+                cout<< str <<endl;
                 vector<string> nameValue;
                 nameValue = ofSplitString(received[1], ": ");
                 if(nameValue[0] == "discIndex") disc.setDiscIndex(ofToInt(nameValue[1]));
                 
                 //graphic values
                 for (int i = 0; i < disc.getDiscIndex(); i++) {
-                    for(int j = 0; j < 10; j++){
-                        nameValue = ofSplitString(received[j+(i*10)+2], ": ");
+                    for(int j = 0; j < 11; j++){
+                        nameValue = ofSplitString(received[j+(i*11)+2], ": ");
                         if(nameValue[0] == "radius"+ofToString(i)) {
                             disc.setRadius(i, ofToFloat(nameValue[1]));
                             //sound
@@ -889,7 +890,7 @@ void ofApp::update(){
                             //ui
                             ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
                             ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("spike"+ofToString(i+1)));
-                            slider->setValue(disc.getDensity(i));
+                            slider->setValue(disc.getSpikeDistance(i));
                         }
                             
                         if(nameValue[0] == "texture"+ofToString(i)) {
@@ -1742,16 +1743,19 @@ void ofApp::soundChange(string name, int index, float value) {
         ofxUISlider *slider1 = static_cast <ofxUISlider*> (canvas1->getWidget("rotation"+ofToString(index+1)));
         ofxUISlider *slider2 = static_cast <ofxUISlider*> (canvas1->getWidget("density"+ofToString(index+1)));
         ofxUISlider *slider3 = static_cast <ofxUISlider*> (canvas1->getWidget("radius"+ofToString(index+1)));
+        ofxUISlider *slider4 = static_cast <ofxUISlider*> (canvas1->getWidget("spike"+ofToString(index+1)));
         
         if(disc.getTexture(index) == 0){
             slider1->setVisible(false);
             slider2->setVisible(false);
             slider3->setVisible(false);
+            slider4->setVisible(false);
         }
         else {
             slider1->setVisible(true);
             slider2->setVisible(true);
             slider3->setVisible(true);
+            slider4->setVisible(true);
         }
         
         
