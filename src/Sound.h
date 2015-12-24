@@ -24,6 +24,7 @@ public:
     
     void setup(Disc* disc);
     void update();
+    void newSynth(int index);
     
     Disc* disc;
     
@@ -33,7 +34,7 @@ public:
     void setScale(int index, float value);
     
 private:
-    void newSynth(int index);
+    
 };
 
 #endif /* defined(__groove_snd__Sound__) */

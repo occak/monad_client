@@ -55,9 +55,10 @@ class ofApp : public ofBaseApp{
     moveReset,
     moveAllChanged,
     muteChanged,
-    spikeChanged;
+    spikeChanged,
+    newDisc;
     
-    void newDisc();
+    void newUI(int index);
 		
     
     ofEasyCam cam;

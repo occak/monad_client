@@ -18,6 +18,7 @@ ofApp::ofApp() {
     moveReset = false;
     muteChanged = false;
     spikeChanged = false;
+    newDisc = false;
     me = NULL;
 }
 
@@ -146,7 +147,7 @@ void ofApp::setup(){
         chat->setFont(OF_TTF_MONO);
         chat->setDrawBack(false);
         int chatWidth = 700;
-        chat->setPosition(ui[0]->getGlobalCanvasWidth()+10, 0);
+        chat->setPosition(addDisc->getGlobalCanvasWidth()+10, 0);
         chat->setDimensions(chatWidth, ofGetHeight());
         chat->setColorFill(ofxUIColor(50,50,50,150));
         conversation = "";
@@ -178,6 +179,7 @@ void ofApp::setup(){
         addDisc->setColorBack(me->getColor());
         dashboard->setColorBack(me->getColor());
         
+        chat->setVisible(true);
         addDisc->setVisible(true);
         
         //set up audio stream & synth network
@@ -764,12 +766,9 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             chat->setVisible(toggle->getValue());
         }
         else if(e.getName() == "new"){
+            
             ofxUIButton *button = e.getButton();
-            if(button->getValue()) {
-                
-                
-                
-            }
+            newDisc = true;
             
         }
     }
@@ -1069,10 +1068,50 @@ void ofApp::update(){
                 }
             }
             
+            else if (title == "addDisc"){
+                
+                cout<< str << endl;
+                
+                Player *_player = NULL;
+                int newSeed;
+                for(int i = 1; i < received.size(); i++ ){
+                    vector<string> playerData = ofSplitString(received[i], ": ");
+                    if(playerData[0] == "IP" && playerData[1] != me->getIP()){
+                        for (int j = 0; j < otherPlayers.size(); j++) {
+                            if(playerData[1] == otherPlayers[j]->getIP()) _player = otherPlayers[j];
+                        }
+                    }
+                    else if(playerData[0] == "IP" && playerData[1] == me->getIP()) _player = me;
+                    
+                    if(playerData[0] == "index") {
+                        
+                        int newIndex = ofToInt(playerData[1]);
+                        if(disc.getDiscIndex() < newIndex + 1) disc.setDiscIndex(newIndex +1);
+                        _player->setDiscIndex(newIndex);
+                    }
+                    
+                    if(playerData[0] == "seed") newSeed = ofToInt(playerData[1]);
+                }
+                
+                
+                //new disc
+                disc.addDisc(_player->getDiscIndex(), newSeed);
+                
+                //new mesh
+                groove.setup(&disc, me, otherPlayers);
+                
+                //new UI
+                newUI(_player->getDiscIndex());
+                
+                //sound
+                sound.newSynth(_player->getDiscIndex());
+            }
+            
             else if (title == "life"){
+                
                 Player *_player = NULL;
                 for(int i = 1; i < received.size(); i++ ){
-                    vector<string> playerData = ofSplitString(received[i], ": ");;
+                    vector<string> playerData = ofSplitString(received[i], ": ");
                     if (playerData[0] == "IP" && playerData[1] != me->getIP()){
                         for (int j = 0; j < otherPlayers.size(); j++) {
                             if(playerData[1] == otherPlayers[j]->getIP()) {
@@ -1783,13 +1822,8 @@ void ofApp::soundChange(string name, int index, float value) {
 }
 
 //--------------------------------------------------------------
-void ofApp::newDisc(){
+void ofApp::newUI(int newIndex){
     
-    if(disc.getDiscIndex() < 9) {
-        
-        //new disc
-        disc.addDisc();
-        int newIndex = disc.getDiscIndex()-1;
         
         //new UI
         ofxUICanvas *_ui;
@@ -1848,8 +1882,7 @@ void ofApp::newDisc(){
         ui.push_back(_ui);
         
         
-        
-    }
+
 }
 
 
@@ -1999,6 +2032,15 @@ void ofApp::mouseReleased(int x, int y, int button){
         
         string movementReset = "moveReset//"+ofToString(me->getDiscIndex())+"//"+me->getIP();
         client.send(movementReset);
+    }
+    
+    else if(newDisc){
+        newDisc = false;
+        
+        //send demand to server
+        string newDisc = "newDisc//"+me->getIP();
+        client.send(newDisc);
+        
     }
     // cost calculation and server notifications of move/stop/resetAll buttons are handled in guiEvent()
 }

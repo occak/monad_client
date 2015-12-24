@@ -12,15 +12,15 @@ void Disc::setup(){
     
 	selected = -1;
 	origin = 10;
-    discIndex = 10;    // 10 discs
+    discIndex = 9;    // 10 discs
     
 //    barPerlin = new Perlin(234,10);
     
     for(int i = 0; i < discIndex; i++){
         
         // generate radius information of discs
-        if (i == 0) radii.push_back(ofRandom(50) + 15.);
-        else radii.push_back(radii[i-1] + ofRandom(50) + 15.);
+        if (i == 0) radii.push_back(15. + origin);
+        else radii.push_back(radii[i-1] + 15.);
         
         // generate texture densities, rule out non-symmetrics
         float thisDensity = ofRandom(30) + 1;
@@ -36,7 +36,7 @@ void Disc::setup(){
         rotationSpeed.push_back(0);
     
         // determine texture type
-        texture.push_back((int) ofRandom(5));
+        texture.push_back(0);
         
         // set depths, all zero by default
         zPosition.push_back(0.);
@@ -119,32 +119,23 @@ void Disc::setDiscIndex(int value){
 
 //----------------------------------
 
-void Disc::addDisc(){
+void Disc::addDisc(int newIndex, int perlinSeed){
     
         
-        discIndex++;
-        
-        int newIndex = discIndex - 1;
-        
         // generate radius information of discs
-        if (newIndex == 0) radii.push_back(ofRandom(50) + 15.);
-        else radii.push_back(radii[newIndex-1] + ofRandom(50) + 15.);
-        
+        if (newIndex == 0) radii.push_back(15. + origin);
+        else radii.push_back(radii[newIndex-1] + 15.);
+    
         // generate texture densities, rule out non-symmetrics
-        float thisDensity = ofRandom(30) + 1;
-        //        while ((int) thisDensity % 360 != 0) {
-        //            thisDensity = ofRandom(30) + 1;
-        ////            cout << "recalculating" << endl;
-        //        }
+        float thisDensity = 30;
         density.push_back(thisDensity);
-        //        cout << (int) thisDensity << endl;
         
         // determine their initial rotation angle and speed
         rotation.push_back(0);
         rotationSpeed.push_back(0);
         
         // determine texture type
-        texture.push_back((int) ofRandom(5));
+        texture.push_back(0);
         
         // set depths, all zero by default
         zPosition.push_back(0.);
@@ -166,7 +157,7 @@ void Disc::addDisc(){
         resetPerlin.push_back(0);
         counter.push_back(0);
         
-        seed.push_back(0);
+        seed.push_back(perlinSeed);
         msa::Perlin* _zMotion = new msa::Perlin(4,2,1.,1);
         zMotion.push_back(_zMotion);
         

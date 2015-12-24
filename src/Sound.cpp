@@ -84,3 +84,62 @@ void Sound::setup(Disc* disc){
     
 }
 
+void Sound::newSynth(int index){
+    
+    // synthesis network
+    
+    Generator groove;
+    
+    ControlGenerator bpm =  synth.addParameter("bpm"+ofToString(index), 0);
+    ControlGenerator metronome = ControlMetro().bpm(bpm);
+    
+    //        float pulseRatio = ofMap(disc->getDensity(i), 1, 30, 0.05, .9);
+    //        ControlGenerator pulseLength = synth.addParameter("pulseLength"+ofToString(i), pulseRatio);
+    ControlGenerator halfPulse = 30 / (bpm+0.001);
+    ControlGenerator pulse = ControlPulse().length(halfPulse).input(metronome);
+    
+    float envelopeCoeff = ofMap(disc->getDensity(index), 1, 30, .1, 10);
+    ControlGenerator envelope = synth.addParameter("envelopeWidth"+ofToString(index), envelopeCoeff);
+    ControlGenerator attack = synth.addParameter("attack"+ofToString(index),disc->getEnvelope(index, 0));
+    ControlGenerator decay = synth.addParameter("decay"+ofToString(index),disc->getEnvelope(index, 1));
+    ControlGenerator sustain = synth.addParameter("sustain"+ofToString(index),disc->getEnvelope(index, 2));
+    ControlGenerator release = synth.addParameter("release"+ofToString(index),disc->getEnvelope(index, 3));
+    Generator amplitude = ADSR().
+    attack(attack*envelope).
+    decay(decay*envelope).
+    sustain(sustain*envelope).
+    release(release*envelope).
+    trigger(pulse);
+    
+    
+    float pitch = ofMap(abs(disc->getNetRotationSpeed(index)), 0, 10, 50, 1500);
+    ControlGenerator freq = synth.addParameter("freq"+ofToString(index), pitch);
+    ControlGenerator amountFreq = synth.addParameter("amountFreq"+ofToString(index));
+    ControlGenerator amountMod = synth.addParameter("amountMod"+ofToString(index),0);
+    
+    Generator modulation = SineWave().freq(amountFreq) * amountMod;
+    Generator snd = SawtoothWave().freq(freq+modulation);
+    
+    
+    float volCoeff = 1;
+    if(disc->getTexture(index) == 1) volCoeff = 1.1;
+    else if(disc->getTexture(index) == 2) volCoeff = .7;
+    else if(disc->getTexture(index) == 3) volCoeff = .5;
+    else if(disc->getTexture(index) == 4) volCoeff = .1;
+    
+    ControlGenerator volumeBalance = synth.addParameter("volBalance"+ofToString(index), volCoeff);
+    groove = snd * amplitude * volumeBalance;
+    
+    float qTarget = ofMap(disc->getThickness(index), 15, 100, 10, 0);
+    ControlGenerator q = synth.addParameter("q"+ofToString(index),qTarget).max(10);
+    Generator filter = BPF12().input(groove).cutoff(freq).Q(q);
+    
+    Generator delay = StereoDelay(0, .0025*index).input(filter).feedback(.01).delayTimeLeft(0).delayTimeRight(.0025*index);
+    
+    float distAmount = ofMap(disc->getSpikeDistance(index), 0., 100., 1., 40.);
+    ControlGenerator gainAmount = synth.addParameter("drive"+ofToString(index),distAmount).max(40.);
+    Generator hardClip = Limiter().input(delay).makeupGain(gainAmount).threshold(.70);
+    
+    master = master + hardClip;
+    
+}

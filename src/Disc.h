@@ -27,7 +27,7 @@ class Disc{
     
     int getDiscIndex() const;
     void setDiscIndex(int value);
-    void addDisc();
+    void addDisc(int newIndex, int perlinSeed);
     
     float getRadius(int index) const;
     void setRadius(int index, float size);
