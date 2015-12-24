@@ -71,7 +71,7 @@ void Sound::setup(Disc* disc){
         
         float distAmount = ofMap(disc->getSpikeDistance(i), 0., 100., 1., 40.);
         ControlGenerator gainAmount = synth.addParameter("drive"+ofToString(i),distAmount).max(40.);
-        Generator hardClip = Limiter().input(delay).makeupGain(gainAmount).threshold(.70);
+        Generator hardClip = Limiter().input(delay).makeupGain(gainAmount).threshold(.5);
         
         master = master + hardClip;
     }
@@ -138,7 +138,7 @@ void Sound::newSynth(int index){
     
     float distAmount = ofMap(disc->getSpikeDistance(index), 0., 100., 1., 40.);
     ControlGenerator gainAmount = synth.addParameter("drive"+ofToString(index),distAmount).max(40.);
-    Generator hardClip = Limiter().input(delay).makeupGain(gainAmount).threshold(.70);
+    Generator hardClip = Limiter().input(delay).makeupGain(gainAmount).threshold(.5);
     
     master = master + hardClip;
     
