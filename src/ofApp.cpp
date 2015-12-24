@@ -29,7 +29,17 @@ void ofApp::setup(){
     ofSetVerticalSync(true);
     ofBackground(255);
     ofSetFrameRate(30);
+    
     if( me == NULL){
+        
+        // set up values of objects
+        disc.setup();
+        
+        //set up synths
+        sound.setup(&disc);
+        
+        
+        //set up gui
         initialize = new ofxUICanvas();
         initialize->setPosition(ofGetWidth()/2-125, ofGetHeight()/2-50);
         initialize->setFont(OF_TTF_MONO);
@@ -44,33 +54,34 @@ void ofApp::setup(){
         initialize->addTextInput("nick", "");
         initialize->autoSizeToFitWidgets();
         ofAddListener(initialize->newGUIEvent, this, &ofApp::guiEvent);
-    }
-    
-    //set up gui
-    dashboard = new ofxUICanvas();
-    dashboard->setFont(OF_TTF_MONO);
-    dashboard->setPosition(ofGetWidth()/2-125, ofGetHeight()-25);
-    dashboard->addMultiImageToggle("inner", "butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
-    dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    dashboard->addMultiImageToggle("outer", "butonlar/buton-07.png",false, 20, 20);
-    dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    dashboard->addToggle("move all", false);
-    dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    dashboard->addButton("reset all", false);
-    dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    dashboard->addLabelToggle("chat", true);
-    dashboard->autoSizeToFitWidgets();
-    if (me == NULL) dashboard->setVisible(false);
-    if (me != NULL) dashboard->setColorBack(me->getColor());
-    ofAddListener(dashboard->newGUIEvent, this, &ofApp::guiEvent);
-    
-    
-    if(me == NULL) {
-        // set up values of objects
-        disc.setup();
         
-        //set up synths
-        sound.setup(&disc);
+        dashboard = new ofxUICanvas();
+        dashboard->setFont(OF_TTF_MONO);
+        dashboard->setPosition(ofGetWidth()/2-125, ofGetHeight()-30);
+        dashboard->addMultiImageToggle("inner", "butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
+        dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+        dashboard->addMultiImageToggle("outer", "butonlar/buton-07.png",false, 20, 20);
+        dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+        dashboard->addToggle("move all", false);
+        dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+        dashboard->addButton("reset all", false);
+        dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+        dashboard->addLabelToggle("chat", true);
+        dashboard->autoSizeToFitWidgets();
+        dashboard->setVisible(false);
+        ofAddListener(dashboard->newGUIEvent, this, &ofApp::guiEvent);
+        
+        addDisc = new ofxUICanvas();
+        addDisc->setFont(OF_TTF_MONO);
+        addDisc->addSpacer();
+        addDisc->addLabel("none");
+        ofxUILabel *label = (ofxUILabel*) addDisc->getWidget("none");
+        addDisc->addWidgetPosition(label, OFX_UI_WIDGET_POSITION_RIGHT, OFX_UI_ALIGN_CENTER);
+        addDisc->addButton("new", false);
+        ofxUIButton *button = (ofxUIButton*) addDisc->getWidget("new");
+        addDisc->addWidgetPosition(button, OFX_UI_WIDGET_POSITION_DOWN, OFX_UI_ALIGN_CENTER);
+        addDisc->setVisible(false);
+        ofAddListener(addDisc->newGUIEvent, this, &ofApp::guiEvent);
         
         for(int i = 0; i < disc.getDiscIndex(); i++){
             
@@ -131,60 +142,47 @@ void ofApp::setup(){
             
         }
         
+        chat = new ofxUICanvas();
+        chat->setFont(OF_TTF_MONO);
+        chat->setDrawBack(false);
+        int chatWidth = 700;
+        chat->setPosition(ui[0]->getGlobalCanvasWidth()+10, 0);
+        chat->setDimensions(chatWidth, ofGetHeight());
+        chat->setColorFill(ofxUIColor(50,50,50,150));
+        conversation = "";
+        chat->addTextInput("chatInput", "", OFX_UI_FONT_SMALL)->setAutoUnfocus(false);
+        chat->addTextArea("chat", "", OFX_UI_FONT_SMALL);
+        if (me == NULL) chat->setVisible(false);
+        chat->autoSizeToFitWidgets();
+        ofAddListener(chat->newGUIEvent, this, &ofApp::guiEvent);
+        
+        history = new ofxUICanvas();
+        history->setDrawBack(false);
+        history->setFont(OF_TTF_MONO);
+        history->setColorFill(ofxUIColor(25));
+        history->setPosition(0, ofGetHeight()/2 - 50);
+        history->setDimensions(dashboard->getGlobalCanvasWidth()+250, ofGetHeight()/2 + 70);
+        historyText = "";
+        history->addTextArea("history", historyText, OFX_UI_FONT_SMALL);
+        if (me == NULL) history->setVisible(false);
+        history->autoSizeToFitWidgets();
     }
     
     if( me != NULL){
+        
+        //give player colors to UI
         for(int i = 0; i < disc.getDiscIndex(); i++){
             ui[i]->setColorBack(me->getColor());
         }
+        
+        addDisc->setColorBack(me->getColor());
+        dashboard->setColorBack(me->getColor());
+        
+        addDisc->setVisible(true);
+        
+        //set up audio stream & synth network
+        ofSoundStreamSetup(2, 0); // 2 out, 0 in
     }
-    
-    
-    //	updateButtons = new ofxUICanvas();
-    //	updateButtons->setPosition(0, ofGetHeight()/2-70);
-    //	updateButtons->setDrawBack(false);
-    //	updateButtons->setFontSize(OFX_UI_FONT_SMALL, 7);
-    //	ofAddListener(updateButtons->newGUIEvent, this, &ofApp::guiEvent);
-    
-    chat = new ofxUICanvas();
-    chat->setFont(OF_TTF_MONO);
-    chat->setDrawBack(false);
-    int chatWidth = 700;
-    chat->setPosition(dashboard->getGlobalCanvasWidth()+10, 0);
-    chat->setDimensions(chatWidth, ofGetHeight());
-    chat->setColorFill(ofxUIColor(50,50,50,150));
-    conversation = "";
-    chat->addTextInput("chatInput", "", OFX_UI_FONT_SMALL)->setAutoUnfocus(false);
-    chat->addTextArea("chat", "", OFX_UI_FONT_SMALL);
-    if (me == NULL) chat->setVisible(false);
-    chat->autoSizeToFitWidgets();
-    
-    history = new ofxUICanvas();
-    history->setDrawBack(false);
-    history->setFont(OF_TTF_MONO);
-    history->setColorFill(ofxUIColor(25));
-    history->setPosition(0, ofGetHeight()/2 - 50);
-    history->setDimensions(dashboard->getGlobalCanvasWidth()+250, ofGetHeight()/2 + 70);
-    historyText = "";
-    history->addTextArea("history", historyText, OFX_UI_FONT_SMALL);
-    if (me == NULL) history->setVisible(false);
-    history->autoSizeToFitWidgets();
-    
-    ofAddListener(chat->newGUIEvent, this, &ofApp::guiEvent);
-    
-    //set up audio stream & synth network
-    if (me != NULL) ofSoundStreamSetup(2, 0); // 2 out, 0 in
-    
-    //        sound.setup(&disc);
-    
-    //	// set up game costs
-    //	costRadius = 1;
-    //	costDensity = 1;
-    //	costRotation = 1;
-    //	costTexture = 1;
-    //	costMute = 1;
-    //	costMove = 1;
-    //	reward = 1;
     
 }
 //--------------------------------------------------------------
@@ -206,12 +204,12 @@ void ofApp::exit(){
         //this part crashes at exit!
         
         //deleting ui elements
-        //        for(int i = 0; i < disc.getDiscIndex(); i++){
-        //            delete ui[i]
-        //        }
-        //        delete dashboard;
-        //        delete chat;
-        //        delete history;
+//        for(int i = 0; i < disc.getDiscIndex(); i++){
+//            delete ui[i];
+//        }
+//        delete dashboard;
+//        delete chat;
+//        delete history;
     }
     delete initialize;
     
@@ -270,7 +268,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     soundChange("freq", i, frequency);
                     soundChange("bpm", i, beatSpeed*beatDensity);
                     
-                   
+                    
                     
                 }
                 else if (disc.getTexture(i) == 0) slider->setValue(0);
@@ -758,14 +756,22 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         else if(e.getName() == "chat"){
             ofxUIToggle *toggle = e.getToggle();
             
-            //toggle chat button           
+            //toggle chat button
             
             ofxUIToggle *dashboardChatToggle = static_cast <ofxUIToggle*> (dashboard->getWidget("chat"));
             dashboardChatToggle->setValue(toggle->getValue());
             
             chat->setVisible(toggle->getValue());
         }
-        
+        else if(e.getName() == "new"){
+            ofxUIButton *button = e.getButton();
+            if(button->getValue()) {
+                
+                
+                
+            }
+            
+        }
     }
 }
 
@@ -891,7 +897,7 @@ void ofApp::update(){
                             ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("spike"+ofToString(i+1)));
                             slider->setValue(disc.getSpikeDistance(i));
                         }
-                            
+                        
                         if(nameValue[0] == "texture"+ofToString(i)) {
                             disc.setTexture (i, ofToFloat(nameValue[1]));
                             //sound
@@ -1681,6 +1687,7 @@ void ofApp::keyPressed(int key){
         
         if(me->getDiscIndex() != -1){
             ui[me->getDiscIndex()]->setVisible(false);
+            addDisc->setVisible(true);
             me->setDiscIndex(-1);
             //send change to server
             string changeDisc = "otherPlayersIndex//";
@@ -1746,8 +1753,8 @@ void ofApp::soundChange(string name, int index, float value) {
         ofxUIButton *button1 = static_cast <ofxUIButton*> (canvas->getWidget("move"));
         ofxUIButton *button2 = static_cast <ofxUIButton*> (canvas->getWidget("reset"));
         ofxUIButton *button3 = static_cast <ofxUIButton*> (canvas->getWidget("mute"));
-
-
+        
+        
         
         if(disc.getTexture(index) == 0){
             slider1->setVisible(false);
@@ -1776,26 +1783,74 @@ void ofApp::soundChange(string name, int index, float value) {
 }
 
 //--------------------------------------------------------------
-//void ofApp::refreshUpdateButtons(){
-//
-//    if(updateButtonsArray.size() > 8){
-//        ofxUILabelToggle *toggle0 = updateButtonsArray.front();
-//        updateButtons->removeWidget(toggle0);
-//        updateButtonsArray.erase(updateButtonsArray.begin());
-//    }
-//    updateButtons->clearWidgets();
-//    for(int i = updateButtonsArray.size()-1; i >= 0; i--){
-//        ofxUILabelToggle *thisToggle = updateButtonsArray[i];
-//
-//        thisToggle = updateButtons->addLabelToggle(thisToggle->getName(), thisToggle->getValue(), 200, 50);
-//        if( thisToggle->getValue() == false){
-//            thisToggle->setColorBack(updateButtonsArray[i]->getColorBack());
-//        }
-//        updateButtonsArray[i] = thisToggle;
-//    }
-//    updateButtons->autoSizeToFitWidgets();
-//
-//}
+void ofApp::newDisc(){
+    
+    if(disc.getDiscIndex() < 9) {
+        
+        //new disc
+        disc.addDisc();
+        int newIndex = disc.getDiscIndex()-1;
+        
+        //new UI
+        ofxUICanvas *_ui;
+        
+        _ui = new ofxUICanvas();
+        _ui->setFont(OF_TTF_MONO);
+        _ui->addMultiImageToggle("inner","butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
+        _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+        _ui->addLabel("Groove " + ofToString(newIndex+1),0);
+        ofxUILabel *label = (ofxUILabel*) _ui->getWidget("Groove " + ofToString(newIndex+1));
+        _ui->addWidgetPosition(label,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_CENTER);
+        _ui->addMultiImageToggle("outer", "butonlar/buton-07.png",false, 20, 20);
+        ofxUIMultiImageToggle *toggle = (ofxUIMultiImageToggle*) _ui->getWidget("outer");
+        _ui->addWidgetPosition(toggle,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_RIGHT);
+        _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+        _ui->addSpacer();
+        
+        _ui->addLabel("texture", 1);
+        if(disc.getTexture(newIndex)==0) _ui->addMultiImageButton("blank","butonlar/buton-01.png", true, 35,35);
+        else _ui->addMultiImageButton("blank","butonlar/buton-01.png", false, 35,35);
+        _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+        if(disc.getTexture(newIndex)==1) _ui->addMultiImageButton("line", "butonlar/buton-02.png", true, 35,35);
+        else _ui->addMultiImageButton("line", "butonlar/buton-02.png", false, 35,35);
+        if(disc.getTexture(newIndex)==2) _ui->addMultiImageButton("tri", "butonlar/buton-03.png", true, 35,35);
+        else _ui->addMultiImageButton("tri", "butonlar/buton-03.png", false, 35,35);
+        if(disc.getTexture(newIndex)==3) _ui->addMultiImageButton("saw", "butonlar/buton-04.png", true, 35,35);
+        else _ui->addMultiImageButton("saw", "butonlar/buton-04.png", false, 35,35);
+        if(disc.getTexture(newIndex)==4) _ui->addMultiImageButton("rect", "butonlar/buton-05.png", true, 35,35);
+        else _ui->addMultiImageButton("rect", "butonlar/buton-05.png", false, 35,35);
+        _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+        
+        _ui->addLabel("rotation speed",1);
+        _ui->addBiLabelSlider("rotation" + ofToString(newIndex+1), "<", ">", 10, -10, disc.getNetRotationSpeed(newIndex));
+        _ui->addLabel("density",1);
+        _ui->addBiLabelSlider("density" + ofToString(newIndex+1), "| | |", "|||||", 30, 3, disc.getDensity(newIndex));
+        _ui->addLabel("size",1);
+        _ui->addBiLabelSlider("radius" + ofToString(newIndex+1), "o", "O", 15, 100, disc.getThickness(newIndex));
+        _ui->addLabel("spike",1);
+        _ui->addBiLabelSlider("spike" + ofToString(newIndex+1), ".", "^", 0, 100, disc.getSpikeDistance(newIndex));
+        
+        
+        _ui->addLabel("z-motion",1);
+        _ui->addToggle("move", disc.isMoving(newIndex));
+        _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+        _ui->addButton("reset", disc.resetPerlin[newIndex]);
+        _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+        _ui->addLabelToggle("mute", disc.isMute(newIndex));
+        
+        _ui->autoSizeToFitWidgets();
+        
+        if(me != NULL && newIndex == me->getDiscIndex()) _ui->setVisible(true);
+        else _ui->setVisible(false);
+        
+        ofAddListener(_ui->newGUIEvent, this, &ofApp::guiEvent);
+        
+        ui.push_back(_ui);
+        
+        
+        
+    }
+}
 
 
 //--------------------------------------------------------------
@@ -1880,7 +1935,7 @@ void ofApp::mouseReleased(int x, int y, int button){
         
         string change = "spike//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getSpikeDistance(me->getDiscIndex()))+"//"+me->getIP();
         client.send(change);
-    
+        
         
         //update history//
         string eventHistory = me->getNick() + "//" + "Grv"+ofToString(me->getDiscIndex()+1)+ "//" + "spike:" + ofToString(disc.getSpikeDistance(me->getDiscIndex())) +"\n\n";

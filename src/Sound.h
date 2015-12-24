@@ -33,7 +33,7 @@ public:
     void setScale(int index, float value);
     
 private:
-//    vector<float> scale;
+    void newSynth(int index);
 };
 
 #endif /* defined(__groove_snd__Sound__) */

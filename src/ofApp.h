@@ -57,7 +57,7 @@ class ofApp : public ofBaseApp{
     muteChanged,
     spikeChanged;
     
-    void refreshUpdateButtons();
+    void newDisc();
 		
     
     ofEasyCam cam;
@@ -79,8 +79,6 @@ private:
     int port;
     int loginMinute;
     float loginSecond;
-    
-//    float newRotation;
     float thisRotation;
     
     Groove groove;
@@ -92,10 +90,8 @@ private:
     
     vector<ofxUICanvas *> ui;
     ofxUICanvas *dashboard;
+    ofxUICanvas *addDisc;
     
-    //update buttons will be removed
-//    vector<ofxUILabelToggle *> updateButtonsArray;
-//    ofxUICanvas *updateButtons;
     
     ofxUICanvas *initialize;
     

@@ -121,8 +121,6 @@ void Disc::setDiscIndex(int value){
 
 void Disc::addDisc(){
     
-    //maximum 9 discs
-    if(discIndex <= 9) {
         
         discIndex++;
         
@@ -171,7 +169,7 @@ void Disc::addDisc(){
         seed.push_back(0);
         msa::Perlin* _zMotion = new msa::Perlin(4,2,1.,1);
         zMotion.push_back(_zMotion);
-    }
+        
     
 }
 
