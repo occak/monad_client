@@ -652,21 +652,27 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         }
         else if(e.getName() == "reset all"){
             ofxUIButton *button = e.getButton();
-            if(me->getLife()>0){
-                if(button->getValue() == true){
-                    int costFactor = 0;
+            
+            if(button->getValue() == true){
+                int costFactor = 0;
+                for(int j = 0; j<disc.getDiscIndex(); j++){
+                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
+                    ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                    if(disc.getPosition(j) != 0) costFactor++;
+                }
+                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (dashboard);
+                ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (canvas->getWidget("move all"));
+                toggleMoveAll->setValue(false);
+                
+                if(me->getLife() >= abs(costMove*costFactor) && costFactor != 0){
                     for(int j = 0; j<disc.getDiscIndex(); j++){
                         ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
                         ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
                         if(disc.getPosition(j) != 0){
                             toggleMove->setValue(false);
                             disc.resetPerlin[j] = 1;
-                            costFactor++;
                         }
                     }
-                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (dashboard);
-                    ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (canvas->getWidget("move all"));
-                    toggleMoveAll->setValue(false);
                     
                     me->changeLife(costMove*costFactor);
                     string resetAll = "resetAll//"+me->getIP();
@@ -679,14 +685,14 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     client.send(lifeUpdate);
                     
                     //update history//
-                    if(costFactor > 0){
-                        string eventHistory = me->getNick() + "//reset all\n\n";
-                        historyText = eventHistory + historyText;
-                        
-                        ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-                        _history->setTextString(historyText);
-                    }
+                    string eventHistory = me->getNick() + "//reset all\n\n";
+                    historyText = eventHistory + historyText;
+                    
+                    ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                    _history->setTextString(historyText);
+                    
                 }
+                
             }
         }
         else if(e.getName() == "mute"){
