@@ -200,7 +200,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 float changeRotation = slider->getScaledValue()-disc.getNetRotationSpeed(i);
                 
                 
-                if(me->getLife() > 0 && mReleased == false && disc.getTexture(i) != 0 && changeRotation != 0) {
+                if(me->getLife() >= abs(costRotation) && mReleased == false && disc.getTexture(i) != 0 && changeRotation != 0) {
                     rotationChanged = true;
                     disc.setRotationSpeed(i, changeRotation);
                     
@@ -225,7 +225,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 ofxUISlider *slider = e.getSlider();
                 float currentSize = disc.getThickness(i);
                 
-                if(me->getLife() > 0 && mReleased == false && slider->getScaledValue() != currentSize) {
+                if(me->getLife() >= abs(costRadius) && mReleased == false && slider->getScaledValue() != currentSize) {
                     radiusChanged = true;
                     disc.setThickness(i, slider->getScaledValue());
                     
@@ -239,7 +239,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 ofxUISlider *slider = e.getSlider();
                 float currentDensity = disc.getDensity(i);
                 
-                if(me->getLife()> 0 && mReleased == false && (int) slider->getScaledValue() != currentDensity) {
+                if(me->getLife() >= abs(costDensity) && mReleased == false && (int) slider->getScaledValue() != currentDensity) {
                     densityChanged = true;
                     disc.setDensity(i, slider->getScaledValue());
                     
@@ -261,7 +261,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 ofxUISlider *slider = e.getSlider();
                 float spikeHeight = disc.getSpikeDistance(i);
                 
-                if(me->getLife()> 0 && mReleased == false && slider->getScaledValue() != spikeHeight) {
+                if(me->getLife() >= abs(costSpike) && mReleased == false && slider->getScaledValue() != spikeHeight) {
                     spikeChanged = true;
                     disc.setSpikeDistance(i, slider->getScaledValue());
                     
@@ -361,7 +361,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             
             ofxUIToggle *toggle = e.getToggle();
             int texture = disc.getTexture(me->getDiscIndex());
-            if(me->getLife()> 0 && texture != 0 && toggle->getValue() == true) {
+            if(me->getLife() >= abs(costTexture) && texture != 0 && toggle->getValue() == true) {
                 textureChanged = true;
                 disc.setTexture(me->getDiscIndex(), 0);
                 ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
@@ -402,7 +402,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         else if(e.getName() == "line"){
             ofxUIToggle *toggle = e.getToggle();
             int texture = disc.getTexture(me->getDiscIndex());
-            if(me->getLife()> 0 && texture != 1 && toggle->getValue() == true) {
+            if(me->getLife() >= abs(costTexture) && texture != 1 && toggle->getValue() == true) {
                 textureChanged = true;
                 disc.setTexture(me->getDiscIndex(), 1);
                 ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
@@ -434,7 +434,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         else if(e.getName() == "tri"){
             ofxUIToggle *toggle = e.getToggle();
             int texture = disc.getTexture(me->getDiscIndex());
-            if(me->getLife() > 0 && texture != 2 && toggle->getValue() == true) {
+            if(me->getLife() >= abs(costTexture) && texture != 2 && toggle->getValue() == true) {
                 textureChanged = true;
                 disc.setTexture(me->getDiscIndex(), 2);
                 ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
@@ -465,7 +465,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         else if(e.getName() == "saw"){
             ofxUIToggle *toggle = e.getToggle();
             int texture = disc.getTexture(me->getDiscIndex());
-            if(me->getLife() > 0 && texture != 3 && toggle->getValue() == true) {
+            if(me->getLife() >= abs(costTexture) && texture != 3 && toggle->getValue() == true) {
                 textureChanged = true;
                 disc.setTexture(me->getDiscIndex(), 3);
                 ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
@@ -496,7 +496,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         else if(e.getName() == "rect"){
             ofxUIToggle *toggle = e.getToggle();
             int texture = disc.getTexture(me->getDiscIndex());
-            if(me->getLife() > 0 && texture != 4 && toggle->getValue() == true) {
+            if(me->getLife() >= abs(costTexture) && texture != 4 && toggle->getValue() == true) {
                 textureChanged = true;
                 disc.setTexture(me->getDiscIndex(), 4);
                 ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
@@ -525,7 +525,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         }
         else if(e.getName() == "move"){
             ofxUIToggle *toggle = e.getToggle();
-            if(me->getLife() > 0){
+            if(me->getLife() >= abs(costMove)){
                 moveChanged = true;
                 if (toggle->getValue() == true) disc.setMoving(me->getDiscIndex(), 1);
                 else disc.setMoving(me->getDiscIndex(), 0);
@@ -543,7 +543,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         }
         else if(e.getName() == "reset"){
             ofxUIButton *button = e.getButton();
-            if(me->getLife() > 0 && disc.getPosition(me->getDiscIndex()) != 0){
+            if(me->getLife() >= abs(costMove) && disc.getPosition(me->getDiscIndex()) != 0){
                 moveReset = true;
                 disc.resetPerlin[me->getDiscIndex()] = 1;
                 ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
@@ -562,38 +562,45 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         else if(e.getName() == "move all"){
             ofxUIToggle *toggle = e.getToggle();
             
-            if(me->getLife()>0){
+
                 
                 if(toggle->getValue() == true){
                     
                     int costFactor = 0;
-                    for(int j = 0; j<disc.getDiscIndex(); j++){
+                    for(int j = 0; j < disc.getDiscIndex(); j++){
                         ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
                         ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                        if(toggleMove->getValue()==false){
-                            toggleMove->setValue(true);
-                            disc.setMoving(j, 1);
-                            costFactor++;
-                        }
+                        if(toggleMove->getValue()==false) costFactor++;
                     }
                     
-                    me->changeLife(costMove*costFactor);
-                    string moveAll = "moveAll//"+me->getIP();
-                    client.send(moveAll);
-                    
-                    //update server
-                    string lifeUpdate = "life//";
-                    lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-                    lifeUpdate += "lifeChange: "+ofToString(costMove*costFactor) + "//";
-                    client.send(lifeUpdate);
-                    
-                    //update history//
-                    if(costFactor > 0){
+                    if(me->getLife() >= abs(costMove*costFactor) && costFactor != 0){
+                        
+                        for(int j = 0; j<disc.getDiscIndex(); j++){
+                            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
+                            ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                            if(toggleMove->getValue()==false){
+                                toggleMove->setValue(true);
+                                disc.setMoving(j, 1);
+                            }
+                        }
+                        
+                        me->changeLife(costMove*costFactor);
+                        string moveAll = "moveAll//"+me->getIP();
+                        client.send(moveAll);
+                        
+                        //update server
+                        string lifeUpdate = "life//";
+                        lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+                        lifeUpdate += "lifeChange: "+ofToString(costMove*costFactor) + "//";
+                        client.send(lifeUpdate);
+                        
+                        //update history//
                         string eventHistory = me->getNick() + "//move all\n\n";
                         historyText = eventHistory + historyText;
-                        
+                            
                         ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
                         _history->setTextString(historyText);
+                        
                     }
                 }
                 if(toggle->getValue() == false){
@@ -601,37 +608,47 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     int costFactor = 0;
                     string zPositionAll = "zPositionAll//";
                     
-                    for(int i = 0; i<disc.getDiscIndex(); i++){
-                        ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
+                    for(int j = 0; j < disc.getDiscIndex(); j++){
+                        
+                        ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
                         ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                        if(toggleMove->getValue()==true){
-                            toggleMove->setValue(false);
-                            disc.setMoving(i, 0);
-                            costFactor++;
-                        }
-                        zPositionAll += ofToString(i)+": "+ofToString(disc.getPosition(i))+"//";
+                        if(toggleMove->getValue()==true) costFactor++;
                     }
-                    me->changeLife(costMove*costFactor);
-                    string stopAll = "stopAll//"+me->getIP();
-                    client.send(stopAll);
-                    client.send(zPositionAll);
                     
-                    //update server
-                    string lifeUpdate = "life//";
-                    lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-                    lifeUpdate += "lifeChange: "+ofToString(costMove*costFactor) + "//";
-                    client.send(lifeUpdate);
-                    
-                    //update history//
-                    if(costFactor > 0){
+                    if(me->getLife() >= abs(costMove*costFactor) && costFactor != 0){
+                        
+                        for(int j = 0; j < disc.getDiscIndex(); j++){
+                            
+                            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
+                            ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                            if(toggleMove->getValue()==true){
+                                toggleMove->setValue(false);
+                                disc.setMoving(j, 0);
+                            }
+                            zPositionAll += ofToString(j)+": "+ofToString(disc.getPosition(j))+"//";
+                        }
+                        
+                        me->changeLife(costMove*costFactor);
+                        string stopAll = "stopAll//"+me->getIP();
+                        client.send(stopAll);
+                        client.send(zPositionAll);
+                        
+                        //update server
+                        string lifeUpdate = "life//";
+                        lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+                        lifeUpdate += "lifeChange: "+ofToString(costMove*costFactor) + "//";
+                        client.send(lifeUpdate);
+                        
+                        //update history//
                         string eventHistory = me->getNick() + "//halt all\n\n";
                         historyText = eventHistory + historyText;
                         
                         ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
                         _history->setTextString(historyText);
+                        
                     }
                 }
-            }
+            
         }
         else if(e.getName() == "reset all"){
             ofxUIButton *button = e.getButton();
@@ -788,7 +805,7 @@ void ofApp::update(){
                 //graphic values
                 for (int i = 0; i < disc.getDiscIndex(); i++) {
                     
-                    disc.addDisc(i, 0);
+                    disc.addDisc(i);
                     newUI(i);
                     //mesh
                     groove.setup(&disc, me, otherPlayers);
@@ -1058,9 +1075,12 @@ void ofApp::update(){
                     if(playerData[0] == "netRotation") newRotation = ofToFloat(playerData[1]);
                 }
                 
+                cout<< newSeed <<endl;
                 
                 //new disc
-                disc.addDisc(newIndex, newSeed);
+                disc.addDisc(newIndex);
+                disc.setSeed(newIndex, newSeed);
+                disc.zMotionSetup(newIndex, newSeed);
                 disc.setNetRotationSpeed(newIndex, 0);
                 
                 //new mesh

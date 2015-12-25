@@ -114,7 +114,7 @@ void Disc::setDiscIndex(int value){
 
 //----------------------------------
 
-void Disc::addDisc(int newIndex, int perlinSeed){
+void Disc::addDisc(int newIndex){
     
         
         // generate radius information of discs
@@ -152,7 +152,7 @@ void Disc::addDisc(int newIndex, int perlinSeed){
         resetPerlin.push_back(0);
         counter.push_back(0);
         
-        seed.push_back(perlinSeed);
+        seed.push_back(0);
         msa::Perlin* _zMotion = new msa::Perlin(4,2,1.,1);
         zMotion.push_back(_zMotion);
         
