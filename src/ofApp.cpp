@@ -266,7 +266,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     disc.setSpikeDistance(i, slider->getScaledValue());
                     
                     //change gain
-                    float distAmount = ofMap(disc.getSpikeDistance(i), 0., 100., 1., 20.);
+                    float distAmount = ofMap(disc.getSpikeDistance(i), 0., 100., 1., 15., true);
                     soundChange("drive", i, distAmount);
                 }
             }
@@ -871,7 +871,7 @@ void ofApp::update(){
                             disc.setSpikeDistance(i, ofToFloat(nameValue[1]));
                             
                             //sound
-                            float distAmount = ofMap(disc.getSpikeDistance(i), 0., 100., 1., 20.);
+                            float distAmount = ofMap(disc.getSpikeDistance(i), 0., 100., 1., 15., true);
                             soundChange("drive", i, distAmount);
                             
                             //ui
@@ -957,6 +957,7 @@ void ofApp::update(){
                 TCPsetup = true;
                 initialize->setVisible(false);
                 dashboard->setVisible(true);
+                keyList = true;
                 
                 loginMinute = ofGetMinutes();
                 loginSecond = ofGetElapsedTimef();
@@ -1263,7 +1264,7 @@ void ofApp::update(){
                 disc.setSpikeDistance(index, ofToFloat(nameValue[1]));
                 
                 //change sound
-                float distAmount = ofMap(disc.getSpikeDistance(index), 0., 100., 1., 20.);
+                float distAmount = ofMap(disc.getSpikeDistance(index), 0., 100., 1., 15., true);
                 soundChange("drive", index, distAmount);
                 
                 //update ui
@@ -1634,6 +1635,11 @@ void ofApp::draw(){
                 ofRect(groove.lifeBar[i+1]);
             }
         }
+        if(keyList){
+            ofSetColor(0);
+            ofDrawBitmapString("<esc> shut down\n<bck> deselect\n<t> timer\n<c> chat\n<w/s> navigate\n<k> key\n<f> fullscreen\n", ofGetWidth()/2 - 250, ofGetHeight()/2 - 150);
+            
+        }
         if(timer) {
             ofSetColor(0);
             ofDrawBitmapString(ofToString(roundf((ofGetElapsedTimef()-loginSecond)*100)/100)+" seconds elapsed", ofGetWidth()/2 - 250, ofGetHeight()/2 - 10);
@@ -1760,10 +1766,16 @@ void ofApp::keyPressed(int key){
     if(key == 'f') {
         fullScreen = !fullScreen;
         ofSetFullscreen(fullScreen);
+        
+        dashboard->setPosition(ofGetWidth()/2-125, ofGetHeight()-30);
     }
     
     if(key == 't' && TCPsetup) {
         timer = !timer;
+    }
+    
+    if(key == 'k' && TCPsetup) {
+        keyList = !keyList;
     }
     
 }
@@ -1772,13 +1784,6 @@ void ofApp::keyPressed(int key){
 void ofApp::audioOut( float * output, int bufferSize, int nChannels ) {
     
     sound.synth.fillBufferOfFloats(output, bufferSize, nChannels);
-    
-    
-    //    for(int i = 0; i < bufferSize; i++){
-    //        float value = 0.1 *sawWave(220);
-    //        output[2*i] = value;
-    //        output[2*i+1] = value;
-    //    }
     
 }
 
@@ -1797,7 +1802,7 @@ void ofApp::soundChange(string name, int index, float value) {
         
         
         float volCoeff = 1;
-        if(disc.getTexture(index) == 1) volCoeff = 1.1;
+        if(disc.getTexture(index) == 1) volCoeff = 1.2;
         else if(disc.getTexture(index) == 2) volCoeff = .6;
         else if(disc.getTexture(index) == 3) volCoeff = .45;
         else if(disc.getTexture(index) == 4) volCoeff = .1;
@@ -1813,8 +1818,6 @@ void ofApp::soundChange(string name, int index, float value) {
         ofxUIButton *button1 = static_cast <ofxUIButton*> (canvas->getWidget("move"));
         ofxUIButton *button2 = static_cast <ofxUIButton*> (canvas->getWidget("reset"));
         ofxUIButton *button3 = static_cast <ofxUIButton*> (canvas->getWidget("mute"));
-        
-        
         
         if(disc.getTexture(index) == 0){
             slider1->setVisible(false);
@@ -1834,8 +1837,6 @@ void ofApp::soundChange(string name, int index, float value) {
             button2->setVisible(true);
             button3->setVisible(true);
         }
-        
-        
     }
     
     else sound.synth.setParameter(name+ofToString(index), value);

@@ -72,6 +72,7 @@ class ofApp : public ofBaseApp{
 private:
     
     bool fullScreen;
+    bool keyList;
     bool mReleased;
     bool TCPsetup;
     bool timer;
