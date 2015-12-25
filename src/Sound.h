@@ -22,7 +22,7 @@ class Sound{
     
 public:
     
-    void setup(Disc* disc);
+    void setup();
     void update();
     void newSynth(int index);
     
