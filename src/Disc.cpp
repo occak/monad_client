@@ -128,7 +128,7 @@ void Disc::addDisc(int newIndex, int perlinSeed){
         // determine their initial rotation angle and speed
         rotation.push_back(0);
         rotationSpeed.push_back(0);
-        
+    
         // determine texture type
         texture.push_back(0);
         

@@ -171,6 +171,15 @@ void ofApp::setup(){
     
     if( me != NULL){
         
+        // set up values of objects
+//        disc.setup();
+        
+        //set up audio stream & synth network
+        ofSoundStreamSetup(2, 0); // 2 out, 0 in
+        sound.setup(&disc);
+        
+        
+        
         //give player colors to UI
         for(int i = 0; i < disc.getDiscIndex(); i++){
             ui[i]->setColorBack(me->getColor());
@@ -181,10 +190,11 @@ void ofApp::setup(){
         
         chat->setVisible(true);
         addDisc->setVisible(true);
+        history->setVisible(true);
         
-        //set up audio stream & synth network
-        ofSoundStreamSetup(2, 0); // 2 out, 0 in
     }
+    
+    
     
 }
 //--------------------------------------------------------------
@@ -843,8 +853,10 @@ void ofApp::update(){
                 for (int i = 0; i < disc.getDiscIndex(); i++) {
                     
                     disc.addDisc(i, 0);
-                    newUI(i);
                     sound.newSynth(i);
+                    newUI(i);
+                    //mesh
+                    groove.setup(&disc, me, otherPlayers);
                     
                     for(int j = 0; j < 11; j++){
                         nameValue = ofSplitString(received[j+(i*11)+2], ": ");
@@ -969,8 +981,6 @@ void ofApp::update(){
                         
                     }
                     
-                    //new mesh
-                    groove.setup(&disc, me, otherPlayers);
                     
                 }
                 //toggle move all button if all grooves are moving
@@ -994,7 +1004,6 @@ void ofApp::update(){
                 loginSecond = ofGetElapsedTimef();
                 
                 setup();
-                //                sound.setup(&disc);
             }
             
             else if (title == "costs"){
@@ -1026,6 +1035,7 @@ void ofApp::update(){
                 
                 me->setConnection(true);
                 groove.setup(&disc, me, otherPlayers);
+                
             }
             
             else if (title == "otherPlayers"){
@@ -1093,6 +1103,8 @@ void ofApp::update(){
                 
                 Player *_player = NULL;
                 int newSeed;
+                int newIndex;
+                float newRotation;
                 for(int i = 1; i < received.size(); i++ ){
                     vector<string> playerData = ofSplitString(received[i], ": ");
                     if(playerData[0] == "IP" && playerData[1] != me->getIP()){
@@ -1104,26 +1116,30 @@ void ofApp::update(){
                     
                     if(playerData[0] == "index") {
                         
-                        int newIndex = ofToInt(playerData[1]);
+                        newIndex = ofToInt(playerData[1]);
                         _player->setDiscIndex(newIndex);
                     }
                     
                     if(playerData[0] == "seed") newSeed = ofToInt(playerData[1]);
                     if(playerData[0] == "total") disc.setDiscIndex(ofToInt(playerData[1]));
+                    if(playerData[0] == "netRotation") newRotation = ofToFloat(playerData[1]);
                 }
                 
                 
                 //new disc
-                disc.addDisc(_player->getDiscIndex(), newSeed);
+                disc.addDisc(newIndex, newSeed);
+                disc.setNetRotationSpeed(newIndex, 0);
                 
                 //new mesh
                 groove.setup(&disc, me, otherPlayers);
                 
                 //sound
-                sound.newSynth(_player->getDiscIndex());
+                sound.newSynth(newIndex);
                 
                 //new UI
-                newUI(_player->getDiscIndex());
+                newUI(newIndex);
+                ui[newIndex]->setVisible(true);
+                addDisc->setVisible(false);
                 
             }
             
@@ -1679,69 +1695,77 @@ void ofApp::keyPressed(int key){
     }
     
     if(key == 'w' && TCPsetup){
-        int jump = 1;
-        bool occupied = true;
-        while(occupied == true){
-            occupied = false;
-            for(int i = 0; i < otherPlayers.size(); i++){
-                int destination = me->getDiscIndex() + jump;
-                if( destination >= disc.getDiscIndex()) destination -= disc.getDiscIndex();
-                if( otherPlayers[i]->getDiscIndex() == destination) {
-                    occupied = true;
-                    jump++;
-                    break;
+        
+        if(disc.getDiscIndex() != 0){
+            int jump = 1;
+            bool occupied = true;
+            while(occupied == true){
+                occupied = false;
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    int destination = me->getDiscIndex() + jump;
+                    if( destination >= disc.getDiscIndex()) destination -= disc.getDiscIndex();
+                    if( otherPlayers[i]->getDiscIndex() == destination) {
+                        occupied = true;
+                        jump++;
+                        break;
+                    }
                 }
             }
+            
+            if(jump > disc.getDiscIndex()) me->setDiscIndex(-1);
+            else if(me->getDiscIndex() + jump < disc.getDiscIndex()) me->setDiscIndex(me->getDiscIndex() + jump);
+            else me->setDiscIndex(me->getDiscIndex() + jump - disc.getDiscIndex());
+            
+            //change ui
+            for(int i = 0; i < disc.getDiscIndex(); i++){
+                ui[i]->setVisible(false);
+            }
+            addDisc->setVisible(false);
+            ui[me->getDiscIndex()]->toggleVisible();
+            
+            //send change to server
+            string changeDisc = "otherPlayersIndex//";
+            changeDisc += "IP: "+ofToString(me->getIP()) + "//";
+            changeDisc += "index: "+ofToString(me->getDiscIndex()) + "//";
+            client.send(changeDisc);
         }
-        
-        if(me->getDiscIndex() + jump < disc.getDiscIndex()) me->setDiscIndex(me->getDiscIndex() + jump);
-        else me->setDiscIndex(me->getDiscIndex() + jump - disc.getDiscIndex());
-        
-        //change ui
-        for(int i = 0; i < disc.getDiscIndex(); i++){
-            ui[i]->setVisible(false);
-        }
-        addDisc->setVisible(false);
-        ui[me->getDiscIndex()]->toggleVisible();
-        
-        //send change to server
-        string changeDisc = "otherPlayersIndex//";
-        changeDisc += "IP: "+ofToString(me->getIP()) + "//";
-        changeDisc += "index: "+ofToString(me->getDiscIndex()) + "//";
-        client.send(changeDisc);
     }
     
     if(key == 's' && TCPsetup){
-        int jump = -1;
-        bool occupied = true;
-        while(occupied == true){
-            occupied = false;
-            for(int i = 0; i < otherPlayers.size(); i++){
-                int destination = me->getDiscIndex() + jump;
-                if( destination < 0 ) destination += disc.getDiscIndex();
-                if( otherPlayers[i]->getDiscIndex() == destination) {
-                    occupied = true;
-                    jump--;
-                    break;
+        if(disc.getDiscIndex() != 0){
+            int jump = -1;
+            bool occupied = true;
+            while(occupied == true){
+                occupied = false;
+                for(int i = 0; i < otherPlayers.size(); i++){
+                    int destination = me->getDiscIndex() + jump;
+                    if( destination < 0 ) destination += disc.getDiscIndex();
+                    if( otherPlayers[i]->getDiscIndex() == destination) {
+                        occupied = true;
+                        jump--;
+                        break;
+                    }
                 }
             }
+            int newIndex = me->getDiscIndex() + jump;
+            
+            if(abs(jump) > disc.getDiscIndex()) me->setDiscIndex(-1);
+            else if(newIndex <= -1) me->setDiscIndex(newIndex + disc.getDiscIndex());
+            else if(newIndex> -1) me->setDiscIndex(newIndex);
+            
+            //change ui
+            for(int i = 0; i < disc.getDiscIndex(); i++){
+                ui[i]->setVisible(false);
+            }
+            addDisc->setVisible(false);
+            ui[me->getDiscIndex()]->toggleVisible();
+            
+            //send change to server
+            string changeDisc = "otherPlayersIndex//";
+            changeDisc += "IP: "+ofToString(me->getIP()) + "//";
+            changeDisc += "index: "+ofToString(me->getDiscIndex()) + "//";
+            client.send(changeDisc);
         }
-        int newIndex = me->getDiscIndex() + jump;
-        if(newIndex <= -1) me->setDiscIndex(newIndex + disc.getDiscIndex());
-        else if(newIndex> -1) me->setDiscIndex(newIndex);
-        
-        //change ui
-        for(int i = 0; i < disc.getDiscIndex(); i++){
-            ui[i]->setVisible(false);
-        }
-        addDisc->setVisible(false);
-        ui[me->getDiscIndex()]->toggleVisible();
-        
-        //send change to server
-        string changeDisc = "otherPlayersIndex//";
-        changeDisc += "IP: "+ofToString(me->getIP()) + "//";
-        changeDisc += "index: "+ofToString(me->getDiscIndex()) + "//";
-        client.send(changeDisc);
     }
     
     if(key == OF_KEY_BACKSPACE && TCPsetup) {
@@ -1909,12 +1933,36 @@ void ofApp::newUI(int newIndex){
         _ui->setColorBack(me->getColor());
     
     
-        addDisc->setVisible(false);
-        for(int i = ui.size()-1; i >= 0; i--)
-        {
-            ui[i]->setVisible(false);
-        }
+    //ui
+    ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[newIndex]);
+    ofxUISlider *slider1 = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(newIndex+1)));
+    ofxUISlider *slider2 = static_cast <ofxUISlider*> (canvas->getWidget("density"+ofToString(newIndex+1)));
+    ofxUISlider *slider3 = static_cast <ofxUISlider*> (canvas->getWidget("radius"+ofToString(newIndex+1)));
+    ofxUISlider *slider4 = static_cast <ofxUISlider*> (canvas->getWidget("spike"+ofToString(newIndex+1)));
+    ofxUIButton *button1 = static_cast <ofxUIButton*> (canvas->getWidget("move"));
+    ofxUIButton *button2 = static_cast <ofxUIButton*> (canvas->getWidget("reset"));
+    ofxUIButton *button3 = static_cast <ofxUIButton*> (canvas->getWidget("mute"));
     
+    
+    
+    if(disc.getTexture(newIndex) == 0){
+        slider1->setVisible(false);
+        slider2->setVisible(false);
+        slider3->setVisible(false);
+        slider4->setVisible(false);
+        button1->setVisible(false);
+        button2->setVisible(false);
+        button3->setVisible(false);
+    }
+    else {
+        slider1->setVisible(true);
+        slider2->setVisible(true);
+        slider3->setVisible(true);
+        slider4->setVisible(true);
+        button1->setVisible(true);
+        button2->setVisible(true);
+        button3->setVisible(true);
+    }
 
 }
 

@@ -77,10 +77,10 @@ void Sound::setup(Disc* disc){
     }
     
     ControlGenerator wet = synth.addParameter("wet", 0.).max(.5).min(0.);
-    Generator limiter = Limiter().input(master).threshold(0.8);
-    Generator reverb = Reverb().input(limiter).stereoWidth(.5).roomSize(.4).wetLevel(wet);
-    ControlGenerator masterLevel = synth.addParameter("master", .99).max(.99).min(0.);
-    synth.setOutputGen(masterLevel*reverb);
+    Generator reverb = Reverb().input(master).stereoWidth(.5).roomSize(.4).wetLevel(wet);
+    Generator limiter = Limiter().input(reverb).threshold(0.95);
+    ControlGenerator masterLevel = synth.addParameter("master", .95).max(.95).min(0.);
+    synth.setOutputGen(masterLevel*limiter);
     
 }
 
