@@ -127,24 +127,25 @@ void Groove::draw(){
         //draw circles
         ofSetLineWidth(3);
         ofNoFill();
-        ofSetColor(50);
-        if( i != me->getDiscIndex() && disc->isMute(i) == 1) ofSetColor(ofColor::lightGrey);
+        ofColor fillColor = 50;
+        if( i != me->getDiscIndex() && disc->isMute(i) == 1) fillColor = ofColor::lightGrey;
         if( otherPlayers.size() > 0){
             for (int j = 0; j < otherPlayers.size(); j++) {
-                if( i == otherPlayers[j]->getDiscIndex() && disc->isMute(otherPlayers[j]->getDiscIndex()) == 0) ofSetColor(otherPlayers[j]->getColor());
+                if( i == otherPlayers[j]->getDiscIndex() && disc->isMute(otherPlayers[j]->getDiscIndex()) == 0) fillColor = otherPlayers[j]->getColor();
                 else if( i == otherPlayers[j]->getDiscIndex() && disc->isMute(otherPlayers[j]->getDiscIndex()) == 1){
                     ofColor pale = otherPlayers[j]->getColor();
                     pale.setSaturation(pale.getSaturation() - 110);
-                    ofSetColor(pale);
+                    fillColor = pale;
                 }
             }
         }
-        if( i == me->getDiscIndex() && disc->isMute(me->getDiscIndex()) == 0) ofSetColor(me->getColor());
+        if( i == me->getDiscIndex() && disc->isMute(me->getDiscIndex()) == 0) fillColor = me->getColor();
         if( i == me->getDiscIndex() && disc->isMute(me->getDiscIndex()) == 1) {
             ofColor pale = me->getColor();
             pale.setSaturation(pale.getSaturation() - 110);
-            ofSetColor(pale);
+            fillColor = pale;
         }
+        ofSetColor(fillColor);
         
         ofSetCircleResolution(70);
         //front
@@ -153,18 +154,6 @@ void Groove::draw(){
         //back
         ofCircle(0,0,disc->getPosition(i)-.2, disc->getRadius(i-1));
         ofCircle(0,0,disc->getPosition(i)-.2, disc->getRadius(i));
-        
-        //        if( i != me->getDiscIndex() && disc->isMute(i) == 1) ofSetColor(ofColor::lightGrey);
-        //        else if( i == me->getDiscIndex() && disc->isMute(me->getDiscIndex()) == 1) ofSetColor(ofColor::lightPink);
-        //        else if( i == me->getDiscIndex() && disc->isMute(me->getDiscIndex()) == 0) ofSetColor(me->getColor());
-        //        else if( otherPlayers.size() > 0){
-        //            for (int j = 0; j < otherPlayers.size(); j++) {
-        //                if( i == otherPlayers[j]->getDiscIndex() && disc->isMute(otherPlayers[j]->getDiscIndex()) == 0) ofSetColor(otherPlayers[j]->getColor());
-        //                else if( i == otherPlayers[j]->getDiscIndex() && disc->isMute(otherPlayers[j]->getDiscIndex()) == 1) ofSetColor(ofColor::lightPink);
-        //                else continue;
-        //            }
-        //        }
-        //        else ofSetColor(33);
         ofFill();
         
         //get texture type and draw
@@ -205,7 +194,7 @@ void Groove::draw(){
                         
                         if(disc->getSpikeDistance(i) != 0){
                             
-                            ofNoFill();
+                            ofSetColor(fillColor, 70);
                             ofBeginShape();
                             ofVertex(p1);
                             ofVertex(p3);
@@ -218,6 +207,8 @@ void Groove::draw(){
                             ofVertex(rp3);
                             ofVertex(rp2);
                             ofEndShape();
+                            
+                            ofSetColor(fillColor, 255);
                         }
                         
                     }
@@ -280,7 +271,7 @@ void Groove::draw(){
                         
                         if(disc->getSpikeDistance(i) != 0){
                             
-                            ofNoFill();
+                            ofSetColor(fillColor, 70);
                             
                             ofBeginShape(); //spike
                             ofVertex(p4);
@@ -306,6 +297,8 @@ void Groove::draw(){
                             ofVertex(rp5);
                             ofVertex(rp1);
                             ofEndShape();
+                            
+                            ofSetColor(fillColor, 255);
                         }
                     }
                 }
@@ -365,7 +358,7 @@ void Groove::draw(){
                         
                         if(disc->getSpikeDistance(i) != 0){
                             
-                            ofNoFill();
+                            ofSetColor(fillColor, 70);
                             ofBeginShape(); //spike
                             ofVertex(p4);
                             ofVertex(p5);
@@ -389,6 +382,8 @@ void Groove::draw(){
                             ofVertex(rp5);
                             ofVertex(rp1);
                             ofEndShape();
+                            
+                            ofSetColor(fillColor, 255);
                         }
                         
                         
@@ -470,7 +465,7 @@ void Groove::draw(){
                         
                         if(disc->getSpikeDistance(i) != 0){
                             
-                            ofNoFill();
+                            ofSetColor(fillColor, 70);
                             
                             ofBeginShape(); //spike
                             ofVertex(p6);
@@ -508,6 +503,8 @@ void Groove::draw(){
                             ofVertex(rp7);
                             ofVertex(rp3);
                             ofEndShape();
+                            
+                            ofSetColor(fillColor, 255);
                         }
                         
                         space = true;

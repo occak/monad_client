@@ -44,6 +44,7 @@ class ofApp : public ofBaseApp{
             costMute = 0,
             costMove = 0,
             costSpike = 0,
+            costCreate = 0,
             reward = 0;
     
     bool radiusChanged,

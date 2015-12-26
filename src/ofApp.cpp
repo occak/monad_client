@@ -2,7 +2,6 @@
 
 /*
  
- 
  */
 
 ofApp::ofApp() {
@@ -43,10 +42,10 @@ void ofApp::setup(){
         
         //set up gui
         initialize = new ofxUICanvas();
-        initialize->setPosition(ofGetWidth()/2-125, ofGetHeight()/2-50);
+        initialize->setPosition(ofGetWidth()/2-155, ofGetHeight()/2-200);
         initialize->setFont(OF_TTF_MONO);
-        initialize->setDimensions(250, 200);
-        initialize->addTextArea("welcome", "     Welcome to Monad.", 0);
+        initialize->setDimensions(310, 200);
+        initialize->addTextArea("welcome", "Welcome to Monad (v0.2)", 0);
         initialize->addLabel("Server IP :");
         initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
         initialize->addTextInput("IP", "");
@@ -76,10 +75,10 @@ void ofApp::setup(){
         addDisc = new ofxUICanvas();
         addDisc->setFont(OF_TTF_MONO);
         addDisc->addSpacer();
-        addDisc->addLabel("none");
-        ofxUILabel *label = (ofxUILabel*) addDisc->getWidget("none");
+        addDisc->addLabel("add");
+        ofxUILabel *label = (ofxUILabel*) addDisc->getWidget("add");
         addDisc->addWidgetPosition(label, OFX_UI_WIDGET_POSITION_RIGHT, OFX_UI_ALIGN_CENTER);
-        addDisc->addToggle("new", false);
+        addDisc->addMultiImageToggle("new", "butonlar/addbutton.png", false, 50, 50);
         ofxUIToggle *toggle = (ofxUIToggle*) addDisc->getWidget("new");
         addDisc->addWidgetPosition(toggle, OFX_UI_WIDGET_POSITION_DOWN, OFX_UI_ALIGN_CENTER);
         addDisc->setVisible(false);
@@ -89,7 +88,7 @@ void ofApp::setup(){
         chat->setFont(OF_TTF_MONO);
         chat->setDrawBack(false);
         int chatWidth = 700;
-        chat->setPosition(addDisc->getGlobalCanvasWidth()+10, 0);
+        chat->setPosition(addDisc->getGlobalCanvasWidth()+100, 0);
         chat->setDimensions(chatWidth, ofGetHeight());
         chat->setColorFill(ofxUIColor(50,50,50,150));
         conversation = "";
@@ -181,7 +180,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         if (IP != "" && nick != "") {
             
             client.setup(IP, 10002);
-            client.setMessageDelimiter("varianet");
+            client.setMessageDelimiter("vnet");
             
             Player* _player = new Player();
             _player->setNick(nick);
@@ -392,7 +391,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             //update history//
             
             string tex = e.getName();
-            string eventHistory = me->getNick() + "//Grv" + ofToString(me->getDiscIndex()+1)+ "//texture:" + tex +"\n\n";
+            string eventHistory = me->getNick() + " // Grv" + ofToString(me->getDiscIndex()+1)+ " // texture:" + tex +"\n\n";
             historyText = eventHistory + historyText;
             
             ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -422,7 +421,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 //update history//
                 
                 string tex = e.getName();
-                string eventHistory = me->getNick() + "//Grv" + ofToString(me->getDiscIndex()+1)+ "//texture:" + tex +"\n\n";
+                string eventHistory = me->getNick() + " // Grv" + ofToString(me->getDiscIndex()+1)+ " // texture:" + tex +"\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -453,7 +452,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 //update history//
                 
                 string tex = e.getName();
-                string eventHistory = me->getNick() + "//Grv" + ofToString(me->getDiscIndex()+1)+ "//texture:" + tex +"\n\n";
+                string eventHistory = me->getNick() + " // Grv" + ofToString(me->getDiscIndex()+1)+ " // texture:" + tex +"\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -484,7 +483,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 //update history//
                 
                 string tex = e.getName();
-                string eventHistory = me->getNick() + "//Grv" + ofToString(me->getDiscIndex()+1)+ "//texture:" + tex +"\n\n";
+                string eventHistory = me->getNick() + " // Grv" + ofToString(me->getDiscIndex()+1)+ " // texture:" + tex +"\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -515,7 +514,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 //update history//
                 
                 string tex = e.getName();
-                string eventHistory = me->getNick() + "//Grv" + ofToString(me->getDiscIndex()+1)+ "//texture:" + tex +"\n\n";
+                string eventHistory = me->getNick() + " // Grv" + ofToString(me->getDiscIndex()+1)+ " // texture:" + tex +"\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -534,7 +533,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 string change;
                 if(disc.isMoving(me->getDiscIndex()) == 0) change = "off";
                 else change = "on";
-                string eventHistory = me->getNick() + "//Grv"+ofToString(me->getDiscIndex() + 1)+ "//move:" + change +"\n\n";
+                string eventHistory = me->getNick() + " // Grv"+ofToString(me->getDiscIndex() + 1)+ " // move:" + change +"\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -552,7 +551,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 
                 //update history//
                 
-                string eventHistory = me->getNick() + "//Grv"+ofToString(me->getDiscIndex()+1)+ "//z-reset\n\n";
+                string eventHistory = me->getNick() + " // Grv"+ofToString(me->getDiscIndex()+1)+ " // z-reset\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -595,7 +594,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                         client.send(lifeUpdate);
                         
                         //update history//
-                        string eventHistory = me->getNick() + "//move all\n\n";
+                        string eventHistory = me->getNick() + " // move all\n\n";
                         historyText = eventHistory + historyText;
                             
                         ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -640,7 +639,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                         client.send(lifeUpdate);
                         
                         //update history//
-                        string eventHistory = me->getNick() + "//halt all\n\n";
+                        string eventHistory = me->getNick() + " // halt all\n\n";
                         historyText = eventHistory + historyText;
                         
                         ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -685,7 +684,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     client.send(lifeUpdate);
                     
                     //update history//
-                    string eventHistory = me->getNick() + "//reset all\n\n";
+                    string eventHistory = me->getNick() + " // reset all\n\n";
                     historyText = eventHistory + historyText;
                     
                     ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -716,7 +715,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                 if(disc.isMute(me->getDiscIndex()) == 0) change = "off";
                 else change = "on";
                 
-                eventHistory = me->getNick() + "//" + "Grv"+ofToString(me->getDiscIndex()+1)+ "//" + "mute:" + change +"\n\n";
+                eventHistory = me->getNick() + " // " + "Grv"+ofToString(me->getDiscIndex()+1)+ " // " + "mute:" + change +"\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -738,7 +737,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             
             ofxUIToggle *toggle = e.getToggle();
             
-            if(toggle->getValue() == true) {
+            if(toggle->getValue() == true && me->getLife() >= costCreate) {
                 
                 //send demand to server
                 string newDisc = "newDisc//"+me->getIP();
@@ -977,6 +976,7 @@ void ofApp::update(){
                     if (playerData[0] == "costMute") costMute = ofToFloat(playerData[1]);
                     if (playerData[0] == "costMove") costMove = ofToFloat(playerData[1]);
                     if (playerData[0] == "costSpike") costSpike = ofToFloat(playerData[1]);
+                    if (playerData[0] == "costCreate") costCreate = ofToFloat(playerData[1]);
                     if (playerData[0] == "reward") reward = ofToFloat(playerData[1]);
                 }
             }
@@ -1082,8 +1082,6 @@ void ofApp::update(){
                     if(playerData[0] == "netRotation") newRotation = ofToFloat(playerData[1]);
                 }
                 
-                cout<< newSeed <<endl;
-                
                 //new disc
                 disc.addDisc(newIndex);
                 disc.setSeed(newIndex, newSeed);
@@ -1095,6 +1093,12 @@ void ofApp::update(){
                 
                 //new UI
                 newUI(newIndex);
+                
+                //update history
+                historyText =" // " +_player->getNick() + " groove create // "+ "\n\n"+ historyText;
+                
+                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                _history->setTextString(historyText);
                 
             }
             
@@ -1176,7 +1180,7 @@ void ofApp::update(){
                     if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
                 }
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "rotation:" + ofToString( roundf(disc.getNetRotationSpeed(index)*10)/10) +"\n\n";
+                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "rotation:" + ofToString( roundf(disc.getNetRotationSpeed(index)*10)/10) +"\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -1209,7 +1213,7 @@ void ofApp::update(){
                     if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
                 }
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "size:" + ofToString(roundf(disc.getThickness(index)*10)/10) +"\n\n";
+                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "size:" + ofToString(roundf(disc.getThickness(index)*10)/10) +"\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -1249,7 +1253,7 @@ void ofApp::update(){
                     if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
                 }
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "density:" + ofToString(disc.getDensity(index)) +"\n\n";
+                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "density:" + ofToString(disc.getDensity(index)) +"\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -1281,7 +1285,7 @@ void ofApp::update(){
                     if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
                 }
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "spike:" + ofToString(disc.getSpikeDistance(index)) +"\n\n";
+                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "spike:" + ofToString(disc.getSpikeDistance(index)) +"\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -1341,7 +1345,7 @@ void ofApp::update(){
                     if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
                 }
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "texture:" + texture +"\n\n";
+                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "texture:" + texture +"\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -1373,7 +1377,7 @@ void ofApp::update(){
                     if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
                 }
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "mute:" + change +"\n\n";
+                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "mute:" + change +"\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -1403,7 +1407,7 @@ void ofApp::update(){
                     if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
                 }
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "move:" + change +"\n\n";
+                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "move:" + change +"\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -1428,7 +1432,7 @@ void ofApp::update(){
                     if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
                 }
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + "//" + "Grv"+ofToString(index+1)+ "//" + "z-reset\n\n";
+                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "z-reset\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -1456,7 +1460,7 @@ void ofApp::update(){
                     if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
                 }
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + "//" + "move all\n\n";
+                else eventHistory = _player->getNick() + " // " + "move all\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -1483,7 +1487,7 @@ void ofApp::update(){
                     if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
                 }
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + "//" + "halt all\n\n";
+                else eventHistory = _player->getNick() + " // " + "halt all\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -1510,7 +1514,7 @@ void ofApp::update(){
                     if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
                 }
                 if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + "//" + "reset all\n\n";
+                else eventHistory = _player->getNick() + " // " + "reset all\n\n";
                 historyText = eventHistory + historyText;
                 
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -1571,7 +1575,7 @@ void ofApp::update(){
             
             string disconnected;
             
-            disconnected = "*you have disconnected from server*";
+            disconnected = "*you are disconnected from server*\n\n";
             historyText = disconnected + historyText;
             conversation = disconnected + conversation;
             
@@ -1589,7 +1593,7 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
-    ofBackgroundGradient(230, 250);
+    ofBackgroundGradient(170, 200);
     glEnable(GL_DEPTH_TEST);
     
     ofPushMatrix();
@@ -1987,7 +1991,7 @@ void ofApp::mouseReleased(int x, int y, int button){
         client.send(change);
         
         //update history//
-        string eventHistory = me->getNick() + "//" + "Grv"+ofToString(me->getDiscIndex()+1)+ "//" + "size:" + ofToString(roundf(disc.getThickness(me->getDiscIndex())*10)/10) +"\n\n";
+        string eventHistory = me->getNick() + " // " + "Grv"+ofToString(me->getDiscIndex()+1)+ " // " + "size:" + ofToString(roundf(disc.getThickness(me->getDiscIndex())*10)/10) +"\n\n";
         historyText = eventHistory + historyText;
         
         ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -2008,7 +2012,7 @@ void ofApp::mouseReleased(int x, int y, int button){
         client.send(change);
         
         //update history//
-        string eventHistory = me->getNick() + "//" + "Grv"+ofToString(me->getDiscIndex()+1)+ "//" + "density:" + ofToString(disc.getDensity(me->getDiscIndex())) +"\n\n";
+        string eventHistory = me->getNick() + " // " + "Grv"+ofToString(me->getDiscIndex()+1)+ " // " + "density:" + ofToString(disc.getDensity(me->getDiscIndex())) +"\n\n";
         historyText = eventHistory + historyText;
         
         ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -2030,7 +2034,7 @@ void ofApp::mouseReleased(int x, int y, int button){
         
         
         //update history//
-        string eventHistory = me->getNick() + "//" + "Grv"+ofToString(me->getDiscIndex()+1)+ "//" + "spike:" + ofToString(disc.getSpikeDistance(me->getDiscIndex())) +"\n\n";
+        string eventHistory = me->getNick() + " // " + "Grv"+ofToString(me->getDiscIndex()+1)+ " // " + "spike:" + ofToString(disc.getSpikeDistance(me->getDiscIndex())) +"\n\n";
         historyText = eventHistory + historyText;
         
         ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
@@ -2070,7 +2074,7 @@ void ofApp::mouseReleased(int x, int y, int button){
         client.send(change);
         
         //update history//
-        string eventHistory = me->getNick() + "//" + "Grv"+ofToString(me->getDiscIndex()+1)+ "//" + "rotation:" + ofToString( roundf(disc.getNetRotationSpeed(me->getDiscIndex())*10)/10) +"\n\n";
+        string eventHistory = me->getNick() + " // " + "Grv"+ofToString(me->getDiscIndex()+1)+ " // " + "rotation:" + ofToString( roundf(disc.getNetRotationSpeed(me->getDiscIndex())*10)/10) +"\n\n";
         historyText = eventHistory + historyText;
         
         ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
