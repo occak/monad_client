@@ -2,4 +2,52 @@
 <Bucket
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "src/ofApp.cpp"
+            timestampString = "472778309.458206"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "2055"
+            endingLineNumber = "2055"
+            landmarkName = "ofApp::mouseReleased(int x, int y, int button)"
+            landmarkType = "5">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ofApp::mouseReleased(int, int, int)"
+                  moduleName = "monad_clientDebug"
+                  urlString = "file:///Users/cem%20cakmak/Desktop/sonicarts/TEZ/monad_client/src/ofApp.cpp"
+                  timestampString = "472138721.560687"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1834"
+                  endingLineNumber = "1834"
+                  offsetFromSymbolStart = "5627">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ofApp::mouseReleased(int, int, int)"
+                  moduleName = "monad_clientDebug"
+                  urlString = "file:///Users/cem%20cakmak/Desktop/sonicarts/TEZ/monad_client/src/ofApp.cpp"
+                  timestampString = "472138721.560958"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1834"
+                  endingLineNumber = "1834"
+                  offsetFromSymbolStart = "5653">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

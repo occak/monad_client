@@ -22,8 +22,9 @@ class Sound{
     
 public:
     
-    void setup(Disc* disc);
+    void setup();
     void update();
+    void newSynth(int index);
     
     Disc* disc;
     
@@ -33,7 +34,7 @@ public:
     void setScale(int index, float value);
     
 private:
-//    vector<float> scale;
+    
 };
 
 #endif /* defined(__groove_snd__Sound__) */

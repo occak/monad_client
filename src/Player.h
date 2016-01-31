@@ -31,6 +31,7 @@ public:
     
     float getLife() const;
     void setLife(float newLife);
+    void changeLife(float amount);
     
     int getDiscIndex() const;
     void setDiscIndex(int index);

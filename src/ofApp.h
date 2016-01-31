@@ -26,9 +26,6 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
     
-    float triangleWave(float frequency);
-    float squareWave(float frequency);
-    float sawWave(float frequency);
     
     //audio
     void audioOut( float * output, int bufferSize, int nChannels );
@@ -40,13 +37,15 @@ class ofApp : public ofBaseApp{
     void guiEvent(ofxUIEventArgs &e);
     
     //game
-    float   costRadius,
-            costTexture,
-            costDensity,
-            costRotation,
-            costMute,
-            costMove,
-            reward;
+    float   costRadius = 0,
+            costTexture  = 0,
+            costDensity = 0,
+            costRotation = 0,
+            costMute = 0,
+            costMove = 0,
+            costSpike = 0,
+            costCreate = 0,
+            reward = 0;
     
     bool radiusChanged,
     textureChanged,
@@ -56,9 +55,11 @@ class ofApp : public ofBaseApp{
     moveChanged,
     moveReset,
     moveAllChanged,
-    muteChanged;
+    muteChanged,
+    spikeChanged,
+    newDisc;
     
-    void refreshUpdateButtons();
+    void newUI(int index);
 		
     
     ofEasyCam cam;
@@ -72,6 +73,7 @@ class ofApp : public ofBaseApp{
 private:
     
     bool fullScreen;
+    bool keyList;
     bool mReleased;
     bool TCPsetup;
     bool timer;
@@ -80,8 +82,6 @@ private:
     int port;
     int loginMinute;
     float loginSecond;
-    
-//    float newRotation;
     float thisRotation;
     
     Groove groove;
@@ -92,13 +92,17 @@ private:
     vector<Player*> otherPlayers;
     
     vector<ofxUICanvas *> ui;
-    ofxUICanvas *noDisc;
-    //update buttons not working
-    vector<ofxUILabelToggle *> updateButtonsArray;
-    ofxUICanvas *updateButtons;
+    ofxUICanvas *dashboard;
+    ofxUICanvas *addDisc;
+    
+    
     ofxUICanvas *initialize;
     
     ofxUICanvas *chat;
     string conversation;
+    
+    ofxUICanvas *history;
+    string historyText;
+    
 };
 
