@@ -181,7 +181,8 @@ float Disc::getRadius(int index) const{
 
 void Disc::setRadius(int index, float size){
     
-    if ( index != -1) radii[index] = size;
+    if ( index == 0 ) radii[index] = size +origin;
+    else if ( index != -1 ) radii[index] = size;
 }
 //----------------------------------
 

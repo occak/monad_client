@@ -43,7 +43,7 @@ void Sound::setup(){
         trigger(pulse);
         
         
-        float pitch = ofMap(0, 0, 10, 50, 1500);
+        float pitch = ofMap(0, 0, 10, 50, 1200);
         ControlGenerator freq = synth.addParameter("freq"+ofToString(i), pitch);
         ControlGenerator amountFreq = synth.addParameter("amountFreq"+ofToString(i));
         ControlGenerator amountMod = synth.addParameter("amountMod"+ofToString(i),0);
@@ -56,16 +56,20 @@ void Sound::setup(){
         
         ControlGenerator volumeBalance = synth.addParameter("volBalance"+ofToString(i), volCoeff);
         groove = snd * amplitude * volumeBalance;
-        
-        float qTarget = ofMap(15, 15, 100, 10, 0);
-        ControlGenerator q = synth.addParameter("q"+ofToString(i),qTarget).max(10);
-        Generator filter = BPF12().input(groove).cutoff(freq).Q(q);
+    
+        float qTarget = ofMap(15., 15., 100., 3.0, 0.2);
+        ControlGenerator q = synth.addParameter("q"+ofToString(i),qTarget).max(3.0).min(0.2);
+        ControlGenerator qDist = synth.addParameter("qDist"+ofToString(i), 1.);
+        ControlGenerator qFinal = q * qDist;
+        Generator filter = BPF12().input(groove).cutoff(freq).Q(qFinal);
         
         Generator delay = StereoDelay(0, .0025*i).input(filter).feedback(.01).delayTimeLeft(0).delayTimeRight(.0025*i);
         
-        float distAmount = ofMap(0., 0., 100., 1., 40.);
-        ControlGenerator gainAmount = synth.addParameter("drive"+ofToString(i),distAmount).max(40.);
+        float distAmount = ofMap(0., 0., 100., 1., 10.);
+        ControlGenerator gainAmount = synth.addParameter("drive"+ofToString(i),distAmount).max(5.);
         Generator hardClip = Limiter().input(delay).makeupGain(gainAmount).threshold(.5);
+        float clipBalance = ofMap(distAmount, 1., 10., 1., 0.5);
+        hardClip = hardClip * clipBalance;
         
         master = master + hardClip;
         
@@ -73,7 +77,7 @@ void Sound::setup(){
     
     ControlGenerator wet = synth.addParameter("wet", 0.).max(.5).min(0.);
     Generator reverb = Reverb().input(master).stereoWidth(.5).roomSize(.4).wetLevel(wet);
-    Generator limiter = Limiter().input(reverb).threshold(0.95);
+    Generator limiter = Limiter().input(reverb).threshold(0.99);
     ControlGenerator masterLevel = synth.addParameter("master", .95).max(.95).min(0.);
     synth.setOutputGen(masterLevel*limiter);
     

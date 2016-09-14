@@ -124,7 +124,7 @@ void ofApp::setup(){
         dashboard->setColorBack(me->getColor());
         
         chat->setVisible(true);
-        addDisc->setVisible(true);
+        if(me->getDiscIndex() == -1) addDisc->setVisible(true);
         history->setVisible(true);
         
     }
@@ -209,7 +209,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     if(netSpeed <= 5){
                         frequency = ofMap(netSpeed, 0, 5, 50, 500);
                     }
-                    else frequency = ofMap(netSpeed, 5, 10, 500, 1500);
+                    else frequency = ofMap(netSpeed, 5, 10, 500, 1200);
                     float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
                     float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
                     soundChange("freq", i, frequency);
@@ -229,7 +229,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     disc.setThickness(i, slider->getScaledValue());
                     
                     //change sound
-                    float q = ofMap(disc.getThickness(i), 15, 100, 10, 0);
+                    float q = ofMap(disc.getThickness(i), 15., 100., 3., 0.);
                     soundChange("q", i, q);
                 }
             }
@@ -789,10 +789,12 @@ void ofApp::update(){
     
     disc.update();
     for(int i = 0; i< disc.getDiscIndex(); i++){
-        float amountFreq = ofMap(abs(disc.getNetRotationSpeed(i)), 0, 10, 0, 5000);
-        float amountMod = ofMap(abs(disc.getPosition(i)), 0, 100, 0, 10000);
+        float amountFreq = ofMap(abs(disc.getNetRotationSpeed(i)), 0, 10, 0, 1000);
+        float amountMod = ofMap(abs(disc.getPosition(i)), 0, 100, 0, 1000);
+        float qDist = ofMap(abs(disc.getPosition(i)), 0, 100, 1., .9);
         soundChange("amountFreq", i, amountFreq);
         soundChange("amountMod", i, amountMod);
+        soundChange("qDist", i, qDist);
     }
     
     
@@ -820,7 +822,7 @@ void ofApp::update(){
                         if(nameValue[0] == "radius"+ofToString(i)) {
                             disc.setRadius(i, ofToFloat(nameValue[1]));
                             //sound
-                            float q = ofMap(disc.getRadius(i)-disc.getRadius(i-1), 15, 100, 10, 0);
+                            float q = ofMap(disc.getRadius(i)-disc.getRadius(i-1), 15., 100., 3., 0.);
                             soundChange("q", i, q);
                             //ui
                             ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
@@ -838,7 +840,7 @@ void ofApp::update(){
                             if(netSpeed <= 5){
                                 frequency = ofMap(netSpeed, 0, 5, 50, 500);
                             }
-                            else frequency = ofMap(netSpeed, 5, 10, 500, 1500);
+                            else frequency = ofMap(netSpeed, 5, 10, 500, 1200);
                             float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
                             float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
                             soundChange("freq", i, frequency);
@@ -990,6 +992,7 @@ void ofApp::update(){
                     if (playerData[0] == "life") me->setLife(ofToFloat(playerData[1]));
                     if (playerData[0] == "index") me->setDiscIndex(ofToInt(playerData[1]));
                     if (playerData[0] == "nick") me->setNick(playerData[1]);
+                    
                 }
                 
                 me->setConnection(true);
@@ -1196,7 +1199,7 @@ void ofApp::update(){
                 disc.setThickness(index, ofToFloat(nameValue[1]));
                 
                 //change sound
-                float q = ofMap(disc.getRadius(index)-disc.getRadius(index-1), 15, 100, 10, 0);
+                float q = ofMap(disc.getRadius(index)-disc.getRadius(index-1), 15., 100., 3., 0.);
                 soundChange("q", ofToInt(nameValue[0]), q);
                 
                 //update ui
@@ -1607,7 +1610,7 @@ void ofApp::draw(){
         if(cam.getDistance() > 100){
             //			cout<< cam.getDistance() <<endl;
             float wetLevel = ofMap(cam.getDistance(), 250, 9000, 0., .75);
-            float masterLevel = ofMap(cam.getDistance(), 0, 9000, .95, 0.01);
+            float masterLevel = ofMap(cam.getDistance(), 0, 9000, .95, 0.1);
             ofClamp(wetLevel, 0., 0.75);
             ofClamp(masterLevel, 0., .999);
             
@@ -1641,7 +1644,7 @@ void ofApp::draw(){
         }
         if(keyList){
             ofSetColor(0);
-            ofDrawBitmapString("<esc> shut down\n<bck> deselect\n<t> timer\n<c> chat\n<w/s> navigate\n<k> key\n<f> fullscreen\n", ofGetWidth()/2 - 250, ofGetHeight()/2 - 150);
+            ofDrawBitmapString("<w/s> navigate\n<bck> deselect\n<m> mute\n<t> timer\n<c> chat\n<f> fullscreen\n<k> key list\n<esc> exit", ofGetWidth()/2 - 250, ofGetHeight()/2 - 150);
             
         }
         if(timer) {
@@ -1766,7 +1769,38 @@ void ofApp::keyPressed(int key){
             client.send(changeDisc);
         }
     }
-    
+    if(key == 'm' && TCPsetup && me->getDiscIndex() != -1) {
+        ofxUIToggle *toggle = static_cast<ofxUILabelToggle*>(ui[me->getDiscIndex()]->getWidget("mute"));
+        if(me->getLife() > 0){
+            muteChanged = true;
+            if(toggle->getValue()==false) {
+                disc.setMute(me->getDiscIndex(), 1); //mute on
+                soundChange("envelope", me->getDiscIndex(), 0);
+                toggle->setValue(true);
+            }
+            else if(toggle->getValue()==true){
+                disc.setMute(me->getDiscIndex(), 0); //mute off
+                disc.setEnvelope(me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
+                soundChange("envelope", me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
+                toggle->setValue(false);
+            }
+            
+            //update history//
+            string eventHistory;
+            string change;
+            if(disc.isMute(me->getDiscIndex()) == 0) change = "off";
+            else change = "on";
+            
+            eventHistory = me->getNick() + " // " + "Grv"+ofToString(me->getDiscIndex()+1)+ " // " + "mute:" + change +"\n\n";
+            historyText = eventHistory + historyText;
+            
+            ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+            _history->setTextString(historyText);
+        }
+        else toggle->setValue(false);
+
+    }
+
     if(key == 'f') {
         fullScreen = !fullScreen;
         ofSetFullscreen(fullScreen);
@@ -1806,9 +1840,9 @@ void ofApp::soundChange(string name, int index, float value) {
         
         
         float volCoeff = 1;
-        if(disc.getTexture(index) == 1) volCoeff = 1.2;
-        else if(disc.getTexture(index) == 2) volCoeff = .6;
-        else if(disc.getTexture(index) == 3) volCoeff = .45;
+        if(disc.getTexture(index) == 1) volCoeff = 1.25;
+        else if(disc.getTexture(index) == 2) volCoeff = .5;
+        else if(disc.getTexture(index) == 3) volCoeff = .5;
         else if(disc.getTexture(index) == 4) volCoeff = .1;
         
         sound.synth.setParameter("volBalance"+ofToString(index), volCoeff);
