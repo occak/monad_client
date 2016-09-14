@@ -1675,7 +1675,17 @@ void ofApp::draw(){
             
             
             ofSetColor(0);
-            ofDrawBitmapString("texture     "+ofToString(costTexture)+"\nrotation    "+ofToString(costRotation)+"\ndensity     "+ofToString(costDensity)+"\nsize        "+ofToString(costRadius)+"\nspike       "+ofToString(costSpike)+"\nmove/reset  "+ofToString(costMove)+"\nmute        "+ofToString(costMute)+"\nnew disc    "+ofToString(costCreate)+"\nmove all    "+ofToString(costMoveAll)+"\nstop all    "+ofToString(costStopAll)+"\nreset all   "+ofToString(costResetAll), ofGetWidth()/2 - 245, ofGetHeight()/2-300);
+            ofDrawBitmapString("texture     "+ofToString(costTexture)+
+                               "\nrotation    "+ofToString(costRotation)+
+                               "\ndensity     "+ofToString(costDensity)+
+                               "\nsize        "+ofToString(costRadius)+
+                               "\nspike       "+ofToString(costSpike)+
+                               "\nmove/reset  "+ofToString(costMove)+
+                               "\nmute        "+ofToString(costMute)+
+                               "\nnew disc    "+ofToString(costCreate)+
+                               "\nmove all    "+ofToString(costMoveAll)+
+                               "\nstop all    "+ofToString(costStopAll)+
+                               "\nreset all   "+ofToString(costResetAll), ofGetWidth()/2 - 245, ofGetHeight()/2-300);
             
         }
         if(keyList){
