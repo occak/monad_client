@@ -74,6 +74,7 @@ private:
     
     bool fullScreen;
     bool keyList;
+    bool costList;
     bool mReleased;
     bool TCPsetup;
     bool timer;

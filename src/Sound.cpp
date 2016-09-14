@@ -29,7 +29,7 @@ void Sound::setup(){
         ControlGenerator halfPulse = 30 / (bpm+0.001);
         ControlGenerator pulse = ControlPulse().length(halfPulse).input(metronome);
         
-        float envelopeCoeff = ofMap(30, 1, 30, .1, 10);
+        float envelopeCoeff = ofMap(30, 1, 30, .1, 10.);
         ControlGenerator envelope = synth.addParameter("envelopeWidth"+ofToString(i), envelopeCoeff);
         ControlGenerator attack = synth.addParameter("attack"+ofToString(i),0);
         ControlGenerator decay = synth.addParameter("decay"+ofToString(i),0);
@@ -63,12 +63,13 @@ void Sound::setup(){
         ControlGenerator qFinal = q * qDist;
         Generator filter = BPF12().input(groove).cutoff(freq).Q(qFinal);
         
-        Generator delay = StereoDelay(0, .0025*i).input(filter).feedback(.01).delayTimeLeft(0).delayTimeRight(.0025*i);
+        Generator delay = StereoDelay(0, .005*i).input(filter).feedback(.01).delayTimeLeft(0).delayTimeRight(.0025*i);
         
         float distAmount = ofMap(0., 0., 100., 1., 10.);
-        ControlGenerator gainAmount = synth.addParameter("drive"+ofToString(i),distAmount).max(5.);
+        ControlGenerator gainAmount = synth.addParameter("drive"+ofToString(i),distAmount).max(10.);
+        ControlGenerator clipBalance = synth.addParameter("clipBalance"+ofToString(i), 1.);
         Generator hardClip = Limiter().input(delay).makeupGain(gainAmount).threshold(.5);
-        float clipBalance = ofMap(distAmount, 1., 10., 1., 0.5);
+        
         hardClip = hardClip * clipBalance;
         
         master = master + hardClip;

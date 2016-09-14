@@ -62,7 +62,7 @@ void Player::setColorByIndex(int index){
             color.set(50,153,187);
             break;
         case 2:
-            color.set(255,153,0);
+            color.set(224,232,0);
             break;
         case 3:
             color.set(161,24,87);

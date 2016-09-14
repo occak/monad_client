@@ -75,11 +75,11 @@ void ofApp::setup(){
         addDisc = new ofxUICanvas();
         addDisc->setFont(OF_TTF_MONO);
         addDisc->addSpacer();
-        addDisc->addLabel("add");
-        ofxUILabel *label = (ofxUILabel*) addDisc->getWidget("add");
+        addDisc->addLabel("new");
+        ofxUILabel *label = (ofxUILabel*) addDisc->getWidget("new");
         addDisc->addWidgetPosition(label, OFX_UI_WIDGET_POSITION_RIGHT, OFX_UI_ALIGN_CENTER);
-        addDisc->addMultiImageToggle("new", "butonlar/addbutton.png", false, 50, 50);
-        ofxUIToggle *toggle = (ofxUIToggle*) addDisc->getWidget("new");
+        addDisc->addMultiImageToggle("add", "butonlar/addbutton.png", false, 50, 50);
+        ofxUIToggle *toggle = (ofxUIToggle*) addDisc->getWidget("add");
         addDisc->addWidgetPosition(toggle, OFX_UI_WIDGET_POSITION_DOWN, OFX_UI_ALIGN_CENTER);
         addDisc->setVisible(false);
         ofAddListener(addDisc->newGUIEvent, this, &ofApp::guiEvent);
@@ -207,9 +207,9 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     float netSpeed = abs(disc.getNetRotationSpeed(i));
                     float frequency;
                     if(netSpeed <= 5){
-                        frequency = ofMap(netSpeed, 0, 5, 50, 500);
+                        frequency = ofMap(netSpeed, 0, 5, 50, 250);
                     }
-                    else frequency = ofMap(netSpeed, 5, 10, 500, 1200);
+                    else frequency = ofMap(netSpeed, 5, 10, 250, 800);
                     float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
                     float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
                     soundChange("freq", i, frequency);
@@ -265,7 +265,9 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     disc.setSpikeDistance(i, slider->getScaledValue());
                     
                     //change gain
-                    float distAmount = ofMap(disc.getSpikeDistance(i), 0., 100., 1., 15., true);
+                    float distAmount = ofMap(disc.getSpikeDistance(i), 0., 100., 1., 10., true);
+                    float clipBalance = ofMap(distAmount, 1., 10., 1., 0.5);
+                    soundChange("clipBalance", i, clipBalance);
                     soundChange("drive", i, distAmount);
                 }
             }
@@ -561,92 +563,92 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         else if(e.getName() == "move all"){
             ofxUIToggle *toggle = e.getToggle();
             
-
+            
+            
+            if(toggle->getValue() == true){
                 
-                if(toggle->getValue() == true){
+                int costFactor = 0;
+                for(int j = 0; j < disc.getDiscIndex(); j++){
+                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
+                    ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                    if(toggleMove->getValue()==false) costFactor++;
+                }
+                
+                if(me->getLife() >= abs(costMove*costFactor) && costFactor != 0){
                     
-                    int costFactor = 0;
-                    for(int j = 0; j < disc.getDiscIndex(); j++){
+                    for(int j = 0; j<disc.getDiscIndex(); j++){
                         ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
                         ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                        if(toggleMove->getValue()==false) costFactor++;
-                    }
-                    
-                    if(me->getLife() >= abs(costMove*costFactor) && costFactor != 0){
-                        
-                        for(int j = 0; j<disc.getDiscIndex(); j++){
-                            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
-                            ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                            if(toggleMove->getValue()==false){
-                                toggleMove->setValue(true);
-                                disc.setMoving(j, 1);
-                            }
+                        if(toggleMove->getValue()==false){
+                            toggleMove->setValue(true);
+                            disc.setMoving(j, 1);
                         }
-                        
-                        me->changeLife(costMove*costFactor);
-                        string moveAll = "moveAll//"+me->getIP();
-                        client.send(moveAll);
-                        
-                        //update server
-                        string lifeUpdate = "life//";
-                        lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-                        lifeUpdate += "lifeChange: "+ofToString(costMove*costFactor) + "//";
-                        client.send(lifeUpdate);
-                        
-                        //update history//
-                        string eventHistory = me->getNick() + " // move all\n\n";
-                        historyText = eventHistory + historyText;
-                            
-                        ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-                        _history->setTextString(historyText);
-                        
                     }
-                }
-                if(toggle->getValue() == false){
                     
-                    int costFactor = 0;
-                    string zPositionAll = "zPositionAll//";
+                    me->changeLife(costMove*costFactor);
+                    string moveAll = "moveAll//"+me->getIP();
+                    client.send(moveAll);
+                    
+                    //update server
+                    string lifeUpdate = "life//";
+                    lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+                    lifeUpdate += "lifeChange: "+ofToString(costMove*costFactor) + "//";
+                    client.send(lifeUpdate);
+                    
+                    //update history//
+                    string eventHistory = me->getNick() + " // move all\n\n";
+                    historyText = eventHistory + historyText;
+                    
+                    ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                    _history->setTextString(historyText);
+                    
+                }
+            }
+            if(toggle->getValue() == false){
+                
+                int costFactor = 0;
+                string zPositionAll = "zPositionAll//";
+                
+                for(int j = 0; j < disc.getDiscIndex(); j++){
+                    
+                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
+                    ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                    if(toggleMove->getValue()==true) costFactor++;
+                }
+                
+                if(me->getLife() >= abs(costMove*costFactor) && costFactor != 0){
                     
                     for(int j = 0; j < disc.getDiscIndex(); j++){
                         
                         ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
                         ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                        if(toggleMove->getValue()==true) costFactor++;
+                        if(toggleMove->getValue()==true){
+                            toggleMove->setValue(false);
+                            disc.setMoving(j, 0);
+                        }
+                        zPositionAll += ofToString(j)+": "+ofToString(disc.getPosition(j))+"//";
                     }
                     
-                    if(me->getLife() >= abs(costMove*costFactor) && costFactor != 0){
-                        
-                        for(int j = 0; j < disc.getDiscIndex(); j++){
-                            
-                            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
-                            ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                            if(toggleMove->getValue()==true){
-                                toggleMove->setValue(false);
-                                disc.setMoving(j, 0);
-                            }
-                            zPositionAll += ofToString(j)+": "+ofToString(disc.getPosition(j))+"//";
-                        }
-                        
-                        me->changeLife(costMove*costFactor);
-                        string stopAll = "stopAll//"+me->getIP();
-                        client.send(stopAll);
-                        client.send(zPositionAll);
-                        
-                        //update server
-                        string lifeUpdate = "life//";
-                        lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-                        lifeUpdate += "lifeChange: "+ofToString(costMove*costFactor) + "//";
-                        client.send(lifeUpdate);
-                        
-                        //update history//
-                        string eventHistory = me->getNick() + " // halt all\n\n";
-                        historyText = eventHistory + historyText;
-                        
-                        ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-                        _history->setTextString(historyText);
-                        
-                    }
+                    me->changeLife(costMove*costFactor);
+                    string stopAll = "stopAll//"+me->getIP();
+                    client.send(stopAll);
+                    client.send(zPositionAll);
+                    
+                    //update server
+                    string lifeUpdate = "life//";
+                    lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+                    lifeUpdate += "lifeChange: "+ofToString(costMove*costFactor) + "//";
+                    client.send(lifeUpdate);
+                    
+                    //update history//
+                    string eventHistory = me->getNick() + " // halt all\n\n";
+                    historyText = eventHistory + historyText;
+                    
+                    ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                    _history->setTextString(historyText);
+                    
                 }
+            }
             
         }
         else if(e.getName() == "reset all"){
@@ -733,7 +735,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             
             chat->setVisible(toggle->getValue());
         }
-        else if(e.getName() == "new"){
+        else if(e.getName() == "add"){
             
             ofxUIToggle *toggle = e.getToggle();
             
@@ -838,9 +840,9 @@ void ofApp::update(){
                             float netSpeed = abs(disc.getNetRotationSpeed(i));
                             float frequency;
                             if(netSpeed <= 5){
-                                frequency = ofMap(netSpeed, 0, 5, 50, 500);
+                                frequency = ofMap(netSpeed, 0, 5, 50, 250);
                             }
-                            else frequency = ofMap(netSpeed, 5, 10, 500, 1200);
+                            else frequency = ofMap(netSpeed, 5, 10, 250, 800);
                             float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
                             float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
                             soundChange("freq", i, frequency);
@@ -959,6 +961,7 @@ void ofApp::update(){
                 initialize->setVisible(false);
                 dashboard->setVisible(true);
                 keyList = true;
+                costList = true;
                 
                 loginMinute = ofGetMinutes();
                 loginSecond = ofGetElapsedTimef();
@@ -1160,9 +1163,9 @@ void ofApp::update(){
                 float netSpeed = abs(disc.getNetRotationSpeed(index));
                 float frequency;
                 if(netSpeed <= 5){
-                    frequency = ofMap(netSpeed, 0, 5, 50, 500);
+                    frequency = ofMap(netSpeed, 0, 5, 50, 250);
                 }
-                else frequency = ofMap(netSpeed, 5, 10, 500, 1500);
+                else frequency = ofMap(netSpeed, 5, 10, 250, 800);
                 float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
                 float beatDensity = ofMap(disc.getDensity(index), 1, 30, 15, 2);
                 soundChange("freq", index, frequency);
@@ -1642,9 +1645,42 @@ void ofApp::draw(){
                 ofRect(groove.lifeBar[i+1]);
             }
         }
+        if(costList){
+            int costFactorMove = 0;
+            for(int j = 0; j < disc.getDiscIndex(); j++){
+                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
+                ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                if(toggleMove->getValue()==false) costFactorMove++;
+            }
+            int costMoveAll;
+            costMoveAll = costMove * costFactorMove;
+            
+            int costFactorStop = 0;
+            for(int j = 0; j < disc.getDiscIndex(); j++){
+                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
+                ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                if(toggleMove->getValue()==true) costFactorStop++;
+            }
+            int costStopAll;
+            costStopAll = costMove * costFactorStop;
+            
+            int costFactorReset = 0;
+            for(int j = 0; j<disc.getDiscIndex(); j++){
+                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
+                ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                if(disc.getPosition(j) != 0) costFactorReset++;
+            }
+            int costResetAll;
+            costResetAll = costMove * costFactorReset;
+            
+            
+            ofSetColor(0);
+            ofDrawBitmapString("texture     "+ofToString(costTexture)+"\nrotation    "+ofToString(costRotation)+"\ndensity     "+ofToString(costDensity)+"\nsize        "+ofToString(costRadius)+"\nspike       "+ofToString(costSpike)+"\nmove/reset  "+ofToString(costMove)+"\nmute        "+ofToString(costMute)+"\nnew disc    "+ofToString(costCreate)+"\nmove all    "+ofToString(costMoveAll)+"\nstop all    "+ofToString(costStopAll)+"\nreset all   "+ofToString(costResetAll), ofGetWidth()/2 - 245, ofGetHeight()/2-300);
+            
+        }
         if(keyList){
             ofSetColor(0);
-            ofDrawBitmapString("<w/s> navigate\n<bck> deselect\n<m> mute\n<t> timer\n<c> chat\n<f> fullscreen\n<k> key list\n<esc> exit", ofGetWidth()/2 - 250, ofGetHeight()/2 - 150);
+            ofDrawBitmapString("<w/s> navigate\n<bck> deselect\n<m> mute\n<t> timer\n<c> chat\n<f> fullscreen\n<k> key list\n<l> cost list\n<esc> exit", ofGetWidth()/2 - 250, ofGetHeight()/2 - 150);
             
         }
         if(timer) {
@@ -1798,9 +1834,9 @@ void ofApp::keyPressed(int key){
             _history->setTextString(historyText);
         }
         else toggle->setValue(false);
-
+        
     }
-
+    
     if(key == 'f') {
         fullScreen = !fullScreen;
         ofSetFullscreen(fullScreen);
@@ -1814,6 +1850,10 @@ void ofApp::keyPressed(int key){
     
     if(key == 'k' && TCPsetup) {
         keyList = !keyList;
+    }
+    
+    if(key == 'l' && TCPsetup) {
+        costList = !costList;
     }
     
 }
@@ -1840,7 +1880,7 @@ void ofApp::soundChange(string name, int index, float value) {
         
         
         float volCoeff = 1;
-        if(disc.getTexture(index) == 1) volCoeff = 1.25;
+        if(disc.getTexture(index) == 1) volCoeff = 1.3;
         else if(disc.getTexture(index) == 2) volCoeff = .5;
         else if(disc.getTexture(index) == 3) volCoeff = .5;
         else if(disc.getTexture(index) == 4) volCoeff = .1;
