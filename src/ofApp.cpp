@@ -160,6 +160,7 @@ void ofApp::exit(){
     }
     delete initialize;
     
+    
 }
 //--------------------------------------------------------------
 void ofApp::guiEvent(ofxUIEventArgs &e)
