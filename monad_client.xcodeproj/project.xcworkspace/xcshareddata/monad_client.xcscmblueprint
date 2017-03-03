@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "3DFB651E52F4B37E035C09C36A6D3165BCF797C5",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "94B904776FBE35C7CEDEF599372319D63A1BA8B7" : 9223372036854775807,
+    "3DFB651E52F4B37E035C09C36A6D3165BCF797C5" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "686B5E9C-DEA1-40E9-893C-FE3A02AEBF27",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "94B904776FBE35C7CEDEF599372319D63A1BA8B7" : "..\/..\/EArts\/of_v0.9.8_osx_release\/addons\/ofxTonic",
+    "3DFB651E52F4B37E035C09C36A6D3165BCF797C5" : "monad_client\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "monad_client",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "monad_client.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/occak\/monad_client.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3DFB651E52F4B37E035C09C36A6D3165BCF797C5"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/jeonghopark\/ofxTonic.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "94B904776FBE35C7CEDEF599372319D63A1BA8B7"
+    }
+  ]
+}

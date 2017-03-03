@@ -1,5 +1,8 @@
+ofxChucK-master
+ofxDatGui-master
+ofxGui
 ofxMSAPerlin-master
 ofxNetwork
-ofxTonic-master
+ofxTonic
 ofxUI-master
 ofxXmlSettings
