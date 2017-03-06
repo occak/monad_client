@@ -30,6 +30,10 @@ void ofApp::setup(){
     ofBackground(255);
     ofSetFrameRate(30);
     
+    udpReceive.Create();
+    udpReceive.Bind(10003);
+    udpReceive.SetNonBlocking(true);
+    
     if( me == NULL){
         
         // set up values of objects
@@ -59,9 +63,9 @@ void ofApp::setup(){
         dashboard = new ofxUICanvas();
         dashboard->setFont(OF_TTF_MONO);
         dashboard->setPosition(ofGetWidth()/2-125, ofGetHeight()-30);
-        dashboard->addMultiImageToggle("inner", "butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
+        dashboard->addMultiImageToggle("inner", "buttonimgs/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
         dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-        dashboard->addMultiImageToggle("outer", "butonlar/buton-07.png",false, 20, 20);
+        dashboard->addMultiImageToggle("outer", "buttonimgs/buton-07.png",false, 20, 20);
         dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
         dashboard->addToggle("move all", false);
         dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
@@ -78,7 +82,7 @@ void ofApp::setup(){
         addDisc->addLabel("new");
         ofxUILabel *label = (ofxUILabel*) addDisc->getWidget("new");
         addDisc->addWidgetPosition(label, OFX_UI_WIDGET_POSITION_RIGHT, OFX_UI_ALIGN_CENTER);
-        addDisc->addMultiImageToggle("add", "butonlar/addbutton.png", false, 50, 50);
+        addDisc->addMultiImageToggle("add", "buttonimgs/addbutton.png", false, 50, 50);
         ofxUIToggle *toggle = (ofxUIToggle*) addDisc->getWidget("add");
         addDisc->addWidgetPosition(toggle, OFX_UI_WIDGET_POSITION_DOWN, OFX_UI_ALIGN_CENTER);
         addDisc->setVisible(false);
@@ -1941,29 +1945,29 @@ void ofApp::newUI(int newIndex){
     
     _ui = new ofxUICanvas();
     _ui->setFont(OF_TTF_MONO);
-    _ui->addMultiImageToggle("inner","butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
+    _ui->addMultiImageToggle("inner","buttonimgs/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
     _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
     _ui->addLabel("Groove " + ofToString(newIndex+1),0);
     ofxUILabel *label = (ofxUILabel*) _ui->getWidget("Groove " + ofToString(newIndex+1));
     _ui->addWidgetPosition(label,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_CENTER);
-    _ui->addMultiImageToggle("outer", "butonlar/buton-07.png",false, 20, 20);
+    _ui->addMultiImageToggle("outer", "buttonimgs/buton-07.png",false, 20, 20);
     ofxUIMultiImageToggle *toggle = (ofxUIMultiImageToggle*) _ui->getWidget("outer");
     _ui->addWidgetPosition(toggle,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_RIGHT);
     _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
     _ui->addSpacer();
     
     _ui->addLabel("texture", 1);
-    if(disc.getTexture(newIndex)==0) _ui->addMultiImageButton("blank","butonlar/buton-01.png", true, 35,35);
-    else _ui->addMultiImageButton("blank","butonlar/buton-01.png", false, 35,35);
+    if(disc.getTexture(newIndex)==0) _ui->addMultiImageButton("blank","buttonimgs/buton-01.png", true, 35,35);
+    else _ui->addMultiImageButton("blank","buttonimgs/buton-01.png", false, 35,35);
     _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    if(disc.getTexture(newIndex)==1) _ui->addMultiImageButton("line", "butonlar/buton-02.png", true, 35,35);
-    else _ui->addMultiImageButton("line", "butonlar/buton-02.png", false, 35,35);
-    if(disc.getTexture(newIndex)==2) _ui->addMultiImageButton("tri", "butonlar/buton-03.png", true, 35,35);
-    else _ui->addMultiImageButton("tri", "butonlar/buton-03.png", false, 35,35);
-    if(disc.getTexture(newIndex)==3) _ui->addMultiImageButton("saw", "butonlar/buton-04.png", true, 35,35);
-    else _ui->addMultiImageButton("saw", "butonlar/buton-04.png", false, 35,35);
-    if(disc.getTexture(newIndex)==4) _ui->addMultiImageButton("rect", "butonlar/buton-05.png", true, 35,35);
-    else _ui->addMultiImageButton("rect", "butonlar/buton-05.png", false, 35,35);
+    if(disc.getTexture(newIndex)==1) _ui->addMultiImageButton("line", "buttonimgs/buton-02.png", true, 35,35);
+    else _ui->addMultiImageButton("line", "buttonimgs/buton-02.png", false, 35,35);
+    if(disc.getTexture(newIndex)==2) _ui->addMultiImageButton("tri", "buttonimgs/buton-03.png", true, 35,35);
+    else _ui->addMultiImageButton("tri", "buttonimgs/buton-03.png", false, 35,35);
+    if(disc.getTexture(newIndex)==3) _ui->addMultiImageButton("saw", "buttonimgs/buton-04.png", true, 35,35);
+    else _ui->addMultiImageButton("saw", "buttonimgs/buton-04.png", false, 35,35);
+    if(disc.getTexture(newIndex)==4) _ui->addMultiImageButton("rect", "buttonimgs/buton-05.png", true, 35,35);
+    else _ui->addMultiImageButton("rect", "buttonimgs/buton-05.png", false, 35,35);
     _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
     
     _ui->addLabel("rotation speed",1);

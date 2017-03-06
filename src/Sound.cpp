@@ -27,7 +27,7 @@ void Sound::setup(){
         //        float pulseRatio = ofMap(disc->getDensity(i), 1, 30, 0.05, .9);
         //        ControlGenerator pulseLength = synth.addParameter("pulseLength"+ofToString(i), pulseRatio);
         ControlGenerator halfPulse = 30 / (bpm+0.001);
-        ControlGenerator pulse = ControlPulse().length(halfPulse).input(metronome);
+        ControlGenerator pulse = ControlPulse().length(halfPulse).trigger(metronome);
         
         float envelopeCoeff = ofMap(30, 1, 30, .1, 10.);
         ControlGenerator envelope = synth.addParameter("envelopeWidth"+ofToString(i), envelopeCoeff);
@@ -96,7 +96,7 @@ void Sound::newSynth(int index){
     //        float pulseRatio = ofMap(disc->getDensity(i), 1, 30, 0.05, .9);
     //        ControlGenerator pulseLength = synth.addParameter("pulseLength"+ofToString(i), pulseRatio);
     ControlGenerator halfPulse = 30 / (bpm+0.001);
-    ControlGenerator pulse = ControlPulse().length(halfPulse).input(metronome);
+    ControlGenerator pulse = ControlPulse().length(halfPulse).trigger(metronome);
     
     float envelopeCoeff = ofMap(disc->getDensity(index), 1, 30, .1, 10);
     ControlGenerator envelope = synth.addParameter("envelopeWidth"+ofToString(index), envelopeCoeff);

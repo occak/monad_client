@@ -69,6 +69,9 @@ class ofApp : public ofBaseApp{
     vector<string> received;
     string title;
     
+    //UDP
+    ofxUDPManager udpSend;
+    ofxUDPManager udpReceive;
     
 private:
     

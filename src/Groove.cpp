@@ -149,11 +149,11 @@ void Groove::draw(){
         
         ofSetCircleResolution(70);
         //front
-        ofCircle(0,0,disc->getPosition(i), disc->getRadius(i-1));
-        ofCircle(0,0,disc->getPosition(i), disc->getRadius(i));
+        ofDrawCircle(0,0,disc->getPosition(i), disc->getRadius(i-1));
+        ofDrawCircle(0,0,disc->getPosition(i), disc->getRadius(i));
         //back
-        ofCircle(0,0,disc->getPosition(i)-.2, disc->getRadius(i-1));
-        ofCircle(0,0,disc->getPosition(i)-.2, disc->getRadius(i));
+        ofDrawCircle(0,0,disc->getPosition(i)-.2, disc->getRadius(i-1));
+        ofDrawCircle(0,0,disc->getPosition(i)-.2, disc->getRadius(i));
         ofFill();
         
         //get texture type and draw
@@ -188,9 +188,9 @@ void Groove::draw(){
                         rp2.set(p2.x, p2.y, p2.z-flipsideDist);
                         rp3.set(p3.x, p3.y, p3.z-(flipsideDist+2*disc->getSpikeDistance(i)));
                         
-                        ofLine(p1,p2);
+                        ofDrawLine(p1,p2);
                         //reverse
-                        ofLine(rp1,rp2);
+                        ofDrawLine(rp1,rp2);
                         
                         if(disc->getSpikeDistance(i) != 0){
                             

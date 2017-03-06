@@ -1,4 +1,3 @@
-ofxChucK-master
 ofxDatGui-master
 ofxGui
 ofxMSAPerlin-master
