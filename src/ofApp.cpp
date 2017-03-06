@@ -30,6 +30,7 @@ void ofApp::setup(){
     ofBackground(255);
     ofSetFrameRate(30);
     
+    //udp receiver
     udpReceive.Create();
     udpReceive.Bind(10003);
     udpReceive.SetNonBlocking(true);
@@ -804,365 +805,22 @@ void ofApp::update(){
         soundChange("qDist", i, qDist);
     }
     
+    //UDP
+    char udpMessage[1000];
+    udpReceive.Receive(udpMessage,1000);
+    string message = udpMessage;
     
-    //TCP
-    if(client.isConnected()){
-        string str = client.receive();
-        if(str.length() > 0){
-            received = ofSplitString(str, "//");
-            title = received[0];
-            if(title == "state"){
-                vector<string> nameValue;
-                nameValue = ofSplitString(received[1], ": ");
-                if(nameValue[0] == "discIndex") disc.setDiscIndex(ofToInt(nameValue[1]));
-                
-                //graphic values
-                for (int i = 0; i < disc.getDiscIndex(); i++) {
-                    
-                    disc.addDisc(i);
-                    newUI(i);
-                    //mesh
-                    groove.setup(&disc, me, otherPlayers);
-                    
-                    for(int j = 0; j < 11; j++){
-                        nameValue = ofSplitString(received[j+(i*11)+2], ": ");
-                        if(nameValue[0] == "radius"+ofToString(i)) {
-                            disc.setRadius(i, ofToFloat(nameValue[1]));
-                            //sound
-                            float q = ofMap(disc.getRadius(i)-disc.getRadius(i-1), 15., 100., 3., 0.);
-                            soundChange("q", i, q);
-                            //ui
-                            ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
-                            ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("radius"+ofToString(i+1)));
-                            slider->setValue(disc.getRadius(i)-disc.getRadius(i-1));
-                        }
-                        if(nameValue[0] == "rotation"+ofToString(i)) {
-                            disc.setRotation (i, ofToFloat(nameValue[1]));
-                        }
-                        if(nameValue[0] == "rotationSpeed"+ofToString(i)) {
-                            disc.setNetRotationSpeed (i, ofToFloat(nameValue[1]));
-                            //sound
-                            float netSpeed = abs(disc.getNetRotationSpeed(i));
-                            float frequency;
-                            if(netSpeed <= 5){
-                                frequency = ofMap(netSpeed, 0, 5, 50, 250);
-                            }
-                            else frequency = ofMap(netSpeed, 5, 10, 250, 800);
-                            float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
-                            float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
-                            soundChange("freq", i, frequency);
-                            soundChange("bpm", i, beatSpeed*beatDensity);
-                            //ui
-                            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
-                            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(i+1)));
-                            slider->setValue(ofToFloat(nameValue[1]));
-                        }
-                        if(nameValue[0] == "density"+ofToString(i)) {
-                            disc.setDensity (i, ofToFloat(nameValue[1]));
-                            
-                            //sound
-                            float envelopeCoeff = ofMap(disc.getDensity(i), 1, 30, 1, 5);
-                            float pulseRatio = ofMap(disc.getDensity(i), 1, 30, 0.001, 1);
-                            soundChange("envelopeWidth", i, envelopeCoeff);
-                            
-                            float netSpeed = abs(disc.getNetRotationSpeed(i));
-                            float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
-                            float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
-                            soundChange("bpm", i, beatSpeed*beatDensity);
-                            
-                            //ui
-                            ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
-                            ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("density"+ofToString(i+1)));
-                            slider->setValue(disc.getDensity(i));
-                        }
-                        if(nameValue[0] == "spike"+ofToString(i)) {
-                            disc.setSpikeDistance(i, ofToFloat(nameValue[1]));
-                            
-                            //sound
-                            float distAmount = ofMap(disc.getSpikeDistance(i), 0., 100., 1., 15., true);
-                            soundChange("drive", i, distAmount);
-                            
-                            //ui
-                            ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
-                            ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("spike"+ofToString(i+1)));
-                            slider->setValue(disc.getSpikeDistance(i));
-                        }
-                        
-                        if(nameValue[0] == "texture"+ofToString(i)) {
-                            disc.setTexture (i, ofToFloat(nameValue[1]));
-                            //sound
-                            soundChange("envelope", i, disc.getTexture(i));
-                            
-                            //ui
-                            ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
-                            ofxUIToggle *toggle0 = static_cast <ofxUIToggle*> (canvas->getWidget("blank"));
-                            ofxUIToggle *toggle1 = static_cast <ofxUIToggle*> (canvas->getWidget("line"));
-                            ofxUIToggle *toggle2 = static_cast <ofxUIToggle*> (canvas->getWidget("tri"));
-                            ofxUIToggle *toggle3 = static_cast <ofxUIToggle*> (canvas->getWidget("saw"));
-                            ofxUIToggle *toggle4 = static_cast <ofxUIToggle*> (canvas->getWidget("rect"));
-                            if(disc.getTexture(i) == 0) {
-                                toggle0->setValue(true);
-                                //set rotation slider to 0
-                                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
-                                ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(i+1)));
-                                slider->setValue(slider->getScaledValue()-slider->getScaledValue());}
-                            else toggle0->setValue(false);
-                            if(disc.getTexture(i) == 1) toggle1->setValue(true);
-                            else toggle1->setValue(false);
-                            if(disc.getTexture(i) == 2) toggle2->setValue(true);
-                            else toggle2->setValue(false);
-                            if(disc.getTexture(i) == 3) toggle3->setValue(true);
-                            else toggle3->setValue(false);
-                            if(disc.getTexture(i) == 4) toggle4->setValue(true);
-                            else toggle4->setValue(false);
-                        }
-                        if(nameValue[0] == "zPosition"+ofToString(i)) {
-                            disc.setPosition (i, ofToFloat(nameValue[1]));
-                        }
-                        if(nameValue[0] == "seed"+ofToString(i)) {
-                            disc.setSeed(i, ofToInt(nameValue[1]));
-                            disc.zMotionSetup(i, ofToInt(nameValue[1]));
-                        }
-                        if(nameValue[0] == "counter"+ofToString(i)) {
-                            disc.setCounter(i, ofToFloat(nameValue[1]));
-                        }
-                        if(nameValue[0] == "mute"+ofToString(i)) {
-                            disc.setMute(i, ofToInt(nameValue[1]));
-                            if(ofToInt(nameValue[1]) == 0) soundChange("envelope", i, disc.getTexture(i));
-                            else soundChange("envelope", i, 0);
-                            //update ui
-                            ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
-                            ofxUILabelToggle *toggle = static_cast<ofxUILabelToggle*>(canvas->getWidget("mute"));
-                            toggle->setValue((bool)disc.isMute(i));
-                        }
-                        if(nameValue[0] == "move"+ofToString(i) && ofToInt(nameValue[1]) == 1) {
-                            if (disc.isMoving(i) == 0) disc.setMoving(i, 1);
-                            else disc.setMoving(i, 0);
-                            //update ui
-                            ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
-                            ofxUILabelToggle *toggle = static_cast<ofxUILabelToggle*>(canvas->getWidget("move"));
-                            toggle->setValue((bool)disc.isMoving(i));
-                        }
-                        
-                        
-                    }
-                    
-                    
-                }
-                //toggle move all button if all grooves are moving
-                bool allMoving = false;
-                for(int i = 0; i < disc.getDiscIndex(); i++){
-                    if (disc.isMoving(i)) allMoving = true;
-                    else {
-                        allMoving = false;
-                        break;
-                    }
-                }
-                ofxUIToggle *moveAll = (ofxUIToggle*) dashboard->getWidget("move all");
-                moveAll->setValue(allMoving);
-                
-                me->setConnection(true);
-                TCPsetup = true;
-                initialize->setVisible(false);
-                dashboard->setVisible(true);
-                keyList = true;
-                costList = true;
-                
-                loginMinute = ofGetMinutes();
-                loginSecond = ofGetElapsedTimef();
-                
-                setup();
-            }
-            
-            else if (title == "costs"){
-                
-                for(int i = 1; i < received.size(); i++ ){
-                    vector<string> playerData;
-                    playerData = ofSplitString(received[i], ": ");
-                    if (playerData[0] == "costRadius") costRadius = ofToFloat(playerData[1]);
-                    if (playerData[0] == "costDensity") costDensity = ofToFloat(playerData[1]);
-                    if (playerData[0] == "costRotation") costRotation = ofToFloat(playerData[1]);
-                    if (playerData[0] == "costTexture") costTexture = ofToFloat(playerData[1]);
-                    if (playerData[0] == "costMute") costMute = ofToFloat(playerData[1]);
-                    if (playerData[0] == "costMove") costMove = ofToFloat(playerData[1]);
-                    if (playerData[0] == "costSpike") costSpike = ofToFloat(playerData[1]);
-                    if (playerData[0] == "costCreate") costCreate = ofToFloat(playerData[1]);
-                    if (playerData[0] == "reward") reward = ofToFloat(playerData[1]);
-                }
-            }
-            
-            else if (title == "playerInfo" ){
-                for(int i = 1; i < received.size(); i++ ){
-                    vector<string> playerData;
-                    playerData = ofSplitString(received[i], ": ");
-                    if (playerData[0] == "IP") me->setIP(playerData[1]);
-                    if (playerData[0] == "color") me->setColor(ofFromString<ofColor>(playerData[1]));
-                    if (playerData[0] == "life") me->setLife(ofToFloat(playerData[1]));
-                    if (playerData[0] == "index") me->setDiscIndex(ofToInt(playerData[1]));
-                    if (playerData[0] == "nick") me->setNick(playerData[1]);
-                    
-                }
-                
-                me->setConnection(true);
-                groove.setup(&disc, me, otherPlayers);
-                
-            }
-            
-            else if (title == "otherPlayers"){
-                
-                Player* _player = new Player();
-                
-                for(int i = 1; i < received.size(); i++ ){
-                    vector<string> playerData;
-                    playerData = ofSplitString(received[i], ": ");
-                    if (playerData[0] == "IP") {
-                        bool exists = false;
-                        for( int j = 0; j < otherPlayers.size(); j++){
-                            if(playerData[1] == otherPlayers[j]->getIP()) {
-                                _player = otherPlayers[j];
-                                exists = true;
-                                break;
-                            }
-                        }
-                        if (exists == false){
-                            otherPlayers.push_back(_player);
-                            _player->setIP(playerData[1]);
-                        }
-                        _player->setConnection(true);
-                    }
-                    if (playerData[0] == "color") _player->setColor(ofFromString<ofColor>(playerData[1]));
-                    if (playerData[0] == "life") _player->setLife(ofToFloat(playerData[1]));
-                    if (playerData[0] == "index") _player->setDiscIndex(ofToInt(playerData[1]));
-                    if (playerData[0] == "nick") {
-                        _player->setNick(playerData[1]);
-                        
-                        conversation = "***"+_player->getNick()+" is online***"+"\n\n" + conversation;
-                        ofxUITextArea *chatHistory = (ofxUITextArea *) chat->getWidget("chat");
-                        chatHistory->setTextString(conversation);
-                        
-                        historyText = "***"+_player->getNick()+" is online***"+"\n\n" + historyText;
-                        ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-                        _history->setTextString(historyText);
-                    }
-                }
-                groove.setup(&disc, me, otherPlayers);
-                
-            }
-            
-            else if (title == "otherPlayersIndex"){
-                
-                int thisPlayer;
-                for(int i = 1; i < received.size(); i++ ){
-                    vector<string> playerData;
-                    playerData = ofSplitString(received[i], ": ");
-                    if (playerData[0] == "IP"){
-                        for (int j = 0; j < otherPlayers.size(); j++) {
-                            if(playerData[1] == otherPlayers[j]->getIP()) {
-                                thisPlayer = j;
-                                break;
-                            }
-                        }
-                    }
-                    if (playerData[0] == "index") otherPlayers[thisPlayer]->setDiscIndex(ofToInt(playerData[1]));
-                }
-            }
-            
-            else if (title == "addDisc"){
-                
-                Player *_player = NULL;
-                int newSeed;
-                int newIndex;
-                float newRotation;
-                for(int i = 1; i < received.size(); i++ ){
-                    vector<string> playerData = ofSplitString(received[i], ": ");
-                    if(playerData[0] == "IP" && playerData[1] != me->getIP()){
-                        for (int j = 0; j < otherPlayers.size(); j++) {
-                            if(playerData[1] == otherPlayers[j]->getIP()) _player = otherPlayers[j];
-                        }
-                    }
-                    else if(playerData[0] == "IP" && playerData[1] == me->getIP()) _player = me;
-                    
-                    if(playerData[0] == "index") {
-                        
-                        newIndex = ofToInt(playerData[1]);
-                        _player->setDiscIndex(newIndex);
-                    }
-                    
-                    if(playerData[0] == "seed") newSeed = ofToInt(playerData[1]);
-                    if(playerData[0] == "total") disc.setDiscIndex(ofToInt(playerData[1]));
-                    if(playerData[0] == "netRotation") newRotation = ofToFloat(playerData[1]);
-                }
-                
-                //new disc
-                disc.addDisc(newIndex);
-                disc.setSeed(newIndex, newSeed);
-                disc.zMotionSetup(newIndex, newSeed);
-                disc.setNetRotationSpeed(newIndex, 0);
-                
-                //new mesh
-                groove.setup(&disc, me, otherPlayers);
-                
-                //new UI
-                newUI(newIndex);
-                
-                //update history
-                historyText =" // " +_player->getNick() + " groove create // "+ "\n\n"+ historyText;
-                
-                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-                _history->setTextString(historyText);
-                
-            }
-            
-            else if (title == "life"){
-                
-                Player *_player = NULL;
-                for(int i = 1; i < received.size(); i++ ){
-                    vector<string> playerData = ofSplitString(received[i], ": ");
-                    if (playerData[0] == "IP" && playerData[1] != me->getIP()){
-                        for (int j = 0; j < otherPlayers.size(); j++) {
-                            if(playerData[1] == otherPlayers[j]->getIP()) {
-                                _player = otherPlayers[j];
-                                break;
-                            }
-                        }
-                    }
-                    else if (playerData[0] == "IP" && playerData[1] == me->getIP()) _player = me;
-                    
-                    if (playerData[0] == "lifeChange" && _player != NULL) _player->changeLife(ofToFloat(playerData[1]));
-                }
-            }
-            
-            else if (title == "reward"){
-                Player *_player = NULL;
-                for(int i = 1; i < received.size(); i++ ){
-                    vector<string> playerData = ofSplitString(received[i], ": ");;
-                    if (playerData[0] == "IP" && playerData[1] != me->getIP()){
-                        for (int j = 0; j < otherPlayers.size(); j++) {
-                            if(playerData[1] == otherPlayers[j]->getIP()) {
-                                _player = otherPlayers[j];
-                                break;
-                            }
-                        }
-                    }
-                    else if (playerData[0] == "IP" && playerData[1] == me->getIP()) _player = me;
-                    
-                    if (playerData[0] == "lifeChange" && _player != NULL) {
-                        
-                        _player->changeLife(ofToFloat(playerData[1]));
-                        historyText = "*" + _player->getNick() + " +"+ ofToString(reward) + " points!*\n\n"+ historyText;
-                        
-                        ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-                        _history->setTextString(historyText);
-                    }
-                }
-                
-                
-            }
-            
-            else if (title == "rotationSpeed"){
-                vector<string> nameValue = ofSplitString(received[1], ": ");;
-                int index = ofToInt(nameValue[0]);
-                disc.setRotationSpeed(index, ofToFloat(nameValue[1]));
+    if(message.length()>0){
+        udpReceived = ofSplitString(message, "//");
+        udpTitle = received[0];
+        
+        
+        if (udpTitle == "rot"){
+            vector<string> nameValue = ofSplitString(received[1], ": ");
+            int index = ofToInt(nameValue[0]);
+            float value = ofToFloat(nameValue[1]);
+            if(abs(value) > 0){
+                disc.setRotationSpeed(index, value);
                 
                 //sound
                 float netSpeed = abs(disc.getNetRotationSpeed(index));
@@ -1181,34 +839,36 @@ void ofApp::update(){
                 ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(index+1)));
                 slider->setValue(disc.getNetRotationSpeed(index));
                 
-                
                 //update history//
                 
-                string eventHistory;
-                
-                Player* _player = NULL;
-                for(int i = 0; i < otherPlayers.size(); i++){
-                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-                }
-                if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "rotation:" + ofToString( roundf(disc.getNetRotationSpeed(index)*10)/10) +"\n\n";
-                historyText = eventHistory + historyText;
-                
-                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-                _history->setTextString(historyText);
-                
+                //                string eventHistory;
+                //
+                //                Player* _player = NULL;
+                //                for(int i = 0; i < otherPlayers.size(); i++){
+                //                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                //                }
+                //                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                //                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "rotation:" + ofToString( roundf(disc.getNetRotationSpeed(index)*10)/10) +"\n\n";
+                //                historyText = eventHistory + historyText;
+                //
+                //                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                //                _history->setTextString(historyText);
                 
             }
             
-            else if (title == "radius"){
-                vector<string> nameValue;
-                nameValue = ofSplitString(received[1], ": ");
-                int index = ofToInt(nameValue[0]);
-                disc.setThickness(index, ofToFloat(nameValue[1]));
+        }
+        
+        else if (udpTitle == "rad"){
+            vector<string> nameValue;
+            nameValue = ofSplitString(received[1], ": ");
+            int index = ofToInt(nameValue[0]);
+            float value = ofToFloat(nameValue[1]);
+            if (disc.getThickness(index) != value) {
+                disc.setThickness(index, value);
                 
                 //change sound
                 float q = ofMap(disc.getRadius(index)-disc.getRadius(index-1), 15., 100., 3., 0.);
-                soundChange("q", ofToInt(nameValue[0]), q);
+                soundChange("q", index, q);
                 
                 //update ui
                 ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
@@ -1217,25 +877,28 @@ void ofApp::update(){
                 
                 //update history//
                 
-                string eventHistory;
-                
-                Player* _player = NULL;
-                for(int i = 0; i < otherPlayers.size(); i++){
-                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-                }
-                if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "size:" + ofToString(roundf(disc.getThickness(index)*10)/10) +"\n\n";
-                historyText = eventHistory + historyText;
-                
-                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-                _history->setTextString(historyText);
-                
+                //                string eventHistory;
+                //
+                //                Player* _player = NULL;
+                //                for(int i = 0; i < otherPlayers.size(); i++){
+                //                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                //                }
+                //                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                //                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "size:" + ofToString(roundf(disc.getThickness(index)*10)/10) +"\n\n";
+                //                historyText = eventHistory + historyText;
+                //
+                //                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                //                _history->setTextString(historyText);
             }
             
-            else if (title == "density"){
-                vector<string> nameValue;
-                nameValue = ofSplitString(received[1], ": ");
-                int index = ofToInt(nameValue[0]);
+        }
+        
+        else if (udpTitle == "den"){
+            vector<string> nameValue;
+            nameValue = ofSplitString(received[1], ": ");
+            int index = ofToInt(nameValue[0]);
+            float value = ofToFloat(nameValue[1]);
+            if (disc.getDensity(index) != value) {
                 disc.setDensity(index, ofToFloat(nameValue[1]));
                 
                 //change sound
@@ -1256,26 +919,28 @@ void ofApp::update(){
                 slider->setValue(disc.getDensity(index));
                 
                 //update history//
-                
-                string eventHistory;
-                
-                Player* _player = NULL;
-                for(int i = 0; i < otherPlayers.size(); i++){
-                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-                }
-                if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "density:" + ofToString(disc.getDensity(index)) +"\n\n";
-                historyText = eventHistory + historyText;
-                
-                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-                _history->setTextString(historyText);
-                
+                //
+                //            string eventHistory;
+                //
+                //            Player* _player = NULL;
+                //            for(int i = 0; i < otherPlayers.size(); i++){
+                //                if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                //            }
+                //            if(_player == NULL) cout<< "_player is not matched" <<endl;
+                //            else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "density:" + ofToString(disc.getDensity(index)) +"\n\n";
+                //            historyText = eventHistory + historyText;
+                //
+                //            ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                //            _history->setTextString(historyText);
             }
-            
-            else if (title == "spike"){
-                vector<string> nameValue;
-                nameValue = ofSplitString(received[1], ": ");
-                int index = ofToInt(nameValue[0]);
+        }
+        
+        else if (udpTitle == "spk"){
+            vector<string> nameValue;
+            nameValue = ofSplitString(received[1], ": ");
+            int index = ofToInt(nameValue[0]);
+            float value = ofToFloat(nameValue[1]);
+            if (disc.getSpikeDistance(index) != value) {
                 disc.setSpikeDistance(index, ofToFloat(nameValue[1]));
                 
                 //change sound
@@ -1288,30 +953,32 @@ void ofApp::update(){
                 slider->setValue(disc.getSpikeDistance(index));
                 
                 //update history//
-                
-                string eventHistory;
-                
-                Player* _player = NULL;
-                for(int i = 0; i < otherPlayers.size(); i++){
-                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-                }
-                if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "spike:" + ofToString(disc.getSpikeDistance(index)) +"\n\n";
-                historyText = eventHistory + historyText;
-                
-                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-                _history->setTextString(historyText);
-                
+                //
+                //            string eventHistory;
+                //
+                //            Player* _player = NULL;
+                //            for(int i = 0; i < otherPlayers.size(); i++){
+                //                if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                //            }
+                //            if(_player == NULL) cout<< "_player is not matched" <<endl;
+                //            else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "spike:" + ofToString(disc.getSpikeDistance(index)) +"\n\n";
+                //            historyText = eventHistory + historyText;
+                //
+                //            ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                //            _history->setTextString(historyText);
             }
-            
-            else if (title == "texture"){
-                vector<string> nameValue;
-                nameValue = ofSplitString(received[1], ": ");
-                int index = ofToInt(nameValue[0]);
-                disc.setTexture(index, ofToInt(nameValue[1]));
+        }
+        
+        else if (udpTitle == "tex"){
+            vector<string> nameValue;
+            nameValue = ofSplitString(received[1], ": ");
+            int index = ofToInt(nameValue[0]);
+            int value = ofToInt(nameValue[1]);
+            if (disc.getTexture(index) != value) {
+                disc.setTexture(index, value);
                 
                 //change sound
-                soundChange("envelope", index, ofToInt(nameValue[1]));
+                soundChange("envelope", index, value);
                 
                 //update ui
                 ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
@@ -1320,7 +987,7 @@ void ofApp::update(){
                 ofxUIToggle *toggle2 = static_cast <ofxUIToggle*> (canvas->getWidget("tri"));
                 ofxUIToggle *toggle3 = static_cast <ofxUIToggle*> (canvas->getWidget("saw"));
                 ofxUIToggle *toggle4 = static_cast <ofxUIToggle*> (canvas->getWidget("rect"));
-                if(disc.getTexture(index) == 0) {
+                if(value == 0) {
                     toggle0->setValue(true);
                     
                     //when texture is set to blank, rotation stops
@@ -1332,75 +999,79 @@ void ofApp::update(){
                     slider->setValue(slider->getScaledValue()-slider->getScaledValue());
                 }
                 else toggle0->setValue(false);
-                if(disc.getTexture(index) == 1) toggle1->setValue(true);
+                if(value == 1) toggle1->setValue(true);
                 else toggle1->setValue(false);
-                if(disc.getTexture(index) == 2) toggle2->setValue(true);
+                if(value == 2) toggle2->setValue(true);
                 else toggle2->setValue(false);
-                if(disc.getTexture(index) == 3) toggle3->setValue(true);
+                if(value == 3) toggle3->setValue(true);
                 else toggle3->setValue(false);
-                if(disc.getTexture(index) == 4) toggle4->setValue(true);
+                if(value == 4) toggle4->setValue(true);
                 else toggle4->setValue(false);
                 
                 //update history//
-                
-                string eventHistory;
-                string texture;
-                if(disc.getTexture(index) == 0) texture = "blank";
-                if(disc.getTexture(index) == 1) texture = "line";
-                if(disc.getTexture(index) == 2) texture = "tri";
-                if(disc.getTexture(index) == 3) texture = "saw";
-                if(disc.getTexture(index) == 4) texture = "rect";
-                
-                Player* _player = NULL;
-                for(int i = 0; i < otherPlayers.size(); i++){
-                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-                }
-                if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "texture:" + texture +"\n\n";
-                historyText = eventHistory + historyText;
-                
-                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-                _history->setTextString(historyText);
-                
-            }
-            
-            else if (title == "mute"){
-                vector<string> nameValue;
-                nameValue = ofSplitString(received[1], ": ");
-                int index = ofToInt(nameValue[0]);
-                disc.setMute(index, ofToInt(nameValue[1]));
-                if(ofToInt(nameValue[1]) == 0) soundChange("envelope", index, disc.getTexture(index));
-                else soundChange("envelope", index, 0);
-                //update ui
-                ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
-                ofxUILabelToggle *toggle = static_cast<ofxUILabelToggle*>(canvas->getWidget("mute"));
-                toggle->setValue((bool)disc.isMute(index));
-                
-                //update history//
-                
-                string eventHistory;
-                string change;
-                if(ofToInt(nameValue[1]) == 0) change = "off";
-                if(ofToInt(nameValue[1]) == 1) change = "on";
-                
-                Player* _player = NULL;
-                for(int i = 0; i < otherPlayers.size(); i++){
-                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-                }
-                if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "mute:" + change +"\n\n";
-                historyText = eventHistory + historyText;
-                
-                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-                _history->setTextString(historyText);
+                //
+                //            string eventHistory;
+                //            string texture;
+                //            if(disc.getTexture(index) == 0) texture = "blank";
+                //            if(disc.getTexture(index) == 1) texture = "line";
+                //            if(disc.getTexture(index) == 2) texture = "tri";
+                //            if(disc.getTexture(index) == 3) texture = "saw";
+                //            if(disc.getTexture(index) == 4) texture = "rect";
+                //
+                //            Player* _player = NULL;
+                //            for(int i = 0; i < otherPlayers.size(); i++){
+                //                if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                //            }
+                //            if(_player == NULL) cout<< "_player is not matched" <<endl;
+                //            else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "texture:" + texture +"\n\n";
+                //            historyText = eventHistory + historyText;
+                //
+                //            ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                //            _history->setTextString(historyText);
                 
             }
             
-            else if (title == "move"){
+            else if (udpTitle == "mut"){
                 vector<string> nameValue;
                 nameValue = ofSplitString(received[1], ": ");
                 int index = ofToInt(nameValue[0]);
-                disc.setMoving(index, ofToInt(nameValue[1]));
+                int value = ofToInt(nameValue[1]);
+                if (disc.isMute(index) != value) {
+                    disc.setMute(index, value);
+                    if(value == 0) soundChange("envelope", index, disc.getTexture(index));
+                    else soundChange("envelope", index, 0);
+                    //update ui
+                    ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
+                    ofxUILabelToggle *toggle = static_cast<ofxUILabelToggle*>(canvas->getWidget("mute"));
+                    toggle->setValue((bool)disc.isMute(index));
+                    
+                    //update history//
+//                    
+//                    string eventHistory;
+//                    string change;
+//                    if(value == 0) change = "off";
+//                    if(value == 1) change = "on";
+//                    
+//                    Player* _player = NULL;
+//                    for(int i = 0; i < otherPlayers.size(); i++){
+//                        if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+//                    }
+//                    if(_player == NULL) cout<< "_player is not matched" <<endl;
+//                    else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "mute:" + change +"\n\n";
+//                    historyText = eventHistory + historyText;
+//                    
+//                    ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+//                    _history->setTextString(historyText);
+                }
+            }
+            
+            else if (udpTitle == "mov"){
+                vector<string> nameValue;
+                nameValue = ofSplitString(received[1], ": ");
+                int index = ofToInt(nameValue[0]);
+                int value = ofToInt(nameValue[1]);
+                if (disc.isMoving(index) != value) {
+                disc.setMoving(index, value);
                 //update ui
                 ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
                 ofxUIToggle *toggle = static_cast<ofxUIToggle*>(canvas->getWidget("move"));
@@ -1408,25 +1079,25 @@ void ofApp::update(){
                 
                 //update history//
                 
-                string eventHistory;
-                string change;
-                if(ofToInt(nameValue[1]) == 0) change = "off";
-                if(ofToInt(nameValue[1]) == 1) change = "on";
-                
-                Player* _player = NULL;
-                for(int i = 0; i < otherPlayers.size(); i++){
-                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-                }
-                if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "move:" + change +"\n\n";
-                historyText = eventHistory + historyText;
-                
-                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-                _history->setTextString(historyText);
+//                string eventHistory;
+//                string change;
+//                if(value == 0) change = "off";
+//                else if(value == 1) change = "on";
+//                
+//                Player* _player = NULL;
+//                for(int i = 0; i < otherPlayers.size(); i++){
+//                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+//                }
+//                if(_player == NULL) cout<< "_player is not matched" <<endl;
+//                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "move:" + change +"\n\n";
+//                historyText = eventHistory + historyText;
+//                
+//                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+//                _history->setTextString(historyText);
                 
             }
             
-            else if (title == "moveReset"){
+            else if (udpTitle == "movR"){
                 int index = ofToInt(received[1]);
                 disc.resetPerlin[index] = 1;
                 //ui
@@ -1435,24 +1106,24 @@ void ofApp::update(){
                 toggle->setValue(false);
                 
                 //update history//
-                
-                string eventHistory;
-                
-                Player* _player = NULL;
-                for(int i = 0; i < otherPlayers.size(); i++){
-                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
-                }
-                if(_player == NULL) cout<< "_player is not matched" <<endl;
-                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "z-reset\n\n";
-                historyText = eventHistory + historyText;
-                
-                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-                _history->setTextString(historyText);
+//                
+//                string eventHistory;
+//                
+//                Player* _player = NULL;
+//                for(int i = 0; i < otherPlayers.size(); i++){
+//                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+//                }
+//                if(_player == NULL) cout<< "_player is not matched" <<endl;
+//                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "z-reset\n\n";
+//                historyText = eventHistory + historyText;
+//                
+//                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+//                _history->setTextString(historyText);
                 
                 
             }
             
-            else if (title == "moveAll"){
+            else if (udpTitle == "movA"){
                 ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (dashboard->getWidget("move all"));
                 toggleMoveAll->setValue(true);
                 for(int i = 0; i<disc.getDiscIndex(); i++){
@@ -1479,7 +1150,7 @@ void ofApp::update(){
                 
             }
             
-            else if (title == "stopAll"){
+            else if (udpTitle == "stpA"){
                 ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (dashboard->getWidget("move all"));
                 toggleMoveAll->setValue(false);
                 for(int i = 0; i<disc.getDiscIndex(); i++){
@@ -1506,7 +1177,7 @@ void ofApp::update(){
                 
             }
             
-            else if (title == "resetAll"){
+            else if (udpTitle == "rstA"){
                 ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (dashboard->getWidget("move all"));
                 toggleMoveAll->setValue(false);
                 for(int i = 0; i<disc.getDiscIndex(); i++){
@@ -1533,13 +1204,13 @@ void ofApp::update(){
                 
             }
             
-            else if (title == "zPosition"){
+            else if (udpTitle == "z"){
                 vector<string> nameValue;
                 nameValue = ofSplitString(received[1], ": ");
                 disc.setPosition(ofToInt(nameValue[0]), ofToFloat(nameValue[1]));
             }
             
-            else if (title == "zPositionAll"){
+            else if (udpTitle == "zA"){
                 for (int i = 1; i < received.size()-1; i++) {
                     vector<string> nameValue;
                     nameValue = ofSplitString(received[i], ": ");
@@ -1547,372 +1218,1229 @@ void ofApp::update(){
                 }
             }
             
-            else if (title == "counter"){
+            else if (udpTitle == "ctr"){
                 vector<string> nameValue;
                 nameValue = ofSplitString(received[1], ": ");
                 disc.setCounter(ofToInt(nameValue[0]), ofToFloat(nameValue[1]));
             }
             
-            else if (title == "chat"){
-                conversation = received[1] + conversation;
-                ofxUITextArea *chatHistory = (ofxUITextArea *) chat->getWidget("chat");
-                chatHistory->setTextString(conversation);
+            
+        }
+        
+        //TCP
+        if(client.isConnected()){
+            string str = client.receive();
+            if(str.length() > 0){
+                received = ofSplitString(str, "//");
+                title = received[0];
+                if(title == "state"){
+                    vector<string> nameValue;
+                    nameValue = ofSplitString(received[1], ": ");
+                    if(nameValue[0] == "discIndex") disc.setDiscIndex(ofToInt(nameValue[1]));
+                    
+                    //graphic values
+                    for (int i = 0; i < disc.getDiscIndex(); i++) {
+                        
+                        disc.addDisc(i);
+                        newUI(i);
+                        //mesh
+                        groove.setup(&disc, me, otherPlayers);
+                        
+                        for(int j = 0; j < 11; j++){
+                            nameValue = ofSplitString(received[j+(i*11)+2], ": ");
+                            if(nameValue[0] == "radius"+ofToString(i)) {
+                                disc.setRadius(i, ofToFloat(nameValue[1]));
+                                //sound
+                                float q = ofMap(disc.getRadius(i)-disc.getRadius(i-1), 15., 100., 3., 0.);
+                                soundChange("q", i, q);
+                                //ui
+                                ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
+                                ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("radius"+ofToString(i+1)));
+                                slider->setValue(disc.getRadius(i)-disc.getRadius(i-1));
+                            }
+                            if(nameValue[0] == "rotation"+ofToString(i)) {
+                                disc.setRotation (i, ofToFloat(nameValue[1]));
+                            }
+                            if(nameValue[0] == "rotationSpeed"+ofToString(i)) {
+                                disc.setNetRotationSpeed (i, ofToFloat(nameValue[1]));
+                                //sound
+                                float netSpeed = abs(disc.getNetRotationSpeed(i));
+                                float frequency;
+                                if(netSpeed <= 5){
+                                    frequency = ofMap(netSpeed, 0, 5, 50, 250);
+                                }
+                                else frequency = ofMap(netSpeed, 5, 10, 250, 800);
+                                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
+                                float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
+                                soundChange("freq", i, frequency);
+                                soundChange("bpm", i, beatSpeed*beatDensity);
+                                //ui
+                                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
+                                ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(i+1)));
+                                slider->setValue(ofToFloat(nameValue[1]));
+                            }
+                            if(nameValue[0] == "density"+ofToString(i)) {
+                                disc.setDensity (i, ofToFloat(nameValue[1]));
+                                
+                                //sound
+                                float envelopeCoeff = ofMap(disc.getDensity(i), 1, 30, 1, 5);
+                                float pulseRatio = ofMap(disc.getDensity(i), 1, 30, 0.001, 1);
+                                soundChange("envelopeWidth", i, envelopeCoeff);
+                                
+                                float netSpeed = abs(disc.getNetRotationSpeed(i));
+                                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
+                                float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
+                                soundChange("bpm", i, beatSpeed*beatDensity);
+                                
+                                //ui
+                                ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
+                                ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("density"+ofToString(i+1)));
+                                slider->setValue(disc.getDensity(i));
+                            }
+                            if(nameValue[0] == "spike"+ofToString(i)) {
+                                disc.setSpikeDistance(i, ofToFloat(nameValue[1]));
+                                
+                                //sound
+                                float distAmount = ofMap(disc.getSpikeDistance(i), 0., 100., 1., 15., true);
+                                soundChange("drive", i, distAmount);
+                                
+                                //ui
+                                ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
+                                ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("spike"+ofToString(i+1)));
+                                slider->setValue(disc.getSpikeDistance(i));
+                            }
+                            
+                            if(nameValue[0] == "texture"+ofToString(i)) {
+                                disc.setTexture (i, ofToFloat(nameValue[1]));
+                                //sound
+                                soundChange("envelope", i, disc.getTexture(i));
+                                
+                                //ui
+                                ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
+                                ofxUIToggle *toggle0 = static_cast <ofxUIToggle*> (canvas->getWidget("blank"));
+                                ofxUIToggle *toggle1 = static_cast <ofxUIToggle*> (canvas->getWidget("line"));
+                                ofxUIToggle *toggle2 = static_cast <ofxUIToggle*> (canvas->getWidget("tri"));
+                                ofxUIToggle *toggle3 = static_cast <ofxUIToggle*> (canvas->getWidget("saw"));
+                                ofxUIToggle *toggle4 = static_cast <ofxUIToggle*> (canvas->getWidget("rect"));
+                                if(disc.getTexture(i) == 0) {
+                                    toggle0->setValue(true);
+                                    //set rotation slider to 0
+                                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
+                                    ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(i+1)));
+                                    slider->setValue(slider->getScaledValue()-slider->getScaledValue());}
+                                else toggle0->setValue(false);
+                                if(disc.getTexture(i) == 1) toggle1->setValue(true);
+                                else toggle1->setValue(false);
+                                if(disc.getTexture(i) == 2) toggle2->setValue(true);
+                                else toggle2->setValue(false);
+                                if(disc.getTexture(i) == 3) toggle3->setValue(true);
+                                else toggle3->setValue(false);
+                                if(disc.getTexture(i) == 4) toggle4->setValue(true);
+                                else toggle4->setValue(false);
+                            }
+                            if(nameValue[0] == "zPosition"+ofToString(i)) {
+                                disc.setPosition (i, ofToFloat(nameValue[1]));
+                            }
+                            if(nameValue[0] == "seed"+ofToString(i)) {
+                                disc.setSeed(i, ofToInt(nameValue[1]));
+                                disc.zMotionSetup(i, ofToInt(nameValue[1]));
+                            }
+                            if(nameValue[0] == "counter"+ofToString(i)) {
+                                disc.setCounter(i, ofToFloat(nameValue[1]));
+                            }
+                            if(nameValue[0] == "mute"+ofToString(i)) {
+                                disc.setMute(i, ofToInt(nameValue[1]));
+                                if(ofToInt(nameValue[1]) == 0) soundChange("envelope", i, disc.getTexture(i));
+                                else soundChange("envelope", i, 0);
+                                //update ui
+                                ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
+                                ofxUILabelToggle *toggle = static_cast<ofxUILabelToggle*>(canvas->getWidget("mute"));
+                                toggle->setValue((bool)disc.isMute(i));
+                            }
+                            if(nameValue[0] == "move"+ofToString(i) && ofToInt(nameValue[1]) == 1) {
+                                if (disc.isMoving(i) == 0) disc.setMoving(i, 1);
+                                else disc.setMoving(i, 0);
+                                //update ui
+                                ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[i]);
+                                ofxUILabelToggle *toggle = static_cast<ofxUILabelToggle*>(canvas->getWidget("move"));
+                                toggle->setValue((bool)disc.isMoving(i));
+                            }
+                            
+                            
+                        }
+                        
+                        
+                    }
+                    //toggle move all button if all grooves are moving
+                    bool allMoving = false;
+                    for(int i = 0; i < disc.getDiscIndex(); i++){
+                        if (disc.isMoving(i)) allMoving = true;
+                        else {
+                            allMoving = false;
+                            break;
+                        }
+                    }
+                    ofxUIToggle *moveAll = (ofxUIToggle*) dashboard->getWidget("move all");
+                    moveAll->setValue(allMoving);
+                    
+                    me->setConnection(true);
+                    TCPsetup = true;
+                    initialize->setVisible(false);
+                    dashboard->setVisible(true);
+                    keyList = true;
+                    costList = true;
+                    
+                    loginMinute = ofGetMinutes();
+                    loginSecond = ofGetElapsedTimef();
+                    
+                    setup();
+                }
+                
+                else if (title == "costs"){
+                    
+                    for(int i = 1; i < received.size(); i++ ){
+                        vector<string> playerData;
+                        playerData = ofSplitString(received[i], ": ");
+                        if (playerData[0] == "costRadius") costRadius = ofToFloat(playerData[1]);
+                        if (playerData[0] == "costDensity") costDensity = ofToFloat(playerData[1]);
+                        if (playerData[0] == "costRotation") costRotation = ofToFloat(playerData[1]);
+                        if (playerData[0] == "costTexture") costTexture = ofToFloat(playerData[1]);
+                        if (playerData[0] == "costMute") costMute = ofToFloat(playerData[1]);
+                        if (playerData[0] == "costMove") costMove = ofToFloat(playerData[1]);
+                        if (playerData[0] == "costSpike") costSpike = ofToFloat(playerData[1]);
+                        if (playerData[0] == "costCreate") costCreate = ofToFloat(playerData[1]);
+                        if (playerData[0] == "reward") reward = ofToFloat(playerData[1]);
+                    }
+                }
+                
+                else if (title == "playerInfo" ){
+                    for(int i = 1; i < received.size(); i++ ){
+                        vector<string> playerData;
+                        playerData = ofSplitString(received[i], ": ");
+                        if (playerData[0] == "IP") me->setIP(playerData[1]);
+                        if (playerData[0] == "color") me->setColor(ofFromString<ofColor>(playerData[1]));
+                        if (playerData[0] == "life") me->setLife(ofToFloat(playerData[1]));
+                        if (playerData[0] == "index") me->setDiscIndex(ofToInt(playerData[1]));
+                        if (playerData[0] == "nick") me->setNick(playerData[1]);
+                        
+                    }
+                    
+                    me->setConnection(true);
+                    groove.setup(&disc, me, otherPlayers);
+                    
+                }
+                
+                else if (title == "otherPlayers"){
+                    
+                    Player* _player = new Player();
+                    
+                    for(int i = 1; i < received.size(); i++ ){
+                        vector<string> playerData;
+                        playerData = ofSplitString(received[i], ": ");
+                        if (playerData[0] == "IP") {
+                            bool exists = false;
+                            for( int j = 0; j < otherPlayers.size(); j++){
+                                if(playerData[1] == otherPlayers[j]->getIP()) {
+                                    _player = otherPlayers[j];
+                                    exists = true;
+                                    break;
+                                }
+                            }
+                            if (exists == false){
+                                otherPlayers.push_back(_player);
+                                _player->setIP(playerData[1]);
+                            }
+                            _player->setConnection(true);
+                        }
+                        if (playerData[0] == "color") _player->setColor(ofFromString<ofColor>(playerData[1]));
+                        if (playerData[0] == "life") _player->setLife(ofToFloat(playerData[1]));
+                        if (playerData[0] == "index") _player->setDiscIndex(ofToInt(playerData[1]));
+                        if (playerData[0] == "nick") {
+                            _player->setNick(playerData[1]);
+                            
+                            conversation = "***"+_player->getNick()+" is online***"+"\n\n" + conversation;
+                            ofxUITextArea *chatHistory = (ofxUITextArea *) chat->getWidget("chat");
+                            chatHistory->setTextString(conversation);
+                            
+                            historyText = "***"+_player->getNick()+" is online***"+"\n\n" + historyText;
+                            ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                            _history->setTextString(historyText);
+                        }
+                    }
+                    groove.setup(&disc, me, otherPlayers);
+                    
+                }
+                
+                else if (title == "otherPlayersIndex"){
+                    
+                    int thisPlayer;
+                    for(int i = 1; i < received.size(); i++ ){
+                        vector<string> playerData;
+                        playerData = ofSplitString(received[i], ": ");
+                        if (playerData[0] == "IP"){
+                            for (int j = 0; j < otherPlayers.size(); j++) {
+                                if(playerData[1] == otherPlayers[j]->getIP()) {
+                                    thisPlayer = j;
+                                    break;
+                                }
+                            }
+                        }
+                        if (playerData[0] == "index") otherPlayers[thisPlayer]->setDiscIndex(ofToInt(playerData[1]));
+                    }
+                }
+                
+                else if (title == "addDisc"){
+                    
+                    Player *_player = NULL;
+                    int newSeed;
+                    int newIndex;
+                    float newRotation;
+                    for(int i = 1; i < received.size(); i++ ){
+                        vector<string> playerData = ofSplitString(received[i], ": ");
+                        if(playerData[0] == "IP" && playerData[1] != me->getIP()){
+                            for (int j = 0; j < otherPlayers.size(); j++) {
+                                if(playerData[1] == otherPlayers[j]->getIP()) _player = otherPlayers[j];
+                            }
+                        }
+                        else if(playerData[0] == "IP" && playerData[1] == me->getIP()) _player = me;
+                        
+                        if(playerData[0] == "index") {
+                            
+                            newIndex = ofToInt(playerData[1]);
+                            _player->setDiscIndex(newIndex);
+                        }
+                        
+                        if(playerData[0] == "seed") newSeed = ofToInt(playerData[1]);
+                        if(playerData[0] == "total") disc.setDiscIndex(ofToInt(playerData[1]));
+                        if(playerData[0] == "netRotation") newRotation = ofToFloat(playerData[1]);
+                    }
+                    
+                    //new disc
+                    disc.addDisc(newIndex);
+                    disc.setSeed(newIndex, newSeed);
+                    disc.zMotionSetup(newIndex, newSeed);
+                    disc.setNetRotationSpeed(newIndex, 0);
+                    
+                    //new mesh
+                    groove.setup(&disc, me, otherPlayers);
+                    
+                    //new UI
+                    newUI(newIndex);
+                    
+                    //update history
+                    historyText =" // " +_player->getNick() + " groove create // "+ "\n\n"+ historyText;
+                    
+                    ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                    _history->setTextString(historyText);
+                    
+                }
+                
+                else if (title == "life"){
+                    
+                    Player *_player = NULL;
+                    for(int i = 1; i < received.size(); i++ ){
+                        vector<string> playerData = ofSplitString(received[i], ": ");
+                        if (playerData[0] == "IP" && playerData[1] != me->getIP()){
+                            for (int j = 0; j < otherPlayers.size(); j++) {
+                                if(playerData[1] == otherPlayers[j]->getIP()) {
+                                    _player = otherPlayers[j];
+                                    break;
+                                }
+                            }
+                        }
+                        else if (playerData[0] == "IP" && playerData[1] == me->getIP()) _player = me;
+                        
+                        if (playerData[0] == "lifeChange" && _player != NULL) _player->changeLife(ofToFloat(playerData[1]));
+                    }
+                }
+                
+                else if (title == "reward"){
+                    Player *_player = NULL;
+                    for(int i = 1; i < received.size(); i++ ){
+                        vector<string> playerData = ofSplitString(received[i], ": ");;
+                        if (playerData[0] == "IP" && playerData[1] != me->getIP()){
+                            for (int j = 0; j < otherPlayers.size(); j++) {
+                                if(playerData[1] == otherPlayers[j]->getIP()) {
+                                    _player = otherPlayers[j];
+                                    break;
+                                }
+                            }
+                        }
+                        else if (playerData[0] == "IP" && playerData[1] == me->getIP()) _player = me;
+                        
+                        if (playerData[0] == "lifeChange" && _player != NULL) {
+                            
+                            _player->changeLife(ofToFloat(playerData[1]));
+                            historyText = "*" + _player->getNick() + " +"+ ofToString(reward) + " points!*\n\n"+ historyText;
+                            
+                            ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                            _history->setTextString(historyText);
+                        }
+                    }
+                    
+                    
+                }
+                
+                //moved to UDP
+                
+                //            else if (title == "rotationSpeed"){
+                //                vector<string> nameValue = ofSplitString(received[1], ": ");;
+                //                int index = ofToInt(nameValue[0]);
+                //                disc.setRotationSpeed(index, ofToFloat(nameValue[1]));
+                //
+                //                //sound
+                //                float netSpeed = abs(disc.getNetRotationSpeed(index));
+                //                float frequency;
+                //                if(netSpeed <= 5){
+                //                    frequency = ofMap(netSpeed, 0, 5, 50, 250);
+                //                }
+                //                else frequency = ofMap(netSpeed, 5, 10, 250, 800);
+                //                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
+                //                float beatDensity = ofMap(disc.getDensity(index), 1, 30, 15, 2);
+                //                soundChange("freq", index, frequency);
+                //                soundChange("bpm", index, beatSpeed*beatDensity);
+                //
+                //                //update ui
+                //                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[index]);
+                //                ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(index+1)));
+                //                slider->setValue(disc.getNetRotationSpeed(index));
+                //
+                //
+                //                //update history//
+                //
+                //                string eventHistory;
+                //
+                //                Player* _player = NULL;
+                //                for(int i = 0; i < otherPlayers.size(); i++){
+                //                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                //                }
+                //                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                //                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "rotation:" + ofToString( roundf(disc.getNetRotationSpeed(index)*10)/10) +"\n\n";
+                //                historyText = eventHistory + historyText;
+                //
+                //                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                //                _history->setTextString(historyText);
+                //
+                //
+                //            }
+                //
+                //            else if (title == "radius"){
+                //                vector<string> nameValue;
+                //                nameValue = ofSplitString(received[1], ": ");
+                //                int index = ofToInt(nameValue[0]);
+                //                disc.setThickness(index, ofToFloat(nameValue[1]));
+                //
+                //                //change sound
+                //                float q = ofMap(disc.getRadius(index)-disc.getRadius(index-1), 15., 100., 3., 0.);
+                //                soundChange("q", ofToInt(nameValue[0]), q);
+                //
+                //                //update ui
+                //                ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
+                //                ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("radius"+ofToString(index+1)));
+                //                slider->setValue(disc.getRadius(index)-disc.getRadius(index-1));
+                //
+                //                //update history//
+                //
+                //                string eventHistory;
+                //
+                //                Player* _player = NULL;
+                //                for(int i = 0; i < otherPlayers.size(); i++){
+                //                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                //                }
+                //                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                //                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "size:" + ofToString(roundf(disc.getThickness(index)*10)/10) +"\n\n";
+                //                historyText = eventHistory + historyText;
+                //
+                //                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                //                _history->setTextString(historyText);
+                //
+                //            }
+                //
+                //            else if (title == "density"){
+                //                vector<string> nameValue;
+                //                nameValue = ofSplitString(received[1], ": ");
+                //                int index = ofToInt(nameValue[0]);
+                //                disc.setDensity(index, ofToFloat(nameValue[1]));
+                //
+                //                //change sound
+                //                float envelopeCoeff = ofMap(disc.getDensity(index), 1, 30, 1, 5);
+                //                float pulseRatio = ofMap(disc.getDensity(index), 1, 30, 0.001, 1);
+                //                soundChange("envelopeWidth", index, envelopeCoeff);
+                //                //                soundChange("pulseLength", index, pulseRatio);
+                //
+                //                //change metronome
+                //                float netSpeed = abs(disc.getNetRotationSpeed(index));
+                //                float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
+                //                float beatDensity = ofMap(disc.getDensity(index), 1, 30, 15, 2);
+                //                soundChange("bpm", index, beatSpeed*beatDensity);
+                //
+                //                //update ui
+                //                ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
+                //                ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("density"+ofToString(index+1)));
+                //                slider->setValue(disc.getDensity(index));
+                //
+                //                //update history//
+                //
+                //                string eventHistory;
+                //
+                //                Player* _player = NULL;
+                //                for(int i = 0; i < otherPlayers.size(); i++){
+                //                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                //                }
+                //                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                //                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "density:" + ofToString(disc.getDensity(index)) +"\n\n";
+                //                historyText = eventHistory + historyText;
+                //
+                //                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                //                _history->setTextString(historyText);
+                //
+                //            }
+                //
+                //            else if (title == "spike"){
+                //                vector<string> nameValue;
+                //                nameValue = ofSplitString(received[1], ": ");
+                //                int index = ofToInt(nameValue[0]);
+                //                disc.setSpikeDistance(index, ofToFloat(nameValue[1]));
+                //
+                //                //change sound
+                //                float distAmount = ofMap(disc.getSpikeDistance(index), 0., 100., 1., 15., true);
+                //                soundChange("drive", index, distAmount);
+                //
+                //                //update ui
+                //                ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
+                //                ofxUISlider *slider = static_cast<ofxUISlider*>(canvas->getWidget("spike"+ofToString(index+1)));
+                //                slider->setValue(disc.getSpikeDistance(index));
+                //
+                //                //update history//
+                //
+                //                string eventHistory;
+                //
+                //                Player* _player = NULL;
+                //                for(int i = 0; i < otherPlayers.size(); i++){
+                //                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                //                }
+                //                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                //                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "spike:" + ofToString(disc.getSpikeDistance(index)) +"\n\n";
+                //                historyText = eventHistory + historyText;
+                //
+                //                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                //                _history->setTextString(historyText);
+                //
+                //            }
+                //
+                //            else if (title == "texture"){
+                //                vector<string> nameValue;
+                //                nameValue = ofSplitString(received[1], ": ");
+                //                int index = ofToInt(nameValue[0]);
+                //                disc.setTexture(index, ofToInt(nameValue[1]));
+                //
+                //                //change sound
+                //                soundChange("envelope", index, ofToInt(nameValue[1]));
+                //
+                //                //update ui
+                //                ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
+                //                ofxUIToggle *toggle0 = static_cast <ofxUIToggle*> (canvas->getWidget("blank"));
+                //                ofxUIToggle *toggle1 = static_cast <ofxUIToggle*> (canvas->getWidget("line"));
+                //                ofxUIToggle *toggle2 = static_cast <ofxUIToggle*> (canvas->getWidget("tri"));
+                //                ofxUIToggle *toggle3 = static_cast <ofxUIToggle*> (canvas->getWidget("saw"));
+                //                ofxUIToggle *toggle4 = static_cast <ofxUIToggle*> (canvas->getWidget("rect"));
+                //                if(disc.getTexture(index) == 0) {
+                //                    toggle0->setValue(true);
+                //
+                //                    //when texture is set to blank, rotation stops
+                //                    disc.setRotationSpeed(index, -disc.getNetRotationSpeed(index));
+                //
+                //                    //set rotation slider to 0
+                //                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[index]);
+                //                    ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(index+1)));
+                //                    slider->setValue(slider->getScaledValue()-slider->getScaledValue());
+                //                }
+                //                else toggle0->setValue(false);
+                //                if(disc.getTexture(index) == 1) toggle1->setValue(true);
+                //                else toggle1->setValue(false);
+                //                if(disc.getTexture(index) == 2) toggle2->setValue(true);
+                //                else toggle2->setValue(false);
+                //                if(disc.getTexture(index) == 3) toggle3->setValue(true);
+                //                else toggle3->setValue(false);
+                //                if(disc.getTexture(index) == 4) toggle4->setValue(true);
+                //                else toggle4->setValue(false);
+                //
+                //                //update history//
+                //
+                //                string eventHistory;
+                //                string texture;
+                //                if(disc.getTexture(index) == 0) texture = "blank";
+                //                if(disc.getTexture(index) == 1) texture = "line";
+                //                if(disc.getTexture(index) == 2) texture = "tri";
+                //                if(disc.getTexture(index) == 3) texture = "saw";
+                //                if(disc.getTexture(index) == 4) texture = "rect";
+                //
+                //                Player* _player = NULL;
+                //                for(int i = 0; i < otherPlayers.size(); i++){
+                //                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                //                }
+                //                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                //                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "texture:" + texture +"\n\n";
+                //                historyText = eventHistory + historyText;
+                //
+                //                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                //                _history->setTextString(historyText);
+                //
+                //            }
+                //
+                //            else if (title == "mute"){
+                //                vector<string> nameValue;
+                //                nameValue = ofSplitString(received[1], ": ");
+                //                int index = ofToInt(nameValue[0]);
+                //                disc.setMute(index, ofToInt(nameValue[1]));
+                //                if(ofToInt(nameValue[1]) == 0) soundChange("envelope", index, disc.getTexture(index));
+                //                else soundChange("envelope", index, 0);
+                //                //update ui
+                //                ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
+                //                ofxUILabelToggle *toggle = static_cast<ofxUILabelToggle*>(canvas->getWidget("mute"));
+                //                toggle->setValue((bool)disc.isMute(index));
+                //
+                //                //update history//
+                //
+                //                string eventHistory;
+                //                string change;
+                //                if(ofToInt(nameValue[1]) == 0) change = "off";
+                //                if(ofToInt(nameValue[1]) == 1) change = "on";
+                //
+                //                Player* _player = NULL;
+                //                for(int i = 0; i < otherPlayers.size(); i++){
+                //                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                //                }
+                //                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                //                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "mute:" + change +"\n\n";
+                //                historyText = eventHistory + historyText;
+                //
+                //                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                //                _history->setTextString(historyText);
+                //
+                //            }
+                //
+                //            else if (title == "move"){
+                //                vector<string> nameValue;
+                //                nameValue = ofSplitString(received[1], ": ");
+                //                int index = ofToInt(nameValue[0]);
+                //                disc.setMoving(index, ofToInt(nameValue[1]));
+                //                //update ui
+                //                ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
+                //                ofxUIToggle *toggle = static_cast<ofxUIToggle*>(canvas->getWidget("move"));
+                //                toggle->setValue((bool)disc.isMoving(index));
+                //
+                //                //update history//
+                //
+                //                string eventHistory;
+                //                string change;
+                //                if(ofToInt(nameValue[1]) == 0) change = "off";
+                //                if(ofToInt(nameValue[1]) == 1) change = "on";
+                //
+                //                Player* _player = NULL;
+                //                for(int i = 0; i < otherPlayers.size(); i++){
+                //                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                //                }
+                //                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                //                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "move:" + change +"\n\n";
+                //                historyText = eventHistory + historyText;
+                //
+                //                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                //                _history->setTextString(historyText);
+                //
+                //            }
+                //
+                //            else if (title == "moveReset"){
+                //                int index = ofToInt(received[1]);
+                //                disc.resetPerlin[index] = 1;
+                //                //ui
+                //                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[index]);
+                //                ofxUIToggle *toggle = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                //                toggle->setValue(false);
+                //
+                //                //update history//
+                //
+                //                string eventHistory;
+                //
+                //                Player* _player = NULL;
+                //                for(int i = 0; i < otherPlayers.size(); i++){
+                //                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                //                }
+                //                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                //                else eventHistory = _player->getNick() + " // " + "Grv"+ofToString(index+1)+ " // " + "z-reset\n\n";
+                //                historyText = eventHistory + historyText;
+                //
+                //                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                //                _history->setTextString(historyText);
+                //
+                //
+                //            }
+                //
+                //            else if (title == "moveAll"){
+                //                ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (dashboard->getWidget("move all"));
+                //                toggleMoveAll->setValue(true);
+                //                for(int i = 0; i<disc.getDiscIndex(); i++){
+                //                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
+                //                    ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                //                    toggleMove->setValue(true);
+                //                    disc.setMoving(i, 1);
+                //                }
+                //
+                //                //update history//
+                //
+                //                string eventHistory;
+                //
+                //                Player* _player = NULL;
+                //                for(int i = 0; i < otherPlayers.size(); i++){
+                //                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                //                }
+                //                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                //                else eventHistory = _player->getNick() + " // " + "move all\n\n";
+                //                historyText = eventHistory + historyText;
+                //
+                //                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                //                _history->setTextString(historyText);
+                //
+                //            }
+                //
+                //            else if (title == "stopAll"){
+                //                ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (dashboard->getWidget("move all"));
+                //                toggleMoveAll->setValue(false);
+                //                for(int i = 0; i<disc.getDiscIndex(); i++){
+                //                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
+                //                    ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                //                    toggleMove->setValue(false);
+                //                    disc.setMoving(i, 0);
+                //                }
+                //
+                //                //update history//
+                //
+                //                string eventHistory;
+                //
+                //                Player* _player = NULL;
+                //                for(int i = 0; i < otherPlayers.size(); i++){
+                //                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                //                }
+                //                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                //                else eventHistory = _player->getNick() + " // " + "halt all\n\n";
+                //                historyText = eventHistory + historyText;
+                //
+                //                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                //                _history->setTextString(historyText);
+                //
+                //            }
+                //
+                //            else if (title == "resetAll"){
+                //                ofxUIToggle *toggleMoveAll = static_cast <ofxUIToggle*> (dashboard->getWidget("move all"));
+                //                toggleMoveAll->setValue(false);
+                //                for(int i = 0; i<disc.getDiscIndex(); i++){
+                //                    disc.resetPerlin[i] = 1;
+                //                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[i]);
+                //                    ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                //                    toggleMove->setValue(false);
+                //                }
+                //
+                //                //update history//
+                //
+                //                string eventHistory;
+                //
+                //                Player* _player = NULL;
+                //                for(int i = 0; i < otherPlayers.size(); i++){
+                //                    if(received[2] == otherPlayers[i]->getIP()) _player = otherPlayers[i];
+                //                }
+                //                if(_player == NULL) cout<< "_player is not matched" <<endl;
+                //                else eventHistory = _player->getNick() + " // " + "reset all\n\n";
+                //                historyText = eventHistory + historyText;
+                //
+                //                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                //                _history->setTextString(historyText);
+                //
+                //            }
+                //
+                //            else if (title == "zPosition"){
+                //                vector<string> nameValue;
+                //                nameValue = ofSplitString(received[1], ": ");
+                //                disc.setPosition(ofToInt(nameValue[0]), ofToFloat(nameValue[1]));
+                //            }
+                //
+                //            else if (title == "zPositionAll"){
+                //                for (int i = 1; i < received.size()-1; i++) {
+                //                    vector<string> nameValue;
+                //                    nameValue = ofSplitString(received[i], ": ");
+                //                    disc.setPosition(ofToInt(nameValue[0]), ofToFloat(nameValue[1]));
+                //                }
+                //            }
+                //
+                //            else if (title == "counter"){
+                //                vector<string> nameValue;
+                //                nameValue = ofSplitString(received[1], ": ");
+                //                disc.setCounter(ofToInt(nameValue[0]), ofToFloat(nameValue[1]));
+                //            }
+                
+                else if (title == "chat"){
+                    conversation = received[1] + conversation;
+                    ofxUITextArea *chatHistory = (ofxUITextArea *) chat->getWidget("chat");
+                    chatHistory->setTextString(conversation);
+                    
+                }
+                
+                else if (title == "goodbye"){
+                    for (int i = 0; i < otherPlayers.size(); i++) {
+                        if(received[1] == otherPlayers[i]->getNick()) {
+                            otherPlayers[i]->setConnection(false);
+                            otherPlayers[i]->setDiscIndex(-1);
+                        }
+                        else continue;
+                    }
+                    conversation = "***"+received[1]+" is offline***"+"\n\n" + conversation;
+                    ofxUITextArea *chatHistory = (ofxUITextArea *) chat->getWidget("chat");
+                    chatHistory->setTextString(conversation);
+                    
+                    historyText = "***"+received[1]+" is offline***"+"\n\n" + historyText;
+                    ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                    _history->setTextString(historyText);
+                }
                 
             }
-            
-            else if (title == "goodbye"){
-                for (int i = 0; i < otherPlayers.size(); i++) {
-                    if(received[1] == otherPlayers[i]->getNick()) {
-                        otherPlayers[i]->setConnection(false);
-                        otherPlayers[i]->setDiscIndex(-1);
-                    }
-                    else continue;
-                }
-                conversation = "***"+received[1]+" is offline***"+"\n\n" + conversation;
-                ofxUITextArea *chatHistory = (ofxUITextArea *) chat->getWidget("chat");
-                chatHistory->setTextString(conversation);
+        }
+        else {
+            if(me != NULL && TCPsetup){
+                TCPsetup = false;
+                me->setDiscIndex(-1);
                 
-                historyText = "***"+received[1]+" is offline***"+"\n\n" + historyText;
+                string disconnected;
+                
+                disconnected = "*you are disconnected from server*\n\n";
+                historyText = disconnected + historyText;
+                conversation = disconnected + conversation;
+                
                 ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                _history->setTextString(historyText);
+                
+                ofxUITextArea *_chat = (ofxUITextArea *) chat->getWidget("chat");
                 _history->setTextString(historyText);
             }
             
         }
+        
+        if(TCPsetup) groove.update();
     }
-    else {
-        if(me != NULL && TCPsetup){
-            TCPsetup = false;
-            me->setDiscIndex(-1);
+    //--------------------------------------------------------------
+    void ofApp::draw(){
+        
+        ofBackgroundGradient(200, 230);
+        glEnable(GL_DEPTH_TEST);
+        
+        ofPushMatrix();
+        
+        ofTranslate(ofGetWidth()/2, ofGetHeight()/2);
+        
+        if(TCPsetup){
+            cam.begin();
+            groove.draw();
             
-            string disconnected;
+            if(cam.getDistance() > 100){
+                //			cout<< cam.getDistance() <<endl;
+                float wetLevel = ofMap(cam.getDistance(), 250, 9000, 0., .75);
+                float masterLevel = ofMap(cam.getDistance(), 0, 9000, .95, 0.1);
+                ofClamp(wetLevel, 0., 0.75);
+                ofClamp(masterLevel, 0., .999);
+                
+                sound.synth.setParameter("wet", wetLevel);
+                sound.synth.setParameter("master", masterLevel);
+            }
             
-            disconnected = "*you are disconnected from server*\n\n";
-            historyText = disconnected + historyText;
-            conversation = disconnected + conversation;
+            if(abs(cam.getPosition().x > 5000 ||
+                   cam.getPosition().y > 5000 ||
+                   cam.getPosition().z > 5000))
+            {
+                
+                cam.setPosition(ofClamp(cam.getPosition().x, -5000, 5000),
+                                ofClamp(cam.getPosition().y, -5000, 5000),
+                                ofClamp(cam.getPosition().z, -5000, 5000));
+                
+            }
             
-            ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-            _history->setTextString(historyText);
+            cam.end();
             
-            ofxUITextArea *_chat = (ofxUITextArea *) chat->getWidget("chat");
-            _history->setTextString(historyText);
+            ofSetColor(me->getColor());
+            ofFill();
+            ofRect(groove.lifeBar[0]);
+            
+            for(int i = 0; i < otherPlayers.size(); i++){
+                if(otherPlayers[i]->isConnected() == true){
+                    ofSetColor(otherPlayers[i]->getColor());
+                    ofFill();
+                    ofRect(groove.lifeBar[i+1]);
+                }
+            }
+            if(costList){
+                int costFactorMove = 0;
+                for(int j = 0; j < disc.getDiscIndex(); j++){
+                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
+                    ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                    if(toggleMove->getValue()==false) costFactorMove++;
+                }
+                int costMoveAll;
+                costMoveAll = costMove * costFactorMove;
+                
+                int costFactorStop = 0;
+                for(int j = 0; j < disc.getDiscIndex(); j++){
+                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
+                    ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                    if(toggleMove->getValue()==true) costFactorStop++;
+                }
+                int costStopAll;
+                costStopAll = costMove * costFactorStop;
+                
+                int costFactorReset = 0;
+                for(int j = 0; j<disc.getDiscIndex(); j++){
+                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
+                    ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
+                    if(disc.getPosition(j) != 0) costFactorReset++;
+                }
+                int costResetAll;
+                costResetAll = costMove * costFactorReset;
+                
+                
+                ofSetColor(0);
+                ofDrawBitmapString("texture     "+ofToString(costTexture)+
+                                   "\nrotation    "+ofToString(costRotation)+
+                                   "\ndensity     "+ofToString(costDensity)+
+                                   "\nsize        "+ofToString(costRadius)+
+                                   "\nspike       "+ofToString(costSpike)+
+                                   "\nmove/reset  "+ofToString(costMove)+
+                                   "\nmute        "+ofToString(costMute)+
+                                   "\nnew disc    "+ofToString(costCreate)+
+                                   "\nmove all    "+ofToString(costMoveAll)+
+                                   "\nstop all    "+ofToString(costStopAll)+
+                                   "\nreset all   "+ofToString(costResetAll), ofGetWidth()/2 - 245, ofGetHeight()/2-300);
+                
+            }
+            if(keyList){
+                ofSetColor(0);
+                ofDrawBitmapString("<w/s> navigate\n<bck> deselect\n<m> mute\n<t> timer\n<c> chat\n<f> fullscreen\n<k> key list\n<l> cost list\n<esc> exit", ofGetWidth()/2 - 250, ofGetHeight()/2 - 150);
+                
+            }
+            if(timer) {
+                ofSetColor(0);
+                ofDrawBitmapString(ofToString(roundf((ofGetElapsedTimef()-loginSecond)*100)/100)+" seconds elapsed", ofGetWidth()/2 - 250, ofGetHeight()/2 - 10);
+            }
         }
         
+        ofPopMatrix();
+        
+        glDisable(GL_DEPTH_TEST);
+        
+        
     }
     
-    if(TCPsetup) groove.update();
-}
-//--------------------------------------------------------------
-void ofApp::draw(){
-    
-    ofBackgroundGradient(200, 230);
-    glEnable(GL_DEPTH_TEST);
-    
-    ofPushMatrix();
-    
-    ofTranslate(ofGetWidth()/2, ofGetHeight()/2);
-    
-    if(TCPsetup){
-        cam.begin();
-        groove.draw();
+    //--------------------------------------------------------------
+    void ofApp::keyPressed(int key){
         
-        if(cam.getDistance() > 100){
-            //			cout<< cam.getDistance() <<endl;
-            float wetLevel = ofMap(cam.getDistance(), 250, 9000, 0., .75);
-            float masterLevel = ofMap(cam.getDistance(), 0, 9000, .95, 0.1);
-            ofClamp(wetLevel, 0., 0.75);
-            ofClamp(masterLevel, 0., .999);
-            
-            sound.synth.setParameter("wet", wetLevel);
-            sound.synth.setParameter("master", masterLevel);
-        }
-        
-        if(abs(cam.getPosition().x > 5000 ||
-               cam.getPosition().y > 5000 ||
-               cam.getPosition().z > 5000))
+        if(chat->hasKeyboardFocus() || initialize->hasKeyboardFocus())
         {
+            return;
+        }
+        
+        
+        
+        if(key == 'c' && TCPsetup) {
             
-            cam.setPosition(ofClamp(cam.getPosition().x, -5000, 5000),
-                            ofClamp(cam.getPosition().y, -5000, 5000),
-                            ofClamp(cam.getPosition().z, -5000, 5000));
+            chat->toggleVisible();
+            
+            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (dashboard);
+            ofxUIToggle *toggleChat = static_cast <ofxUIToggle*> (canvas->getWidget("chat"));
+            toggleChat->setValue(!toggleChat->getValue());
             
         }
         
-        cam.end();
-        
-        ofSetColor(me->getColor());
-        ofFill();
-        ofRect(groove.lifeBar[0]);
-        
-        for(int i = 0; i < otherPlayers.size(); i++){
-            if(otherPlayers[i]->isConnected() == true){
-                ofSetColor(otherPlayers[i]->getColor());
-                ofFill();
-                ofRect(groove.lifeBar[i+1]);
-            }
-        }
-        if(costList){
-            int costFactorMove = 0;
-            for(int j = 0; j < disc.getDiscIndex(); j++){
-                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
-                ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                if(toggleMove->getValue()==false) costFactorMove++;
-            }
-            int costMoveAll;
-            costMoveAll = costMove * costFactorMove;
+        if(key == 'w' && TCPsetup){
             
-            int costFactorStop = 0;
-            for(int j = 0; j < disc.getDiscIndex(); j++){
-                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
-                ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                if(toggleMove->getValue()==true) costFactorStop++;
-            }
-            int costStopAll;
-            costStopAll = costMove * costFactorStop;
-            
-            int costFactorReset = 0;
-            for(int j = 0; j<disc.getDiscIndex(); j++){
-                ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[j]);
-                ofxUIToggle *toggleMove = static_cast <ofxUIToggle*> (canvas->getWidget("move"));
-                if(disc.getPosition(j) != 0) costFactorReset++;
-            }
-            int costResetAll;
-            costResetAll = costMove * costFactorReset;
-            
-            
-            ofSetColor(0);
-            ofDrawBitmapString("texture     "+ofToString(costTexture)+
-                               "\nrotation    "+ofToString(costRotation)+
-                               "\ndensity     "+ofToString(costDensity)+
-                               "\nsize        "+ofToString(costRadius)+
-                               "\nspike       "+ofToString(costSpike)+
-                               "\nmove/reset  "+ofToString(costMove)+
-                               "\nmute        "+ofToString(costMute)+
-                               "\nnew disc    "+ofToString(costCreate)+
-                               "\nmove all    "+ofToString(costMoveAll)+
-                               "\nstop all    "+ofToString(costStopAll)+
-                               "\nreset all   "+ofToString(costResetAll), ofGetWidth()/2 - 245, ofGetHeight()/2-300);
-            
-        }
-        if(keyList){
-            ofSetColor(0);
-            ofDrawBitmapString("<w/s> navigate\n<bck> deselect\n<m> mute\n<t> timer\n<c> chat\n<f> fullscreen\n<k> key list\n<l> cost list\n<esc> exit", ofGetWidth()/2 - 250, ofGetHeight()/2 - 150);
-            
-        }
-        if(timer) {
-            ofSetColor(0);
-            ofDrawBitmapString(ofToString(roundf((ofGetElapsedTimef()-loginSecond)*100)/100)+" seconds elapsed", ofGetWidth()/2 - 250, ofGetHeight()/2 - 10);
-        }
-    }
-    
-    ofPopMatrix();
-    
-    glDisable(GL_DEPTH_TEST);
-    
-    
-}
-
-//--------------------------------------------------------------
-void ofApp::keyPressed(int key){
-    
-    if(chat->hasKeyboardFocus() || initialize->hasKeyboardFocus())
-    {
-        return;
-    }
-    
-    
-    
-    if(key == 'c' && TCPsetup) {
-        
-        chat->toggleVisible();
-        
-        ofxUICanvas *canvas = static_cast <ofxUICanvas*> (dashboard);
-        ofxUIToggle *toggleChat = static_cast <ofxUIToggle*> (canvas->getWidget("chat"));
-        toggleChat->setValue(!toggleChat->getValue());
-        
-    }
-    
-    if(key == 'w' && TCPsetup){
-        
-        if(disc.getDiscIndex() != 0){
-            int jump = 1;
-            bool occupied = true;
-            while(occupied == true){
-                occupied = false;
-                for(int i = 0; i < otherPlayers.size(); i++){
-                    int destination = me->getDiscIndex() + jump;
-                    if( destination >= disc.getDiscIndex()) destination -= disc.getDiscIndex();
-                    if( otherPlayers[i]->getDiscIndex() == destination) {
-                        occupied = true;
-                        jump++;
-                        break;
+            if(disc.getDiscIndex() != 0){
+                int jump = 1;
+                bool occupied = true;
+                while(occupied == true){
+                    occupied = false;
+                    for(int i = 0; i < otherPlayers.size(); i++){
+                        int destination = me->getDiscIndex() + jump;
+                        if( destination >= disc.getDiscIndex()) destination -= disc.getDiscIndex();
+                        if( otherPlayers[i]->getDiscIndex() == destination) {
+                            occupied = true;
+                            jump++;
+                            break;
+                        }
                     }
                 }
+                
+                if(jump > disc.getDiscIndex()) me->setDiscIndex(-1);
+                else if(me->getDiscIndex() + jump < disc.getDiscIndex()) me->setDiscIndex(me->getDiscIndex() + jump);
+                else me->setDiscIndex(me->getDiscIndex() + jump - disc.getDiscIndex());
+                
+                //change ui
+                for(int i = 0; i < disc.getDiscIndex(); i++){
+                    ui[i]->setVisible(false);
+                }
+                addDisc->setVisible(false);
+                ui[me->getDiscIndex()]->toggleVisible();
+                
+                //send change to server
+                string changeDisc = "otherPlayersIndex//";
+                changeDisc += "IP: "+ofToString(me->getIP()) + "//";
+                changeDisc += "index: "+ofToString(me->getDiscIndex()) + "//";
+                client.send(changeDisc);
             }
-            
-            if(jump > disc.getDiscIndex()) me->setDiscIndex(-1);
-            else if(me->getDiscIndex() + jump < disc.getDiscIndex()) me->setDiscIndex(me->getDiscIndex() + jump);
-            else me->setDiscIndex(me->getDiscIndex() + jump - disc.getDiscIndex());
-            
-            //change ui
-            for(int i = 0; i < disc.getDiscIndex(); i++){
-                ui[i]->setVisible(false);
-            }
-            addDisc->setVisible(false);
-            ui[me->getDiscIndex()]->toggleVisible();
-            
-            //send change to server
-            string changeDisc = "otherPlayersIndex//";
-            changeDisc += "IP: "+ofToString(me->getIP()) + "//";
-            changeDisc += "index: "+ofToString(me->getDiscIndex()) + "//";
-            client.send(changeDisc);
         }
-    }
-    
-    if(key == 's' && TCPsetup){
-        if(disc.getDiscIndex() != 0){
-            int jump = -1;
-            bool occupied = true;
-            while(occupied == true){
-                occupied = false;
-                for(int i = 0; i < otherPlayers.size(); i++){
-                    int destination = me->getDiscIndex() + jump;
-                    if( destination < 0 ) destination += disc.getDiscIndex();
-                    if( otherPlayers[i]->getDiscIndex() == destination) {
-                        occupied = true;
-                        jump--;
-                        break;
+        
+        if(key == 's' && TCPsetup){
+            if(disc.getDiscIndex() != 0){
+                int jump = -1;
+                bool occupied = true;
+                while(occupied == true){
+                    occupied = false;
+                    for(int i = 0; i < otherPlayers.size(); i++){
+                        int destination = me->getDiscIndex() + jump;
+                        if( destination < 0 ) destination += disc.getDiscIndex();
+                        if( otherPlayers[i]->getDiscIndex() == destination) {
+                            occupied = true;
+                            jump--;
+                            break;
+                        }
                     }
                 }
+                int newIndex = me->getDiscIndex() + jump;
+                
+                if(abs(jump) > disc.getDiscIndex()) me->setDiscIndex(-1);
+                else if(newIndex <= -1) me->setDiscIndex(newIndex + disc.getDiscIndex());
+                else if(newIndex> -1) me->setDiscIndex(newIndex);
+                
+                //change ui
+                for(int i = 0; i < disc.getDiscIndex(); i++){
+                    ui[i]->setVisible(false);
+                }
+                addDisc->setVisible(false);
+                ui[me->getDiscIndex()]->toggleVisible();
+                
+                //send change to server
+                string changeDisc = "otherPlayersIndex//";
+                changeDisc += "IP: "+ofToString(me->getIP()) + "//";
+                changeDisc += "index: "+ofToString(me->getDiscIndex()) + "//";
+                client.send(changeDisc);
             }
-            int newIndex = me->getDiscIndex() + jump;
+        }
+        
+        if(key == OF_KEY_BACKSPACE && TCPsetup) {
             
-            if(abs(jump) > disc.getDiscIndex()) me->setDiscIndex(-1);
-            else if(newIndex <= -1) me->setDiscIndex(newIndex + disc.getDiscIndex());
-            else if(newIndex> -1) me->setDiscIndex(newIndex);
-            
-            //change ui
-            for(int i = 0; i < disc.getDiscIndex(); i++){
-                ui[i]->setVisible(false);
+            if(me->getDiscIndex() != -1){
+                for(int i = 0; i < ui.size(); i++){
+                    ui[i]->setVisible(false);
+                }
+                addDisc->setVisible(true);
+                me->setDiscIndex(-1);
+                //send change to server
+                string changeDisc = "otherPlayersIndex//";
+                changeDisc += "IP: "+ofToString(me->getIP()) + "//";
+                changeDisc += "index: "+ofToString(me->getDiscIndex()) + "//";
+                client.send(changeDisc);
             }
+        }
+        if(key == 'm' && TCPsetup && me->getDiscIndex() != -1) {
+            ofxUIToggle *toggle = static_cast<ofxUILabelToggle*>(ui[me->getDiscIndex()]->getWidget("mute"));
+            if(me->getLife() > 0){
+                muteChanged = true;
+                if(toggle->getValue()==false) {
+                    disc.setMute(me->getDiscIndex(), 1); //mute on
+                    soundChange("envelope", me->getDiscIndex(), 0);
+                    toggle->setValue(true);
+                }
+                else if(toggle->getValue()==true){
+                    disc.setMute(me->getDiscIndex(), 0); //mute off
+                    disc.setEnvelope(me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
+                    soundChange("envelope", me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
+                    toggle->setValue(false);
+                }
+                
+                //update history//
+                string eventHistory;
+                string change;
+                if(disc.isMute(me->getDiscIndex()) == 0) change = "off";
+                else change = "on";
+                
+                eventHistory = me->getNick() + " // " + "Grv"+ofToString(me->getDiscIndex()+1)+ " // " + "mute:" + change +"\n\n";
+                historyText = eventHistory + historyText;
+                
+                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+                _history->setTextString(historyText);
+            }
+            else toggle->setValue(false);
+            
+        }
+        
+        if(key == 'f') {
+            fullScreen = !fullScreen;
+            ofSetFullscreen(fullScreen);
+            
+            dashboard->setPosition(ofGetWidth()/2-125, ofGetHeight()-30);
+        }
+        
+        if(key == 't' && TCPsetup) {
+            timer = !timer;
+        }
+        
+        if(key == 'k' && TCPsetup) {
+            keyList = !keyList;
+        }
+        
+        if(key == 'l' && TCPsetup) {
+            costList = !costList;
+        }
+        
+    }
+    
+    //--------------------------------------------------------------
+    void ofApp::audioOut( float * output, int bufferSize, int nChannels ) {
+        
+        sound.synth.fillBufferOfFloats(output, bufferSize, nChannels);
+        
+    }
+    
+    //--------------------------------------------------------------
+    void ofApp::soundChange(string name, int index, float value) {
+        
+        if(name == "envelope"){
+            
+            if(disc.isMute(index) == 0) disc.setEnvelope(index, value);
+            else disc.setEnvelope(index, 0);
+            
+            sound.synth.setParameter("attack"+ofToString(index),disc.getEnvelope(index, 0));
+            sound.synth.setParameter("decay"+ofToString(index),disc.getEnvelope(index, 1));
+            sound.synth.setParameter("sustain"+ofToString(index),disc.getEnvelope(index, 2));
+            sound.synth.setParameter("release"+ofToString(index),disc.getEnvelope(index, 3));
+            
+            
+            float volCoeff = 1;
+            if(disc.getTexture(index) == 1) volCoeff = 1.3;
+            else if(disc.getTexture(index) == 2) volCoeff = .5;
+            else if(disc.getTexture(index) == 3) volCoeff = .5;
+            else if(disc.getTexture(index) == 4) volCoeff = .1;
+            
+            sound.synth.setParameter("volBalance"+ofToString(index), volCoeff);
+            
+            //ui
+            ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
+            ofxUISlider *slider1 = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(index+1)));
+            ofxUISlider *slider2 = static_cast <ofxUISlider*> (canvas->getWidget("density"+ofToString(index+1)));
+            ofxUISlider *slider3 = static_cast <ofxUISlider*> (canvas->getWidget("radius"+ofToString(index+1)));
+            ofxUISlider *slider4 = static_cast <ofxUISlider*> (canvas->getWidget("spike"+ofToString(index+1)));
+            ofxUIButton *button1 = static_cast <ofxUIButton*> (canvas->getWidget("move"));
+            ofxUIButton *button2 = static_cast <ofxUIButton*> (canvas->getWidget("reset"));
+            ofxUIButton *button3 = static_cast <ofxUIButton*> (canvas->getWidget("mute"));
+            
+            if(disc.getTexture(index) == 0){
+                slider1->setVisible(false);
+                slider2->setVisible(false);
+                slider3->setVisible(false);
+                slider4->setVisible(false);
+                button1->setVisible(false);
+                button2->setVisible(false);
+                button3->setVisible(false);
+            }
+            else {
+                slider1->setVisible(true);
+                slider2->setVisible(true);
+                slider3->setVisible(true);
+                slider4->setVisible(true);
+                button1->setVisible(true);
+                button2->setVisible(true);
+                button3->setVisible(true);
+            }
+        }
+        
+        else sound.synth.setParameter(name+ofToString(index), value);
+        
+    }
+    
+    //--------------------------------------------------------------
+    void ofApp::newUI(int newIndex){
+        
+        
+        //new UI
+        ofxUICanvas *_ui;
+        
+        _ui = new ofxUICanvas();
+        _ui->setFont(OF_TTF_MONO);
+        _ui->addMultiImageToggle("inner","buttonimgs/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
+        _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+        _ui->addLabel("Groove " + ofToString(newIndex+1),0);
+        ofxUILabel *label = (ofxUILabel*) _ui->getWidget("Groove " + ofToString(newIndex+1));
+        _ui->addWidgetPosition(label,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_CENTER);
+        _ui->addMultiImageToggle("outer", "buttonimgs/buton-07.png",false, 20, 20);
+        ofxUIMultiImageToggle *toggle = (ofxUIMultiImageToggle*) _ui->getWidget("outer");
+        _ui->addWidgetPosition(toggle,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_RIGHT);
+        _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+        _ui->addSpacer();
+        
+        _ui->addLabel("texture", 1);
+        if(disc.getTexture(newIndex)==0) _ui->addMultiImageButton("blank","buttonimgs/buton-01.png", true, 35,35);
+        else _ui->addMultiImageButton("blank","buttonimgs/buton-01.png", false, 35,35);
+        _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+        if(disc.getTexture(newIndex)==1) _ui->addMultiImageButton("line", "buttonimgs/buton-02.png", true, 35,35);
+        else _ui->addMultiImageButton("line", "buttonimgs/buton-02.png", false, 35,35);
+        if(disc.getTexture(newIndex)==2) _ui->addMultiImageButton("tri", "buttonimgs/buton-03.png", true, 35,35);
+        else _ui->addMultiImageButton("tri", "buttonimgs/buton-03.png", false, 35,35);
+        if(disc.getTexture(newIndex)==3) _ui->addMultiImageButton("saw", "buttonimgs/buton-04.png", true, 35,35);
+        else _ui->addMultiImageButton("saw", "buttonimgs/buton-04.png", false, 35,35);
+        if(disc.getTexture(newIndex)==4) _ui->addMultiImageButton("rect", "buttonimgs/buton-05.png", true, 35,35);
+        else _ui->addMultiImageButton("rect", "buttonimgs/buton-05.png", false, 35,35);
+        _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+        
+        _ui->addLabel("rotation speed",1);
+        _ui->addBiLabelSlider("rotation" + ofToString(newIndex+1), "<", ">", 10, -10, disc.getNetRotationSpeed(newIndex));
+        _ui->addLabel("density",1);
+        _ui->addBiLabelSlider("density" + ofToString(newIndex+1), "| | |", "|||||", 30, 3, disc.getDensity(newIndex));
+        _ui->addLabel("size",1);
+        _ui->addBiLabelSlider("radius" + ofToString(newIndex+1), "o", "O", 15, 100, disc.getThickness(newIndex));
+        _ui->addLabel("spike",1);
+        _ui->addBiLabelSlider("spike" + ofToString(newIndex+1), ".", "^", 0, 100, disc.getSpikeDistance(newIndex));
+        
+        
+        _ui->addLabel("z-motion",1);
+        _ui->addToggle("move", disc.isMoving(newIndex));
+        _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+        _ui->addButton("reset", disc.resetPerlin[newIndex]);
+        _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+        _ui->addLabelToggle("mute", disc.isMute(newIndex));
+        
+        _ui->autoSizeToFitWidgets();
+        
+        if(me != NULL && newIndex == me->getDiscIndex()) {
+            
+            _ui->setVisible(true);
             addDisc->setVisible(false);
-            ui[me->getDiscIndex()]->toggleVisible();
-            
-            //send change to server
-            string changeDisc = "otherPlayersIndex//";
-            changeDisc += "IP: "+ofToString(me->getIP()) + "//";
-            changeDisc += "index: "+ofToString(me->getDiscIndex()) + "//";
-            client.send(changeDisc);
         }
-    }
-    
-    if(key == OF_KEY_BACKSPACE && TCPsetup) {
+        else _ui->setVisible(false);
         
-        if(me->getDiscIndex() != -1){
-            for(int i = 0; i < ui.size(); i++){
-                ui[i]->setVisible(false);
-            }
-            addDisc->setVisible(true);
-            me->setDiscIndex(-1);
-            //send change to server
-            string changeDisc = "otherPlayersIndex//";
-            changeDisc += "IP: "+ofToString(me->getIP()) + "//";
-            changeDisc += "index: "+ofToString(me->getDiscIndex()) + "//";
-            client.send(changeDisc);
-        }
-    }
-    if(key == 'm' && TCPsetup && me->getDiscIndex() != -1) {
-        ofxUIToggle *toggle = static_cast<ofxUILabelToggle*>(ui[me->getDiscIndex()]->getWidget("mute"));
-        if(me->getLife() > 0){
-            muteChanged = true;
-            if(toggle->getValue()==false) {
-                disc.setMute(me->getDiscIndex(), 1); //mute on
-                soundChange("envelope", me->getDiscIndex(), 0);
-                toggle->setValue(true);
-            }
-            else if(toggle->getValue()==true){
-                disc.setMute(me->getDiscIndex(), 0); //mute off
-                disc.setEnvelope(me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
-                soundChange("envelope", me->getDiscIndex(), disc.getTexture(me->getDiscIndex()));
-                toggle->setValue(false);
-            }
-            
-            //update history//
-            string eventHistory;
-            string change;
-            if(disc.isMute(me->getDiscIndex()) == 0) change = "off";
-            else change = "on";
-            
-            eventHistory = me->getNick() + " // " + "Grv"+ofToString(me->getDiscIndex()+1)+ " // " + "mute:" + change +"\n\n";
-            historyText = eventHistory + historyText;
-            
-            ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-            _history->setTextString(historyText);
-        }
-        else toggle->setValue(false);
+        ofAddListener(_ui->newGUIEvent, this, &ofApp::guiEvent);
         
-    }
-    
-    if(key == 'f') {
-        fullScreen = !fullScreen;
-        ofSetFullscreen(fullScreen);
-        
-        dashboard->setPosition(ofGetWidth()/2-125, ofGetHeight()-30);
-    }
-    
-    if(key == 't' && TCPsetup) {
-        timer = !timer;
-    }
-    
-    if(key == 'k' && TCPsetup) {
-        keyList = !keyList;
-    }
-    
-    if(key == 'l' && TCPsetup) {
-        costList = !costList;
-    }
-    
-}
-
-//--------------------------------------------------------------
-void ofApp::audioOut( float * output, int bufferSize, int nChannels ) {
-    
-    sound.synth.fillBufferOfFloats(output, bufferSize, nChannels);
-    
-}
-
-//--------------------------------------------------------------
-void ofApp::soundChange(string name, int index, float value) {
-    
-    if(name == "envelope"){
-        
-        if(disc.isMute(index) == 0) disc.setEnvelope(index, value);
-        else disc.setEnvelope(index, 0);
-        
-        sound.synth.setParameter("attack"+ofToString(index),disc.getEnvelope(index, 0));
-        sound.synth.setParameter("decay"+ofToString(index),disc.getEnvelope(index, 1));
-        sound.synth.setParameter("sustain"+ofToString(index),disc.getEnvelope(index, 2));
-        sound.synth.setParameter("release"+ofToString(index),disc.getEnvelope(index, 3));
+        ui.push_back(_ui);
         
         
-        float volCoeff = 1;
-        if(disc.getTexture(index) == 1) volCoeff = 1.3;
-        else if(disc.getTexture(index) == 2) volCoeff = .5;
-        else if(disc.getTexture(index) == 3) volCoeff = .5;
-        else if(disc.getTexture(index) == 4) volCoeff = .1;
+        _ui->setColorBack(me->getColor());
         
-        sound.synth.setParameter("volBalance"+ofToString(index), volCoeff);
         
         //ui
-        ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[index]);
-        ofxUISlider *slider1 = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(index+1)));
-        ofxUISlider *slider2 = static_cast <ofxUISlider*> (canvas->getWidget("density"+ofToString(index+1)));
-        ofxUISlider *slider3 = static_cast <ofxUISlider*> (canvas->getWidget("radius"+ofToString(index+1)));
-        ofxUISlider *slider4 = static_cast <ofxUISlider*> (canvas->getWidget("spike"+ofToString(index+1)));
+        ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[newIndex]);
+        ofxUISlider *slider1 = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(newIndex+1)));
+        ofxUISlider *slider2 = static_cast <ofxUISlider*> (canvas->getWidget("density"+ofToString(newIndex+1)));
+        ofxUISlider *slider3 = static_cast <ofxUISlider*> (canvas->getWidget("radius"+ofToString(newIndex+1)));
+        ofxUISlider *slider4 = static_cast <ofxUISlider*> (canvas->getWidget("spike"+ofToString(newIndex+1)));
         ofxUIButton *button1 = static_cast <ofxUIButton*> (canvas->getWidget("move"));
         ofxUIButton *button2 = static_cast <ofxUIButton*> (canvas->getWidget("reset"));
         ofxUIButton *button3 = static_cast <ofxUIButton*> (canvas->getWidget("mute"));
         
-        if(disc.getTexture(index) == 0){
+        
+        
+        if(disc.getTexture(newIndex) == 0){
             slider1->setVisible(false);
             slider2->setVisible(false);
             slider3->setVisible(false);
@@ -1930,289 +2458,185 @@ void ofApp::soundChange(string name, int index, float value) {
             button2->setVisible(true);
             button3->setVisible(true);
         }
-    }
-    
-    else sound.synth.setParameter(name+ofToString(index), value);
-    
-}
-
-//--------------------------------------------------------------
-void ofApp::newUI(int newIndex){
-    
-    
-    //new UI
-    ofxUICanvas *_ui;
-    
-    _ui = new ofxUICanvas();
-    _ui->setFont(OF_TTF_MONO);
-    _ui->addMultiImageToggle("inner","buttonimgs/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
-    _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    _ui->addLabel("Groove " + ofToString(newIndex+1),0);
-    ofxUILabel *label = (ofxUILabel*) _ui->getWidget("Groove " + ofToString(newIndex+1));
-    _ui->addWidgetPosition(label,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_CENTER);
-    _ui->addMultiImageToggle("outer", "buttonimgs/buton-07.png",false, 20, 20);
-    ofxUIMultiImageToggle *toggle = (ofxUIMultiImageToggle*) _ui->getWidget("outer");
-    _ui->addWidgetPosition(toggle,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_RIGHT);
-    _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-    _ui->addSpacer();
-    
-    _ui->addLabel("texture", 1);
-    if(disc.getTexture(newIndex)==0) _ui->addMultiImageButton("blank","buttonimgs/buton-01.png", true, 35,35);
-    else _ui->addMultiImageButton("blank","buttonimgs/buton-01.png", false, 35,35);
-    _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    if(disc.getTexture(newIndex)==1) _ui->addMultiImageButton("line", "buttonimgs/buton-02.png", true, 35,35);
-    else _ui->addMultiImageButton("line", "buttonimgs/buton-02.png", false, 35,35);
-    if(disc.getTexture(newIndex)==2) _ui->addMultiImageButton("tri", "buttonimgs/buton-03.png", true, 35,35);
-    else _ui->addMultiImageButton("tri", "buttonimgs/buton-03.png", false, 35,35);
-    if(disc.getTexture(newIndex)==3) _ui->addMultiImageButton("saw", "buttonimgs/buton-04.png", true, 35,35);
-    else _ui->addMultiImageButton("saw", "buttonimgs/buton-04.png", false, 35,35);
-    if(disc.getTexture(newIndex)==4) _ui->addMultiImageButton("rect", "buttonimgs/buton-05.png", true, 35,35);
-    else _ui->addMultiImageButton("rect", "buttonimgs/buton-05.png", false, 35,35);
-    _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-    
-    _ui->addLabel("rotation speed",1);
-    _ui->addBiLabelSlider("rotation" + ofToString(newIndex+1), "<", ">", 10, -10, disc.getNetRotationSpeed(newIndex));
-    _ui->addLabel("density",1);
-    _ui->addBiLabelSlider("density" + ofToString(newIndex+1), "| | |", "|||||", 30, 3, disc.getDensity(newIndex));
-    _ui->addLabel("size",1);
-    _ui->addBiLabelSlider("radius" + ofToString(newIndex+1), "o", "O", 15, 100, disc.getThickness(newIndex));
-    _ui->addLabel("spike",1);
-    _ui->addBiLabelSlider("spike" + ofToString(newIndex+1), ".", "^", 0, 100, disc.getSpikeDistance(newIndex));
-    
-    
-    _ui->addLabel("z-motion",1);
-    _ui->addToggle("move", disc.isMoving(newIndex));
-    _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    _ui->addButton("reset", disc.resetPerlin[newIndex]);
-    _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-    _ui->addLabelToggle("mute", disc.isMute(newIndex));
-    
-    _ui->autoSizeToFitWidgets();
-    
-    if(me != NULL && newIndex == me->getDiscIndex()) {
-        
-        _ui->setVisible(true);
-        addDisc->setVisible(false);
-    }
-    else _ui->setVisible(false);
-    
-    ofAddListener(_ui->newGUIEvent, this, &ofApp::guiEvent);
-    
-    ui.push_back(_ui);
-    
-    
-    _ui->setColorBack(me->getColor());
-    
-    
-    //ui
-    ofxUICanvas *canvas = static_cast<ofxUICanvas*>(ui[newIndex]);
-    ofxUISlider *slider1 = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(newIndex+1)));
-    ofxUISlider *slider2 = static_cast <ofxUISlider*> (canvas->getWidget("density"+ofToString(newIndex+1)));
-    ofxUISlider *slider3 = static_cast <ofxUISlider*> (canvas->getWidget("radius"+ofToString(newIndex+1)));
-    ofxUISlider *slider4 = static_cast <ofxUISlider*> (canvas->getWidget("spike"+ofToString(newIndex+1)));
-    ofxUIButton *button1 = static_cast <ofxUIButton*> (canvas->getWidget("move"));
-    ofxUIButton *button2 = static_cast <ofxUIButton*> (canvas->getWidget("reset"));
-    ofxUIButton *button3 = static_cast <ofxUIButton*> (canvas->getWidget("mute"));
-    
-    
-    
-    if(disc.getTexture(newIndex) == 0){
-        slider1->setVisible(false);
-        slider2->setVisible(false);
-        slider3->setVisible(false);
-        slider4->setVisible(false);
-        button1->setVisible(false);
-        button2->setVisible(false);
-        button3->setVisible(false);
-    }
-    else {
-        slider1->setVisible(true);
-        slider2->setVisible(true);
-        slider3->setVisible(true);
-        slider4->setVisible(true);
-        button1->setVisible(true);
-        button2->setVisible(true);
-        button3->setVisible(true);
-    }
-    
-}
-
-
-//--------------------------------------------------------------
-void ofApp::keyReleased(int key){
-    
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
-    
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button){
-    
-}
-
-//--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button){
-    
-    mReleased = false;
-    if(me != NULL && me->getDiscIndex()>=0) thisRotation = disc.getNetRotationSpeed(me->getDiscIndex());
-    
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button){
-    
-    mReleased = true;
-    
-    if(radiusChanged) {
-        radiusChanged = false;
-        me->changeLife(costRadius);
-        
-        //update server
-        string lifeUpdate = "life//";
-        lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-        lifeUpdate += "lifeChange: "+ofToString(costRadius) + "//";
-        client.send(lifeUpdate);
-        
-        string change = "radius//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getThickness(me->getDiscIndex()))+"//"+me->getIP();
-        client.send(change);
-        
-        //update history//
-        string eventHistory = me->getNick() + " // " + "Grv"+ofToString(me->getDiscIndex()+1)+ " // " + "size:" + ofToString(roundf(disc.getThickness(me->getDiscIndex())*10)/10) +"\n\n";
-        historyText = eventHistory + historyText;
-        
-        ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-        _history->setTextString(historyText);
         
     }
-    else if(densityChanged){
-        densityChanged = false;
-        me->changeLife(costDensity);
+    
+    
+    //--------------------------------------------------------------
+    void ofApp::keyReleased(int key){
         
-        //update server
-        string lifeUpdate = "life//";
-        lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-        lifeUpdate += "lifeChange: "+ofToString(costDensity) + "//";
-        client.send(lifeUpdate);
-        
-        string change = "density//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getDensity(me->getDiscIndex()))+"//"+me->getIP();
-        client.send(change);
-        
-        //update history//
-        string eventHistory = me->getNick() + " // " + "Grv"+ofToString(me->getDiscIndex()+1)+ " // " + "density:" + ofToString(disc.getDensity(me->getDiscIndex())) +"\n\n";
-        historyText = eventHistory + historyText;
-        
-        ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-        _history->setTextString(historyText);
     }
     
-    else if(spikeChanged){
-        spikeChanged = false;
-        me->changeLife(costSpike);
-        
-        //update server
-        string lifeUpdate = "life//";
-        lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-        lifeUpdate += "lifeChange: "+ofToString(costSpike) + "//";
-        client.send(lifeUpdate);
-        
-        string change = "spike//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getSpikeDistance(me->getDiscIndex()))+"//"+me->getIP();
-        client.send(change);
-        
-        
-        //update history//
-        string eventHistory = me->getNick() + " // " + "Grv"+ofToString(me->getDiscIndex()+1)+ " // " + "spike:" + ofToString(disc.getSpikeDistance(me->getDiscIndex())) +"\n\n";
-        historyText = eventHistory + historyText;
-        
-        ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-        _history->setTextString(historyText);
-    }
-    
-    else if(textureChanged){
-        textureChanged = false;
-        me->changeLife(costTexture);
-        
-        //update server
-        string lifeUpdate = "life//";
-        lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-        lifeUpdate += "lifeChange: "+ofToString(costTexture) + "//";
-        client.send(lifeUpdate);
-        
-        string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()))+"//"+me->getIP();
-        client.send(change);
-    }
-    else if(rotationChanged){
-        rotationChanged = false;
-        me->changeLife(costRotation);
-        
-        //update ui
-        ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
-        ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
-        float newRotation = slider->getValue() - thisRotation;
-        
-        //update server
-        string lifeUpdate = "life//";
-        lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-        lifeUpdate += "lifeChange: "+ofToString(costRotation) + "//";
-        client.send(lifeUpdate);
-        
-        //send to server
-        string change = "rotationSpeed//"+ ofToString(me->getDiscIndex())+": "+ ofToString(newRotation)+"//"+me->getIP();
-        client.send(change);
-        
-        //update history//
-        string eventHistory = me->getNick() + " // " + "Grv"+ofToString(me->getDiscIndex()+1)+ " // " + "rotation:" + ofToString( roundf(disc.getNetRotationSpeed(me->getDiscIndex())*10)/10) +"\n\n";
-        historyText = eventHistory + historyText;
-        
-        ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-        _history->setTextString(historyText);
-    }
-    
-    //    moveChanged is in update()
-    
-    else if(moveReset){
-        moveReset = false;
-        me->changeLife(costMove);
-        
-        //update server
-        string lifeUpdate = "life//";
-        lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
-        lifeUpdate += "lifeChange: "+ofToString(costMove) + "//";
-        client.send(lifeUpdate);
-        
-        string movementReset = "moveReset//"+ofToString(me->getDiscIndex())+"//"+me->getIP();
-        client.send(movementReset);
-    }
-    
-    else if(newDisc){
-        
-        newDisc = false;
-        
-        //        //send demand to server
-        //        string newDisc = "newDisc//"+me->getIP();
-        //        client.send(newDisc);
-        //
-        //
-        //        ofxUIToggle *toggle = (ofxUIToggle *) addDisc->getWidget("new");
-        //        toggle->setValue(false);
+    //--------------------------------------------------------------
+    void ofApp::mouseMoved(int x, int y ){
         
     }
-    // cost calculation and server notifications of move/stop/resetAll buttons are handled in guiEvent()
-}
-
-//--------------------------------------------------------------
-void ofApp::windowResized(int w, int h){
     
-}
-
-//--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg){
+    //--------------------------------------------------------------
+    void ofApp::mouseDragged(int x, int y, int button){
+        
+    }
     
-}
-
-//--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){
+    //--------------------------------------------------------------
+    void ofApp::mousePressed(int x, int y, int button){
+        
+        mReleased = false;
+        if(me != NULL && me->getDiscIndex()>=0) thisRotation = disc.getNetRotationSpeed(me->getDiscIndex());
+        
+    }
     
-}
+    //--------------------------------------------------------------
+    void ofApp::mouseReleased(int x, int y, int button){
+        
+        mReleased = true;
+        
+        if(radiusChanged) {
+            radiusChanged = false;
+            me->changeLife(costRadius);
+            
+            //update server
+            string lifeUpdate = "life//";
+            lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+            lifeUpdate += "lifeChange: "+ofToString(costRadius) + "//";
+            client.send(lifeUpdate);
+            
+            string change = "radius//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getThickness(me->getDiscIndex()))+"//"+me->getIP();
+            client.send(change);
+            
+            //update history//
+            string eventHistory = me->getNick() + " // " + "Grv"+ofToString(me->getDiscIndex()+1)+ " // " + "size:" + ofToString(roundf(disc.getThickness(me->getDiscIndex())*10)/10) +"\n\n";
+            historyText = eventHistory + historyText;
+            
+            ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+            _history->setTextString(historyText);
+            
+        }
+        else if(densityChanged){
+            densityChanged = false;
+            me->changeLife(costDensity);
+            
+            //update server
+            string lifeUpdate = "life//";
+            lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+            lifeUpdate += "lifeChange: "+ofToString(costDensity) + "//";
+            client.send(lifeUpdate);
+            
+            string change = "density//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getDensity(me->getDiscIndex()))+"//"+me->getIP();
+            client.send(change);
+            
+            //update history//
+            string eventHistory = me->getNick() + " // " + "Grv"+ofToString(me->getDiscIndex()+1)+ " // " + "density:" + ofToString(disc.getDensity(me->getDiscIndex())) +"\n\n";
+            historyText = eventHistory + historyText;
+            
+            ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+            _history->setTextString(historyText);
+        }
+        
+        else if(spikeChanged){
+            spikeChanged = false;
+            me->changeLife(costSpike);
+            
+            //update server
+            string lifeUpdate = "life//";
+            lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+            lifeUpdate += "lifeChange: "+ofToString(costSpike) + "//";
+            client.send(lifeUpdate);
+            
+            string change = "spike//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getSpikeDistance(me->getDiscIndex()))+"//"+me->getIP();
+            client.send(change);
+            
+            
+            //update history//
+            string eventHistory = me->getNick() + " // " + "Grv"+ofToString(me->getDiscIndex()+1)+ " // " + "spike:" + ofToString(disc.getSpikeDistance(me->getDiscIndex())) +"\n\n";
+            historyText = eventHistory + historyText;
+            
+            ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+            _history->setTextString(historyText);
+        }
+        
+        else if(textureChanged){
+            textureChanged = false;
+            me->changeLife(costTexture);
+            
+            //update server
+            string lifeUpdate = "life//";
+            lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+            lifeUpdate += "lifeChange: "+ofToString(costTexture) + "//";
+            client.send(lifeUpdate);
+            
+            string change = "texture//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getTexture(me->getDiscIndex()))+"//"+me->getIP();
+            client.send(change);
+        }
+        else if(rotationChanged){
+            rotationChanged = false;
+            me->changeLife(costRotation);
+            
+            //update ui
+            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
+            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
+            float newRotation = slider->getValue() - thisRotation;
+            
+            //update server
+            string lifeUpdate = "life//";
+            lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+            lifeUpdate += "lifeChange: "+ofToString(costRotation) + "//";
+            client.send(lifeUpdate);
+            
+            //send to server
+            string change = "rotationSpeed//"+ ofToString(me->getDiscIndex())+": "+ ofToString(newRotation)+"//"+me->getIP();
+            client.send(change);
+            
+            //update history//
+            string eventHistory = me->getNick() + " // " + "Grv"+ofToString(me->getDiscIndex()+1)+ " // " + "rotation:" + ofToString( roundf(disc.getNetRotationSpeed(me->getDiscIndex())*10)/10) +"\n\n";
+            historyText = eventHistory + historyText;
+            
+            ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+            _history->setTextString(historyText);
+        }
+        
+        //    moveChanged is in update()
+        
+        else if(moveReset){
+            moveReset = false;
+            me->changeLife(costMove);
+            
+            //update server
+            string lifeUpdate = "life//";
+            lifeUpdate += "IP: "+ofToString(me->getIP()) + "//";
+            lifeUpdate += "lifeChange: "+ofToString(costMove) + "//";
+            client.send(lifeUpdate);
+            
+            string movementReset = "moveReset//"+ofToString(me->getDiscIndex())+"//"+me->getIP();
+            client.send(movementReset);
+        }
+        
+        else if(newDisc){
+            
+            newDisc = false;
+            
+            //        //send demand to server
+            //        string newDisc = "newDisc//"+me->getIP();
+            //        client.send(newDisc);
+            //
+            //
+            //        ofxUIToggle *toggle = (ofxUIToggle *) addDisc->getWidget("new");
+            //        toggle->setValue(false);
+            
+        }
+        // cost calculation and server notifications of move/stop/resetAll buttons are handled in guiEvent()
+    }
+    
+    //--------------------------------------------------------------
+    void ofApp::windowResized(int w, int h){
+        
+    }
+    
+    //--------------------------------------------------------------
+    void ofApp::gotMessage(ofMessage msg){
+        
+    }
+    
+    //--------------------------------------------------------------
+    void ofApp::dragEvent(ofDragInfo dragInfo){
+        
+    }
