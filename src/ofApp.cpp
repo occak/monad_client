@@ -1030,7 +1030,8 @@ void ofApp::update(){
                 //            _history->setTextString(historyText);
                 
             }
-            
+        }
+        
             else if (udpTitle == "mut"){
                 vector<string> nameValue;
                 nameValue = ofSplitString(received[1], ": ");
@@ -1094,7 +1095,7 @@ void ofApp::update(){
 //                
 //                ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
 //                _history->setTextString(historyText);
-                
+                }
             }
             
             else if (udpTitle == "movR"){
