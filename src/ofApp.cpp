@@ -815,25 +815,27 @@ void ofApp::update(){
     
     //send some values of current disc
     // rot, rad, den, spk
-    if(TCPsetup && me->getDiscIndex() != -1){
+    if(TCPsetup && me->getDiscIndex() >= 0){
+        
         string sendmsg;
         
         // rot//5: 1.43//IP
-//        if(me != NULL && me->getDiscIndex()>=0) thisRotation = disc.getNetRotationSpeed(me->getDiscIndex());
-//        ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
-//        ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
-//        float newRotation = slider->getValue() - thisRotation;
-//        sendmsg = "rot//"+ ofToString(me->getDiscIndex())+": "+ ofToString(newRotation)+"//"+me->getIP();
-//        udpSend.Send(sendmsg.c_str(), 100);
-        
-        sendmsg = "rad//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getThickness(me->getDiscIndex()))+"//"+me->getIP();
-        udpSend.Send(sendmsg.c_str(), 100);
-        
-        sendmsg = "den//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getDensity(me->getDiscIndex()))+"//"+me->getIP();
-        udpSend.Send(sendmsg.c_str(), 100);
-        
-        sendmsg = "spk//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getSpikeDistance(me->getDiscIndex()))+"//"+me->getIP();
-        udpSend.Send(sendmsg.c_str(), 100);
+        if(me != NULL && me->getDiscIndex()>=0) {
+//            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
+//            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
+//            float newRotation = slider->getValue();
+            sendmsg = "rot//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getNetRotationSpeed(me->getDiscIndex()))+"//"+me->getIP();
+            udpSend.Send(sendmsg.c_str(), 100);
+            
+            sendmsg = "rad//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getThickness(me->getDiscIndex()))+"//"+me->getIP();
+            udpSend.Send(sendmsg.c_str(), 100);
+            
+            sendmsg = "den//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getDensity(me->getDiscIndex()))+"//"+me->getIP();
+            udpSend.Send(sendmsg.c_str(), 100);
+            
+            sendmsg = "spk//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getSpikeDistance(me->getDiscIndex()))+"//"+me->getIP();
+            udpSend.Send(sendmsg.c_str(), 100);
+        }
         
     }
     
@@ -852,8 +854,16 @@ void ofApp::update(){
                 vector<string> nameValue = ofSplitString(received[1], ": ");
                 int index = ofToInt(nameValue[0]);
                 float value = ofToFloat(nameValue[1]);
-                if(abs(value) > 0){
-                    disc.setRotationSpeed(index, value);
+                
+                if(value != disc.getNetRotationSpeed(index)){
+                    
+                    //update ui
+                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[index]);
+                    ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(index+1)));
+                    float oldValue = slider->getValue();
+                    float newChange = value-oldValue;
+                    disc.setRotationSpeed(index, newChange);
+                    slider->setValue(disc.getNetRotationSpeed(index));
                     
                     //sound
                     float netSpeed = abs(disc.getNetRotationSpeed(index));
@@ -867,10 +877,6 @@ void ofApp::update(){
                     soundChange("freq", index, frequency);
                     soundChange("bpm", index, beatSpeed*beatDensity);
                     
-                    //update ui
-                    ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[index]);
-                    ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(index+1)));
-                    slider->setValue(disc.getNetRotationSpeed(index));
                     
                     //update history//
                     
