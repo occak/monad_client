@@ -63,12 +63,14 @@ void ofApp::setup(){
         
         dashboard = new ofxUICanvas();
         dashboard->setFont(OF_TTF_MONO);
-        dashboard->setPosition(ofGetWidth()/2-125, ofGetHeight()-30);
-        dashboard->addMultiImageToggle("inner", "buttonimgs/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
+        dashboard->setPosition(ofGetWidth()/2-405, ofGetHeight()-30);
+        dashboard->addMultiImageToggle("inner", "butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
         dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-        dashboard->addMultiImageToggle("outer", "buttonimgs/buton-07.png",false, 20, 20);
+        dashboard->addMultiImageToggle("outer", "butonlar/buton-07.png",false, 20, 20);
         dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-        dashboard->addToggle("move all", false);
+        dashboard->addButton("move all", false);
+        dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+        dashboard->addButton("stop all", false);
         dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
         dashboard->addButton("reset all", false);
         dashboard->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
@@ -83,7 +85,7 @@ void ofApp::setup(){
         addDisc->addLabel("new");
         ofxUILabel *label = (ofxUILabel*) addDisc->getWidget("new");
         addDisc->addWidgetPosition(label, OFX_UI_WIDGET_POSITION_RIGHT, OFX_UI_ALIGN_CENTER);
-        addDisc->addMultiImageToggle("add", "buttonimgs/addbutton.png", false, 50, 50);
+        addDisc->addMultiImageToggle("add", "butonlar/addbutton.png", false, 50, 50);
         ofxUIToggle *toggle = (ofxUIToggle*) addDisc->getWidget("add");
         addDisc->addWidgetPosition(toggle, OFX_UI_WIDGET_POSITION_DOWN, OFX_UI_ALIGN_CENTER);
         addDisc->setVisible(false);
@@ -108,7 +110,7 @@ void ofApp::setup(){
         history->setFont(OF_TTF_MONO);
         history->setColorFill(ofxUIColor(25));
         history->setPosition(0, ofGetHeight()/2 - 50);
-        history->setDimensions(dashboard->getGlobalCanvasWidth()+250, ofGetHeight()/2 + 70);
+        history->setDimensions(dashboard->getGlobalCanvasWidth()+250, ofGetHeight()/2 + 40);
         historyText = "";
         history->addTextArea("history", historyText, OFX_UI_FONT_SMALL);
         if (me == NULL) history->setVisible(false);
@@ -574,11 +576,9 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             }
         }
         else if(e.getName() == "move all"){
-            ofxUIToggle *toggle = e.getToggle();
+            ofxUIButton *button = e.getButton();
             
-            
-            
-            if(toggle->getValue() == true){
+            if(button->getValue() == true){
                 
                 int costFactor = 0;
                 for(int j = 0; j < disc.getDiscIndex(); j++){
@@ -617,7 +617,10 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     
                 }
             }
-            if(toggle->getValue() == false){
+        }
+        else if(e.getName() == "stop all"){
+            ofxUIButton *button = e.getButton();
+            if(button->getValue() == true){
                 
                 int costFactor = 0;
                 string zPositionAll = "zPositionAll//";
@@ -662,6 +665,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     
                 }
             }
+            
             
         }
         else if(e.getName() == "reset all"){
@@ -821,9 +825,9 @@ void ofApp::update(){
         
         // rot//5: 1.43//IP
         if(me != NULL && me->getDiscIndex()>=0) {
-//            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
-//            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
-//            float newRotation = slider->getValue();
+            //            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
+            //            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
+            //            float newRotation = slider->getValue();
             sendmsg = "rot//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getNetRotationSpeed(me->getDiscIndex()))+"//"+me->getIP();
             udpSend.Send(sendmsg.c_str(), 100);
             
@@ -2144,18 +2148,18 @@ void ofApp::draw(){
             costResetAll = costMove * costFactorReset;
             
             
-            ofSetColor(0);
-            ofDrawBitmapString("texture     "+ofToString(costTexture)+
-                               "\nrotation    "+ofToString(costRotation)+
-                               "\ndensity     "+ofToString(costDensity)+
-                               "\nsize        "+ofToString(costRadius)+
-                               "\nspike       "+ofToString(costSpike)+
-                               "\nmove/reset  "+ofToString(costMove)+
-                               "\nmute        "+ofToString(costMute)+
-                               "\nnew disc    "+ofToString(costCreate)+
-                               "\nmove all    "+ofToString(costMoveAll)+
-                               "\nstop all    "+ofToString(costStopAll)+
-                               "\nreset all   "+ofToString(costResetAll), ofGetWidth()/2 - 245, ofGetHeight()/2-300);
+            //            ofSetColor(0);
+            //            ofDrawBitmapString("texture     "+ofToString(costTexture)+
+            //                               "\nrotation    "+ofToString(costRotation)+
+            //                               "\ndensity     "+ofToString(costDensity)+
+            //                               "\nsize        "+ofToString(costRadius)+
+            //                               "\nspike       "+ofToString(costSpike)+
+            //                               "\nmove/reset  "+ofToString(costMove)+
+            //                               "\nmute        "+ofToString(costMute)+
+            //                               "\nnew disc    "+ofToString(costCreate)+
+            //                               "\nmove all    "+ofToString(costMoveAll)+
+            //                               "\nstop all    "+ofToString(costStopAll)+
+            //                               "\nreset all   "+ofToString(costResetAll), ofGetWidth()/2 - 245, ofGetHeight()/2-300);
             
         }
         if(keyList){
@@ -2165,7 +2169,7 @@ void ofApp::draw(){
         }
         if(timer) {
             ofSetColor(0);
-            ofDrawBitmapString(ofToString(roundf((ofGetElapsedTimef()-loginSecond)*100)/100)+" seconds elapsed", ofGetWidth()/2 - 250, ofGetHeight()/2 - 10);
+            ofDrawBitmapString(ofToString(roundf((ofGetElapsedTimef()-loginSecond)*100)/100)+" seconds elapsed", -ofGetWidth()/2 + 300, ofGetHeight()/2 - 10);
         }
     }
     
@@ -2410,29 +2414,29 @@ void ofApp::newUI(int newIndex){
     
     _ui = new ofxUICanvas();
     _ui->setFont(OF_TTF_MONO);
-    _ui->addMultiImageToggle("inner","buttonimgs/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
+    _ui->addMultiImageToggle("inner","butonlar/buton-06.png", false, 20, 20, OFX_UI_ALIGN_LEFT);
     _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
     _ui->addLabel("Groove " + ofToString(newIndex+1),0);
     ofxUILabel *label = (ofxUILabel*) _ui->getWidget("Groove " + ofToString(newIndex+1));
     _ui->addWidgetPosition(label,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_CENTER);
-    _ui->addMultiImageToggle("outer", "buttonimgs/buton-07.png",false, 20, 20);
+    _ui->addMultiImageToggle("outer", "butonlar/buton-07.png",false, 20, 20);
     ofxUIMultiImageToggle *toggle = (ofxUIMultiImageToggle*) _ui->getWidget("outer");
     _ui->addWidgetPosition(toggle,OFX_UI_WIDGET_POSITION_RIGHT ,OFX_UI_ALIGN_RIGHT);
     _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
     _ui->addSpacer();
     
     _ui->addLabel("texture", 1);
-    if(disc.getTexture(newIndex)==0) _ui->addMultiImageButton("blank","buttonimgs/buton-01.png", true, 35,35);
-    else _ui->addMultiImageButton("blank","buttonimgs/buton-01.png", false, 35,35);
+    if(disc.getTexture(newIndex)==0) _ui->addMultiImageButton("blank","butonlar/buton-01.png", true, 35,35);
+    else _ui->addMultiImageButton("blank","butonlar/buton-01.png", false, 35,35);
     _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    if(disc.getTexture(newIndex)==1) _ui->addMultiImageButton("line", "buttonimgs/buton-02.png", true, 35,35);
-    else _ui->addMultiImageButton("line", "buttonimgs/buton-02.png", false, 35,35);
-    if(disc.getTexture(newIndex)==2) _ui->addMultiImageButton("tri", "buttonimgs/buton-03.png", true, 35,35);
-    else _ui->addMultiImageButton("tri", "buttonimgs/buton-03.png", false, 35,35);
-    if(disc.getTexture(newIndex)==3) _ui->addMultiImageButton("saw", "buttonimgs/buton-04.png", true, 35,35);
-    else _ui->addMultiImageButton("saw", "buttonimgs/buton-04.png", false, 35,35);
-    if(disc.getTexture(newIndex)==4) _ui->addMultiImageButton("rect", "buttonimgs/buton-05.png", true, 35,35);
-    else _ui->addMultiImageButton("rect", "buttonimgs/buton-05.png", false, 35,35);
+    if(disc.getTexture(newIndex)==1) _ui->addMultiImageButton("line", "butonlar/buton-02.png", true, 35,35);
+    else _ui->addMultiImageButton("line", "butonlar/buton-02.png", false, 35,35);
+    if(disc.getTexture(newIndex)==2) _ui->addMultiImageButton("tri", "butonlar/buton-03.png", true, 35,35);
+    else _ui->addMultiImageButton("tri", "butonlar/buton-03.png", false, 35,35);
+    if(disc.getTexture(newIndex)==3) _ui->addMultiImageButton("saw", "butonlar/buton-04.png", true, 35,35);
+    else _ui->addMultiImageButton("saw", "butonlar/buton-04.png", false, 35,35);
+    if(disc.getTexture(newIndex)==4) _ui->addMultiImageButton("rect", "butonlar/buton-05.png", true, 35,35);
+    else _ui->addMultiImageButton("rect", "butonlar/buton-05.png", false, 35,35);
     _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
     
     _ui->addLabel("rotation speed",1);
