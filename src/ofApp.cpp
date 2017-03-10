@@ -30,11 +30,6 @@ void ofApp::setup(){
     ofBackground(255);
     ofSetFrameRate(30);
     
-    //udp receiver
-    udpReceive.Create();
-    udpReceive.Bind(10003);
-    udpReceive.SetNonBlocking(true);
-    
     if( me == NULL){
         
         // set up values of objects
@@ -50,7 +45,8 @@ void ofApp::setup(){
         initialize->setPosition(ofGetWidth()/2-155, ofGetHeight()/2-200);
         initialize->setFont(OF_TTF_MONO);
         initialize->setDimensions(310, 200);
-        initialize->addTextArea("welcome", "Welcome to Monad (v0.2)", 0);
+        initialize->stateChange();
+        initialize->addTextArea("welcome", "Welcome to Monad (v0.3)", 0);
         initialize->addLabel("Server IP :");
         initialize->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
         initialize->addTextInput("IP", "");
@@ -192,9 +188,9 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
             client.setMessageDelimiter("vnet");
             
             //udp
-            udpSend.Create();
-            udpSend.Connect(IP.c_str(), 10003);
-            udpSend.SetNonBlocking(true);
+            udpManage.Create();
+            udpManage.Connect(IP.c_str(), 10003);
+            udpManage.SetNonBlocking(true);
             
             
             Player* _player = new Player();
@@ -829,16 +825,16 @@ void ofApp::update(){
             //            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
             //            float newRotation = slider->getValue();
             sendmsg = "rot//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getNetRotationSpeed(me->getDiscIndex()))+"//"+me->getIP();
-            udpSend.Send(sendmsg.c_str(), 100);
+            udpManage.Send(sendmsg.c_str(), 100);
             
             sendmsg = "rad//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getThickness(me->getDiscIndex()))+"//"+me->getIP();
-            udpSend.Send(sendmsg.c_str(), 100);
+            udpManage.Send(sendmsg.c_str(), 100);
             
             sendmsg = "den//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getDensity(me->getDiscIndex()))+"//"+me->getIP();
-            udpSend.Send(sendmsg.c_str(), 100);
+            udpManage.Send(sendmsg.c_str(), 100);
             
             sendmsg = "spk//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getSpikeDistance(me->getDiscIndex()))+"//"+me->getIP();
-            udpSend.Send(sendmsg.c_str(), 100);
+            udpManage.Send(sendmsg.c_str(), 100);
         }
         
     }
@@ -846,7 +842,7 @@ void ofApp::update(){
     //UDP receive
     if(TCPsetup){
         char udpMessage[1000];
-        udpReceive.Receive(udpMessage,1000);
+        udpManage.Receive(udpMessage,1000);
         string message = udpMessage;
         
         if(message.length()>0){
@@ -2338,6 +2334,14 @@ void ofApp::keyPressed(int key){
     
     if(key == 'l' && TCPsetup) {
         costList = !costList;
+    }
+    if(key == OF_KEY_TAB && !TCPsetup && initialize->getWidget("IP")->hasState() == true) {
+        cout<< "girdi" << endl;
+         cout<< initialize->getWidget("Server IP :")->hasState() << endl;
+//        if(initialize->getWidget("Server IP :")->state == true){
+//            
+//        }
+        
     }
     
 }

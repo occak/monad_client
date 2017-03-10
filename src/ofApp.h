@@ -71,7 +71,7 @@ class ofApp : public ofBaseApp{
     
     //UDP
     ofxUDPManager udpSend;
-    ofxUDPManager udpReceive;
+    ofxUDPManager udpManage;
     vector<string> udpReceived;
     string udpTitle;
     
