@@ -841,15 +841,18 @@ void ofApp::update(){
     
     //UDP receive
     if(TCPsetup){
-        char udpMessage[1000];
-        udpManage.Receive(udpMessage,1000);
+        char udpMessage[100];
+        udpManage.Receive(udpMessage,100);
         string message = udpMessage;
         
         if(message.length()>0){
             
+//            cout<< message <<endl;
+            
             udpReceived = ofSplitString(message, "//");
             udpTitle = udpReceived[0];
             
+           
             
             if(me->getIP() != udpReceived[2]){ //check client IP
                 
@@ -899,7 +902,6 @@ void ofApp::update(){
                         //                _history->setTextString(historyText);
                         
                     }
-                    
                 }
                 
                 else if (udpTitle == "rad"){
@@ -2373,7 +2375,7 @@ void ofApp::soundChange(string name, int index, float value) {
         
         
         float volCoeff = 1;
-        if(disc.getTexture(index) == 1) volCoeff = 1.3;
+        if(disc.getTexture(index) == 1) volCoeff = 1.5;
         else if(disc.getTexture(index) == 2) volCoeff = .5;
         else if(disc.getTexture(index) == 3) volCoeff = .5;
         else if(disc.getTexture(index) == 4) volCoeff = .1;
@@ -2449,9 +2451,9 @@ void ofApp::newUI(int newIndex){
     _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
     
     _ui->addLabel("rotation speed",1);
-    _ui->addBiLabelSlider("rotation" + ofToString(newIndex+1), "<", ">", 10, -10, disc.getNetRotationSpeed(newIndex));
+    _ui->addBiLabelSlider("rotation" + ofToString(newIndex+1), "<", ">", 5, -5, disc.getNetRotationSpeed(newIndex));
     _ui->addLabel("density",1);
-    _ui->addBiLabelSlider("density" + ofToString(newIndex+1), "| | |", "|||||", 30, 3, disc.getDensity(newIndex));
+    _ui->addBiLabelSlider("density" + ofToString(newIndex+1), "| | |", "|||||", 30, 1, disc.getDensity(newIndex));
     _ui->addLabel("size",1);
     _ui->addBiLabelSlider("radius" + ofToString(newIndex+1), "o", "O", 15, 100, disc.getThickness(newIndex));
     _ui->addLabel("spike",1);
@@ -2537,16 +2539,16 @@ void ofApp::mouseDragged(int x, int y, int button){
         //            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
         //            float newRotation = slider->getValue();
         sendmsg = "rot//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getNetRotationSpeed(me->getDiscIndex()))+"//"+me->getIP();
-        udpManage.Send(sendmsg.c_str(), 100);
+        udpManage.SendAll(sendmsg.c_str(), 100);
         
         sendmsg = "rad//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getThickness(me->getDiscIndex()))+"//"+me->getIP();
-        udpManage.Send(sendmsg.c_str(), 100);
+        udpManage.SendAll(sendmsg.c_str(), 100);
         
         sendmsg = "den//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getDensity(me->getDiscIndex()))+"//"+me->getIP();
-        udpManage.Send(sendmsg.c_str(), 100);
+        udpManage.SendAll(sendmsg.c_str(), 100);
         
         sendmsg = "spk//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getSpikeDistance(me->getDiscIndex()))+"//"+me->getIP();
-        udpManage.Send(sendmsg.c_str(), 100);
+        udpManage.SendAll(sendmsg.c_str(), 100);
         
     }
     

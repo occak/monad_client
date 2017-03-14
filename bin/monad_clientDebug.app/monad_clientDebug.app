@@ -1,1 +1,1 @@
-/Users/cem cakmak/Library/Developer/Xcode/DerivedData/monad_client-ebulglemcqrntddhhdwbpwypdszf/Build/Intermediates/ArchiveIntermediates/monad_client Debug/InstallationBuildProductsLocation/Users/cem cakmak/Applications/monad_clientDebug.app
+/Users/cem cakmak/Library/Developer/Xcode/DerivedData/monad_client-ebulglemcqrntddhhdwbpwypdszf/Build/Intermediates/ArchiveIntermediates/monad_client Debug/InstallationBuildProductsLocation/Applications/monad_clientDebug.app
