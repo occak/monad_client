@@ -174,7 +174,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         if(e.getName() == "IP"){
             ofxUITextInput *text = (ofxUITextInput *) e.widget;
             if(text->getTextString() != ""){
-                if(IP.length() > 0){ IP = text->getTextString();}
+                if(IP.length() == 0){ IP = text->getTextString();}
             }
         }
         if(e.getName() == "nick"){
