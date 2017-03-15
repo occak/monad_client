@@ -60,7 +60,7 @@ class ofApp : public ofBaseApp{
     newDisc;
     
     void newUI(int index);
-		
+    
     
     ofEasyCam cam;
     
@@ -68,22 +68,25 @@ class ofApp : public ofBaseApp{
     ofxTCPClient client;
     vector<string> received;
     string title;
+    int TCPport = 10005;
     
     //UDP
     ofxUDPManager udpSend;
     ofxUDPManager udpManage;
     vector<string> udpReceived;
     string udpTitle;
+    int UDPport = 10003;
     
 private:
     
     bool fullScreen;
     bool keyList;
+    bool eventList;
     bool costList;
     bool mReleased;
     bool TCPsetup;
     bool timer;
-    string IP;
+    string IP /*= "127.0.0.1"*/;
     string nick;
     int port;
     int loginMinute;

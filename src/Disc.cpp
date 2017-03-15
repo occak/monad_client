@@ -11,7 +11,7 @@
 void Disc::setup(){
     
 	selected = -1;
-	origin = 10;
+	origin = 25;
     discIndex = 0;    // start w/ 0 discs
     
 //    barPerlin = new Perlin(234,10);

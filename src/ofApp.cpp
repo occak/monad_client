@@ -76,14 +76,16 @@ void ofApp::setup(){
         ofAddListener(dashboard->newGUIEvent, this, &ofApp::guiEvent);
         
         addDisc = new ofxUICanvas();
-        addDisc->setFont(OF_TTF_MONO);
-        addDisc->addSpacer();
-        addDisc->addLabel("new");
-        ofxUILabel *label = (ofxUILabel*) addDisc->getWidget("new");
-        addDisc->addWidgetPosition(label, OFX_UI_WIDGET_POSITION_RIGHT, OFX_UI_ALIGN_CENTER);
-        addDisc->addMultiImageToggle("add", "butonlar/addbutton.png", false, 50, 50);
+//        addDisc->setFont(OF_TTF_MONO);
+//        addDisc->addSpacer();
+        addDisc->setWidth(55);
+        addDisc->setHeight(55);
+//        addDisc->addLabel("new");
+//        ofxUILabel *label = (ofxUILabel*) addDisc->getWidget("new");
+//        addDisc->addWidgetPosition(label, OFX_UI_WIDGET_POSITION_RIGHT, OFX_UI_ALIGN_CENTER);
+        addDisc->addMultiImageToggle("add", "butonlar/addbutton.png", false, 45, 45,0,0);
         ofxUIToggle *toggle = (ofxUIToggle*) addDisc->getWidget("add");
-        addDisc->addWidgetPosition(toggle, OFX_UI_WIDGET_POSITION_DOWN, OFX_UI_ALIGN_CENTER);
+        addDisc->addWidgetPosition(toggle, OFX_UI_WIDGET_POSITION_UP, OFX_UI_ALIGN_TOP);
         addDisc->setVisible(false);
         ofAddListener(addDisc->newGUIEvent, this, &ofApp::guiEvent);
         
@@ -172,7 +174,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         if(e.getName() == "IP"){
             ofxUITextInput *text = (ofxUITextInput *) e.widget;
             if(text->getTextString() != ""){
-                IP = text->getTextString();
+                if(IP.length() > 0){ IP = text->getTextString();}
             }
         }
         if(e.getName() == "nick"){
@@ -184,12 +186,12 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         if (IP != "" && nick != "") {
             
             //tcp
-            client.setup(IP, 10002);
+            client.setup(IP, TCPport);
             client.setMessageDelimiter("vnet");
             
             //udp
             udpManage.Create();
-            udpManage.Connect(IP.c_str(), 10003);
+            udpManage.Connect(IP.c_str(), UDPport);
             udpManage.SetNonBlocking(true);
             
             
@@ -222,7 +224,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     }
                     else frequency = ofMap(netSpeed, 5, 10, 250, 800);
                     float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
-                    float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
+                    float beatDensity = ofMap(disc.getDensity(i), 1, 30, 60, 1);
                     soundChange("freq", i, frequency);
                     soundChange("bpm", i, beatSpeed*beatDensity);
                     
@@ -1437,6 +1439,7 @@ void ofApp::update(){
                 dashboard->setVisible(true);
                 keyList = true;
                 costList = true;
+                eventList = true;
                 
                 loginMinute = ofGetMinutes();
                 loginSecond = ofGetElapsedTimef();
@@ -2089,8 +2092,8 @@ void ofApp::draw(){
         
         if(cam.getDistance() > 100){
             //			cout<< cam.getDistance() <<endl;
-            float wetLevel = ofMap(cam.getDistance(), 250, 9000, 0., .75);
-            float masterLevel = ofMap(cam.getDistance(), 0, 9000, .95, 0.1);
+            float wetLevel = ofMap(cam.getDistance(), disc.origin, 5000, 0.005, .80);
+            float masterLevel = ofMap(cam.getDistance(), disc.origin, 5000, .95, 0.1);
             ofClamp(wetLevel, 0., 0.75);
             ofClamp(masterLevel, 0., .999);
             
@@ -2098,14 +2101,14 @@ void ofApp::draw(){
             sound.synth.setParameter("master", masterLevel);
         }
         
-        if(abs(cam.getPosition().x > 5000 ||
+        if((cam.getPosition().x > 5000 ||
                cam.getPosition().y > 5000 ||
                cam.getPosition().z > 5000))
         {
             
-            cam.setPosition(ofClamp(cam.getPosition().x, -5000, 5000),
-                            ofClamp(cam.getPosition().y, -5000, 5000),
-                            ofClamp(cam.getPosition().z, -5000, 5000));
+            cam.setPosition(ofClamp(cam.getPosition().x, -4000, 4000),
+                            ofClamp(cam.getPosition().y, -4000, 4000),
+                            ofClamp(cam.getPosition().z, -4000, 4000));
             
         }
         
@@ -2167,7 +2170,7 @@ void ofApp::draw(){
         }
         if(keyList){
             ofSetColor(0);
-            ofDrawBitmapString("<w/s> navigate\n<bck> deselect\n<m> mute\n<t> timer\n<c> chat\n<f> fullscreen\n<k> key list\n<l> cost list\n<esc> exit", ofGetWidth()/2 - 250, ofGetHeight()/2 - 150);
+            ofDrawBitmapString("<w/s> navigate\n<bck> deselect\n<m> mute\n<t> timer\n<c> chat\n<e> event list\n<f> fullscreen\n<k> key list\n<l> cost list\n<esc> exit", ofGetWidth()/2 - 250, ofGetHeight()/2 - 150);
             
         }
         if(timer) {
@@ -2337,6 +2340,12 @@ void ofApp::keyPressed(int key){
     
     if(key == 'k' && TCPsetup) {
         keyList = !keyList;
+    }
+    
+    if(key == 'e' && TCPsetup) {
+        eventList = !eventList;
+            ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+            _history->setVisible(eventList);
     }
     
     if(key == 'l' && TCPsetup) {

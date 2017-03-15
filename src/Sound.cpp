@@ -77,7 +77,7 @@ void Sound::setup(){
     }
     
     ControlGenerator wet = synth.addParameter("wet", 0.).max(.5).min(0.);
-    Generator reverb = Reverb().input(master).stereoWidth(.5).roomSize(.4).wetLevel(wet);
+    Generator reverb = Reverb().input(master).stereoWidth(1.0).roomSize(.4).wetLevel(wet);
     Generator limiter = Limiter().input(reverb).threshold(0.99);
     ControlGenerator masterLevel = synth.addParameter("master", .95).max(.95).min(0.);
     synth.setOutputGen(masterLevel*limiter);
