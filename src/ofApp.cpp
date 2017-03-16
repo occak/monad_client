@@ -76,13 +76,13 @@ void ofApp::setup(){
         ofAddListener(dashboard->newGUIEvent, this, &ofApp::guiEvent);
         
         addDisc = new ofxUICanvas();
-//        addDisc->setFont(OF_TTF_MONO);
-//        addDisc->addSpacer();
+        //        addDisc->setFont(OF_TTF_MONO);
+        //        addDisc->addSpacer();
         addDisc->setWidth(55);
         addDisc->setHeight(55);
-//        addDisc->addLabel("new");
-//        ofxUILabel *label = (ofxUILabel*) addDisc->getWidget("new");
-//        addDisc->addWidgetPosition(label, OFX_UI_WIDGET_POSITION_RIGHT, OFX_UI_ALIGN_CENTER);
+        //        addDisc->addLabel("new");
+        //        ofxUILabel *label = (ofxUILabel*) addDisc->getWidget("new");
+        //        addDisc->addWidgetPosition(label, OFX_UI_WIDGET_POSITION_RIGHT, OFX_UI_ALIGN_CENTER);
         addDisc->addMultiImageToggle("add", "butonlar/addbutton.png", false, 45, 45,0,0);
         ofxUIToggle *toggle = (ofxUIToggle*) addDisc->getWidget("add");
         addDisc->addWidgetPosition(toggle, OFX_UI_WIDGET_POSITION_UP, OFX_UI_ALIGN_TOP);
@@ -229,7 +229,6 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     soundChange("bpm", i, beatSpeed*beatDensity);
                     
                     
-                    
                 }
                 else if (disc.getTexture(i) == 0) slider->setValue(0);
             }
@@ -257,13 +256,15 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
                     
                     //change envelope
                     float envelopeCoeff = ofMap(disc.getDensity(i), 1, 30, 1, 5);
-                    float pulseRatio = ofMap(disc.getDensity(i), 1, 30, 0.005, 1);
+                    float pulseRatio = ofMap(disc.getDensity(i), 1, 30, 0.01, 1);
                     soundChange("envelopeWidth", i, envelopeCoeff);
                     //                    soundChange("pulseLength", i, pulseRatio);
                     
                     //change metronome
-                    float netSpeed = abs(disc.getNetRotationSpeed(i));
-                    float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
+//                    float netSpeed = abs(disc.getNetRotationSpeed(i));
+//                    float beatSpeed = ofMap(netSpeed, 0, 10, 0, 200);
+                    float beatSpeed = ofMap(abs(disc.getNetRotationSpeed(i)), 0, 5, 0, 120);
+                    
                     float beatDensity = ofMap(disc.getDensity(i), 1, 30, 15, 2);
                     soundChange("bpm", i, beatSpeed*beatDensity);
                 }
@@ -806,10 +807,11 @@ void ofApp::update(){
     }
     
     disc.update();
+    
     for(int i = 0; i< disc.getDiscIndex(); i++){
         float amountFreq = ofMap(abs(disc.getNetRotationSpeed(i)), 0, 10, 0, 1000);
         float amountMod = ofMap(abs(disc.getPosition(i)), 0, 100, 0, 1000);
-        float qDist = ofMap(abs(disc.getPosition(i)), 0, 100, 1., .9);
+        float qDist = ofMap(abs(disc.getPosition(i)), 0, 100, 1., .5);
         soundChange("amountFreq", i, amountFreq);
         soundChange("amountMod", i, amountMod);
         soundChange("qDist", i, qDist);
@@ -821,23 +823,22 @@ void ofApp::update(){
         
         string sendmsg;
         
-        // rot//5: 1.43//IP
-        //        if(me != NULL && me->getDiscIndex()>=0) {
-        //            //            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
-        //            //            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
-        //            //            float newRotation = slider->getValue();
-        //            sendmsg = "rot//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getNetRotationSpeed(me->getDiscIndex()))+"//"+me->getIP();
-        //            udpManage.Send(sendmsg.c_str(), 100);
-        //
-        //            sendmsg = "rad//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getThickness(me->getDiscIndex()))+"//"+me->getIP();
-        //            udpManage.Send(sendmsg.c_str(), 100);
-        //
-        //            sendmsg = "den//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getDensity(me->getDiscIndex()))+"//"+me->getIP();
-        //            udpManage.Send(sendmsg.c_str(), 100);
-        //
-        //            sendmsg = "spk//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getSpikeDistance(me->getDiscIndex()))+"//"+me->getIP();
-        //            udpManage.Send(sendmsg.c_str(), 100);
-        //        }
+        //         rot//5: 1.43//IP
+        //            ofxUICanvas *canvas = static_cast <ofxUICanvas*> (ui[me->getDiscIndex()]);
+        //            ofxUISlider *slider = static_cast <ofxUISlider*> (canvas->getWidget("rotation"+ofToString(me->getDiscIndex()+1)));
+        //            float newRotation = slider->getValue();
+        sendmsg = "rot//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getNetRotationSpeed(me->getDiscIndex()))+"//"+me->getIP();
+        udpManage.Send(sendmsg.c_str(), 100);
+        
+        sendmsg = "rad//"+ofToString(me->getDiscIndex())+": "+ofToString(disc.getThickness(me->getDiscIndex()))+"//"+me->getIP();
+        udpManage.Send(sendmsg.c_str(), 100);
+        
+        sendmsg = "den//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getDensity(me->getDiscIndex()))+"//"+me->getIP();
+        udpManage.Send(sendmsg.c_str(), 100);
+        
+        sendmsg = "spk//"+ ofToString(me->getDiscIndex())+": "+ ofToString(disc.getSpikeDistance(me->getDiscIndex()))+"//"+me->getIP();
+        udpManage.Send(sendmsg.c_str(), 100);
+        
         
     }
     
@@ -849,12 +850,12 @@ void ofApp::update(){
         
         if(message.length()>0){
             
-//            cout<< message <<endl;
+            //            cout<< message <<endl;
             
             udpReceived = ofSplitString(message, "//");
             udpTitle = udpReceived[0];
             
-           
+            
             
             if(me->getIP() != udpReceived[2]){ //check client IP
                 
@@ -2092,18 +2093,18 @@ void ofApp::draw(){
         
         if(cam.getDistance() > 100){
             //			cout<< cam.getDistance() <<endl;
-            float wetLevel = ofMap(cam.getDistance(), disc.origin, 5000, 0.005, .80);
-            float masterLevel = ofMap(cam.getDistance(), disc.origin, 5000, .95, 0.1);
-            ofClamp(wetLevel, 0., 0.75);
-            ofClamp(masterLevel, 0., .999);
+            float wetLevel = ofMap(cam.getDistance(), disc.origin, 7000, 0.005, .80);
+            float masterLevel = ofMap(cam.getDistance(), disc.origin, 7000, .95, 0.05);
+            ofClamp(wetLevel, 0., 0.85);
+            ofClamp(masterLevel, 0.01, .999);
             
             sound.synth.setParameter("wet", wetLevel);
             sound.synth.setParameter("master", masterLevel);
         }
         
-        if((cam.getPosition().x > 5000 ||
-               cam.getPosition().y > 5000 ||
-               cam.getPosition().z > 5000))
+        if((cam.getPosition().x > 4000 ||
+            cam.getPosition().y > 4000 ||
+            cam.getPosition().z > 4000))
         {
             
             cam.setPosition(ofClamp(cam.getPosition().x, -4000, 4000),
@@ -2175,7 +2176,7 @@ void ofApp::draw(){
         }
         if(timer) {
             ofSetColor(0);
-            ofDrawBitmapString(ofToString(roundf((ofGetElapsedTimef()-loginSecond)*100)/100)+" seconds elapsed", -ofGetWidth()/2 + 300, ofGetHeight()/2 - 10);
+            ofDrawBitmapString(ofToString(roundf((ofGetElapsedTimef()-loginSecond)*100)/100)+" s elapsed", -ofGetWidth()/2 + 300, ofGetHeight()/2 - 10);
         }
     }
     
@@ -2344,8 +2345,8 @@ void ofApp::keyPressed(int key){
     
     if(key == 'e' && TCPsetup) {
         eventList = !eventList;
-            ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
-            _history->setVisible(eventList);
+        ofxUITextArea *_history = (ofxUITextArea *) history->getWidget("history");
+        _history->setVisible(eventList);
     }
     
     if(key == 'l' && TCPsetup) {
@@ -2384,10 +2385,10 @@ void ofApp::soundChange(string name, int index, float value) {
         
         
         float volCoeff = 1;
-        if(disc.getTexture(index) == 1) volCoeff = 1.5;
-        else if(disc.getTexture(index) == 2) volCoeff = .5;
-        else if(disc.getTexture(index) == 3) volCoeff = .5;
-        else if(disc.getTexture(index) == 4) volCoeff = .1;
+        if(disc.getTexture(index) == 1) volCoeff = 1.7;
+        else if(disc.getTexture(index) == 2) volCoeff = .45;
+        else if(disc.getTexture(index) == 3) volCoeff = .45;
+        else if(disc.getTexture(index) == 4) volCoeff = .15;
         
         sound.synth.setParameter("volBalance"+ofToString(index), volCoeff);
         

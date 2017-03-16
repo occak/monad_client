@@ -68,7 +68,7 @@ class ofApp : public ofBaseApp{
     ofxTCPClient client;
     vector<string> received;
     string title;
-    int TCPport = 10005;
+    int TCPport = 10002;
     
     //UDP
     ofxUDPManager udpSend;
@@ -86,7 +86,7 @@ private:
     bool mReleased;
     bool TCPsetup;
     bool timer;
-    string IP /*= "127.0.0.1"*/;
+    string IP = "127.0.0.1";
     string nick;
     int port;
     int loginMinute;

@@ -43,13 +43,13 @@ void Sound::setup(){
         trigger(pulse);
         
         
-        float pitch = ofMap(0, 0, 10, 50, 1200);
+        float pitch = ofMap(0, 0, 10, 50, 1500);
         ControlGenerator freq = synth.addParameter("freq"+ofToString(i), pitch);
         ControlGenerator amountFreq = synth.addParameter("amountFreq"+ofToString(i));
         ControlGenerator amountMod = synth.addParameter("amountMod"+ofToString(i),0);
         
-        Generator modulation = SineWave().freq(amountFreq) * amountMod;
-        Generator snd = SawtoothWave().freq(freq+modulation);
+        Generator modulation = SineWave().freq(amountFreq);
+        Generator snd = SawtoothWave().freq(freq+(modulation * amountMod));
         
         
         float volCoeff = 0;
@@ -57,22 +57,24 @@ void Sound::setup(){
         ControlGenerator volumeBalance = synth.addParameter("volBalance"+ofToString(i), volCoeff);
         groove = snd * amplitude * volumeBalance;
     
-        float qTarget = ofMap(15., 15., 100., 3.0, 0.2);
-        ControlGenerator q = synth.addParameter("q"+ofToString(i),qTarget).max(3.0).min(0.2);
+        float qTarget = ofMap(15., 15., 100., 7.0, 0.2);
+        ControlGenerator q = synth.addParameter("q"+ofToString(i),qTarget).max(10.0).min(0.2);
         ControlGenerator qDist = synth.addParameter("qDist"+ofToString(i), 1.);
         ControlGenerator qFinal = q * qDist;
         Generator filter = BPF12().input(groove).cutoff(freq).Q(qFinal);
         
-        Generator delay = StereoDelay(0, .005*i).input(filter).feedback(.01).delayTimeLeft(0).delayTimeRight(.0025*i);
         
         float distAmount = ofMap(0., 0., 100., 1., 10.);
         ControlGenerator gainAmount = synth.addParameter("drive"+ofToString(i),distAmount).max(10.);
         ControlGenerator clipBalance = synth.addParameter("clipBalance"+ofToString(i), 1.);
-        Generator hardClip = Limiter().input(delay).makeupGain(gainAmount).threshold(.5);
+        Generator hardClip = Limiter().input(filter).makeupGain(gainAmount).threshold(.5);
         
-        hardClip = hardClip * clipBalance;
+        Generator delay = StereoDelay(0, .05*i).input(hardClip).feedback(.1).delayTimeLeft(0).delayTimeRight(.025*i);
+
         
-        master = master + hardClip;
+        delay = delay * clipBalance;
+        
+        master = master + delay;
         
     }
     

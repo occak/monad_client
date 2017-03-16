@@ -78,7 +78,7 @@ void Disc::update(){
 //        float time = ofGetElapsedTimef();
         float timeScale = .11-0.01*abs(rotationSpeed[i]);
 //        float displacementScale = 1 + 5 * (radii[i]-radii[i-1])/density[i];
-        float displacementScale = 20;
+        float displacementScale = 10;
         float timeOffset = posOffset[i];
         
         //        position += (sin((counter[i]*timeScale)+timeOffset) * displacementScale) - (position/10);
