@@ -809,7 +809,7 @@ void ofApp::update(){
     disc.update();
     
     for(int i = 0; i< disc.getDiscIndex(); i++){
-        float amountFreq = ofMap(abs(disc.getNetRotationSpeed(i)), 0, 10, 0, 1000);
+        float amountFreq = ofMap(abs(disc.getNetRotationSpeed(i)), 0, 5, 0, 1000);
         float amountMod = ofMap(abs(disc.getPosition(i)), 0, 100, 0, 1000);
         float qDist = ofMap(abs(disc.getPosition(i)), 0, 100, 1., .5);
         soundChange("amountFreq", i, amountFreq);
@@ -2176,7 +2176,7 @@ void ofApp::draw(){
         }
         if(timer) {
             ofSetColor(0);
-            ofDrawBitmapString(ofToString(roundf((ofGetElapsedTimef()-loginSecond)*100)/100)+" s elapsed", -ofGetWidth()/2 + 300, ofGetHeight()/2 - 10);
+            ofDrawBitmapString(ofToString(roundf((ofGetElapsedTimef()-loginSecond)*100)/100)+" s", -ofGetWidth()/2 + 300, ofGetHeight()/2 - 10);
         }
     }
     
