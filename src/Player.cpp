@@ -60,17 +60,29 @@ void Player::setColorByIndex(int index){
     // 103,185,88 - green
     switch (index) {
         case 1:
-            color.set(161,24,87);
+            color.setHex(0x0A447B); //indigo
+            //            color.set(161,24,87);
             break;
         case 2:
-            color.setHex(0x2A5E91);
-//            color.set(50,153,187);
+            color.set(219,227,0); // sari
             break;
         case 3:
-            color.set(103,185,88);
+            color.set(103,185,88); //green
             break;
         case 4:
-            color.set(219,227,0);
+            color.set(50,153,187); //mavi acik
+            break;
+        case 5:
+            color.set(161,24,87); //bordo
+            break;
+        case 6:
+            color.setHex(0x006214); //dark green
+            break;
+        case 7:
+            color.set(230, 165, 0); //orange
+            break;
+        case 8:
+            color.setHex(0xff186b); //pink
             break;
             
         default:

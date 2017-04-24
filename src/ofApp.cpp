@@ -2461,7 +2461,8 @@ void ofApp::newUI(int newIndex){
     _ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
     
     _ui->addLabel("rotation speed",1);
-    _ui->addBiLabelSlider("rotation" + ofToString(newIndex+1), "<", ">", 5, -5, disc.getNetRotationSpeed(newIndex));
+    _ui->addBiLabelSlider("rotation" + ofToString(newIndex+1), "<", ">", 5, -5, 0.);
+    cout<< "initial speed disc " + ofToString(newIndex+1) + ": " + ofToString(disc.getNetRotationSpeed(newIndex)) <<endl;
     _ui->addLabel("density",1);
     _ui->addBiLabelSlider("density" + ofToString(newIndex+1), "| | |", "|||||", 30, 1, disc.getDensity(newIndex));
     _ui->addLabel("size",1);

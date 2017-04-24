@@ -15,7 +15,7 @@ void Sound::setup(){
     // Tonic Synth setup
     ///////////////////////
     
-    for(int i = 0; i < 9; i++){
+    for(int i = 0; i < 20; i++){
         
         // synthesis network
         
